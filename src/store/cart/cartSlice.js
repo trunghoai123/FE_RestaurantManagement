@@ -21,6 +21,7 @@ const cartSlice = createSlice({
   name: "cart",
   initialState: {
     cartItems: JSON.parse(localStorage.getItem("Restaurant-Cart")) || [],
+    totalMoney: 0,
   },
   reducers: {
     createCart(state, action) {
@@ -30,7 +31,24 @@ const cartSlice = createSlice({
       return state;
     },
     updateCart(state, action) {},
-    deleteCart(state, action) {},
+    clearCart(state, action) {
+      state.cartItems = [];
+      state.totalMoney = 0;
+    },
+    setTotalMoney(state, action) {
+      // console.log(action.payload);
+      state.totalMoney = action.payload;
+    },
+    reloadTotalMoney(state, action) {
+      // console.log(action.payload);
+      if (state.cartItems && state.cartItems.length > 0) {
+        let sum = 0;
+        state.cartItems.forEach((item) => {
+          sum += item.GiaMon * item.SoLuong;
+        });
+        state.totalMoney = sum;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -62,6 +80,8 @@ const cartSlice = createSlice({
             localStorage.setItem("Restaurant-Cart", JSON.stringify(newValues));
           }
           state.cartItems = newValues;
+          console.log(data);
+          state.totalMoney += data.GiaMon;
         }
       })
       .addCase(addToCartById.rejected, (state, action) => {
@@ -73,6 +93,7 @@ const cartSlice = createSlice({
 // Extract the action creators object and the reducer
 const { actions, reducer } = cartSlice;
 // Extract and export each action creator by name
-export const { createCart, updateCart, deleteCart, addToCart } = actions;
+export const { createCart, updateCart, clearCart, addToCart, setTotalMoney, reloadTotalMoney } =
+  actions;
 // Export the reducer, either as a default or named export
 export default reducer;

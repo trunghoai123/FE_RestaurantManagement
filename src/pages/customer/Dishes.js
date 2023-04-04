@@ -10,7 +10,7 @@ import Search from "components/Search";
 import BookingModal from "components/Modal/BookingModal";
 import Cart from "components/Cart/Cart";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCartById } from "store/cart/cartSlice";
+import { addToCartById, reloadTotalMoney, setTotalMoney } from "store/cart/cartSlice";
 import { useAuthContext } from "utils/context/AuthContext";
 import { useFormStateContext } from "utils/context/FormStateContext";
 const DishesStyles = styled.div`
@@ -211,8 +211,8 @@ const Dishes = (props) => {
   const handleCloseForm = () => setShowForm(false);
   const [dishes, setDishes] = useState();
   const dispatch = useDispatch();
-  const { cartItems } = useSelector((state) => state.cart);
-  const [total, setTotal] = useState(0);
+  const { cartItems, totalMoney } = useSelector((state) => state.cart);
+  // const [total, setTotal] = useState(0);
   const { user, updateAuthUser } = useAuthContext();
   const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
   const handleShowModal = () => {
@@ -223,14 +223,17 @@ const Dishes = (props) => {
     // }
   };
   useEffect(() => {
-    if (cartItems && cartItems.length > 0) {
-      let sum = 0;
-      cartItems.forEach((item) => {
-        sum += item.GiaMon * item.SoLuong;
-        setTotal(sum);
-      });
-    }
-  }, [cartItems]);
+    // console.log(cartItems);
+    // if (cartItems && cartItems.length > 0) {
+    //   console.log("running useEffect");
+    //   let sum = 0;
+    //   cartItems.forEach((item) => {
+    //     sum += item.GiaMon * item.SoLuong;
+    //     setTotalMoney(sum);
+    //   });
+    // }
+    dispatch(reloadTotalMoney());
+  }, []);
   useEffect(() => {
     window.scrollTo(0, 0);
     const fetchDishes = async () => {
@@ -259,7 +262,7 @@ const Dishes = (props) => {
         <Search placeholder="Tìm Kiếm"></Search>
       </div>
       <div className="main__container">
-        <Cart total={total} cartList={cartItems} handleShowModal={handleShowModal}></Cart>
+        <Cart total={totalMoney} cartList={cartItems} handleShowModal={handleShowModal}></Cart>
         <div className="left__container">
           <div className="filter__kind">
             {kinds.map((kind) => {

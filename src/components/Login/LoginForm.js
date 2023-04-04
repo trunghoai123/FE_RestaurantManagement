@@ -51,6 +51,11 @@ const LoginFormStyles = styled.div`
       height: 90%;
       display: flex;
       flex-direction: column;
+      .btn__to__singup {
+        text-decoration: underline;
+        color: blue;
+        cursor: pointer;
+      }
       .value__container {
         margin-bottom: 8px;
         position: relative;
@@ -102,6 +107,7 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
   });
   const navigation = useNavigate();
   const dispatch = useDispatch();
+  const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
   const onSubmit = (values) => {
     const processedValue = {
       Email: values.email,
@@ -131,6 +137,10 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
       .catch((err) => {
         console.log("error while create account");
       });
+  };
+  const handleSwitchSignUpForm = () => {
+    setOpenSignIn(false);
+    setOpenSignUp(true);
   };
   const { user, updateAuthUser } = useAuthContext();
   return (
@@ -175,7 +185,9 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
                   <Button type="submit" bgHover={colors.orange_2_hover} bgColor={colors.orange_2}>
                     <div>Đăng Nhập</div>
                   </Button>
-
+                  <div onClick={handleSwitchSignUpForm} className="btn__to__singup">
+                    Đăng ký
+                  </div>
                   <hr className="my-4" />
 
                   <Button bgColor={colors.facebook} bgHover={colors.facebook_hover} type="button">
