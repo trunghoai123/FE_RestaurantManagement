@@ -129,7 +129,6 @@ const Orders = (props) => {
     let total = 0;
     try {
       const order = await getOrderDetailByOrder(orderId);
-      console.log(order);
       const orderDetail = order.data[0];
       dishes = orderDetail.ListThucDon;
     } catch (error) {

@@ -16,6 +16,7 @@ import { enqueueSnackbar } from "notistack";
 import { redirect, useNavigate } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "utils/context/AuthContext";
+import SelectBox from "SelectBox/SelectBox";
 const BookingModalStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -188,6 +189,12 @@ const BookingModalStyles = styled.div`
                 }
               }
               .input__container {
+                .select__box {
+                  width: 100%;
+                  border: 1px solid lightGray;
+                  padding: 6px 12px;
+                  outline: none;
+                }
                 &.time__picker__container {
                   position: relative;
                   display: flex;
@@ -243,16 +250,23 @@ const schema = yup
   .object({
     phone: yup
       .string("hãy xem lại số điện thoại")
-      .matches(/[0][0-9][0-9]{8}/, "hãy nhập đúng định dạng số điện thoại")
-      .required("hãy nhập số lượng"),
+      .required("hãy nhập số điện thoại")
+      .matches(/[0][1-9][0-9]{8}/, "hãy nhập đúng định dạng số điện thoại"),
     fullname: yup
       .string("hãy xem lại họ tên")
+      .required("hãy nhập họ tên")
       .matches(
         /^(([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\s\'ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]))*$/,
         "hãy kiểm tra lại họ tên"
-      )
-      .required("hãy nhập họ tên"),
-    size: yup.string("hãy xem lại số lượng").required("hãy nhập số lượng"),
+      ),
+    email: yup
+      .string("hãy xem lại email")
+      .required("hãy nhập email")
+      .email("Hãy nhập đúng định dạng email"),
+    tableSize: yup.string("hãy xem lại số lượng bàn").required("hãy nhập số lượng bàn"),
+    peoplePerTable: yup.string("hãy xem lại số lượng người").required("hãy nhập số lượng"),
+    roomSize: yup.string("hãy xem lại số lượng phòng").required("hãy nhập số lượng phòng"),
+    peoplePerRoom: yup.string("hãy xem lại số lượng người").required("hãy nhập số lượng người"),
     time: yup.string("hãy xem lại thời gian").required("hãy nhập thời gian"),
     date: yup.string("hãy xem lại ngày").required("hãy chọn ngày"),
     kind: yup.string("hãy xem lại loại").required("hãy chọn loại"),
@@ -264,7 +278,7 @@ const schema = yup
 const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [bookingType, setBookingType] = useState();
+  const [bookingType, setBookingType] = useState(0);
   const [loading, setLoading] = useState(false);
   // const [file, setFile] = useState();
   const {
@@ -278,12 +292,17 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
     defaultValues: {
       size: "2",
       time: "07:43",
-      date: "2023-03-15",
+      date: "2023-04-15",
       kind: "0",
       note: "Không có gì",
       image: "",
-      phone: "",
-      fullname: "",
+      phone: "0906461526",
+      fullname: "trung hoai",
+      email: "trunghoai@gamil.com",
+      peoplePerTable: "2",
+      peoplePerRoom: "2",
+      roomSize: "1",
+      tableSize: "1",
       // phone: "006461526",
       // fullname: "Nguyễn Trung Hoài",
     },
@@ -291,14 +310,41 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   });
   const { user, updateAuthUser } = useAuthContext();
   useEffect(() => {
-    // if (user.LoaiTaiKhoan === 0) {
-    // setValue("fullname", "trung hoai");
-    // setValue("phone", "0906461526");
-    // }
+    if (user) {
+      if (user?.LoaiTaiKhoan === 0) {
+        setValue("fullname", user?.HoTen);
+        setValue("phone", user?.SoDienThoai);
+        setValue("email", user?.Email);
+      }
+    }
   }, [user]);
+  useEffect(() => {
+    if (bookingType === 1) {
+      // bàn
+      setValue("tableSize", "1");
+      setValue("peoplePerTable", "2");
+    } else {
+      setValue("roomSize", "2");
+      setValue("peoplePerRoom", "5");
+    }
+  }, [bookingType]);
+
   const onSubmit = (data) => {
     if (isValid) {
-      const { size, date, time, kind, note, image } = data;
+      const {
+        peoplePerTable,
+        peoplePerRoom,
+        roomSize,
+        tableSize,
+        date,
+        time,
+        kind,
+        note,
+        image,
+        email,
+        phone,
+        fullname,
+      } = data;
       let startAt = new Date(new Date(date + "T" + time));
       // let addedDate = new Date(
       //   new Date(date + "T" + time).setHours(
@@ -336,16 +382,26 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
           });
         });
         const order = {
-          LoaiPhieuDat: bookingType ? 0 : kind === "0" ? 1 : 2,
+          LoaiPhieuDat: Number(bookingType) === 0 ? 0 : kind === 0 ? 1 : 2,
           TrangThai: Number(0),
-          SoLuongNguoi: Number(size),
           ThoiGianBatDau: startAt,
-          // ThoiGianKetThuc: endAt,
-          MaKhachHang: user._id,
+          ThoiGianKetThuc: null,
+          MaKhachHang: user?._id || null,
           ListThucDon: clonedCartItems,
-          Email: user.Email,
+          // Email: user.Email,
           ListPhong: null,
           ListBan: null,
+          Email: email,
+          SoDienThoai: phone,
+          HoTen: fullname,
+          GhiChu: note,
+          SoLuongNguoiTrenBanOrPhong:
+            bookingType === 0 ? Number(peoplePerTable) : Number(peoplePerRoom),
+          SoLuongBanOrPhong: bookingType === 0 ? Number(tableSize) : Number(roomSize),
+          // SoNguoiTrenBan: Number(peoplePerTable),
+          // SoNguoiTrenPhong: Number(peoplePerRoom),
+          // SoLuongPhong: Number(roomSize),
+          // SoLuongBan: Number(tableSize),
         };
         setLoading(true);
         dispatch(addOrder(order))
@@ -355,7 +411,12 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
             enqueueSnackbar("đã đặt thành công, đang chờ xác nhận", {
               variant: "success",
             });
-            navigate("/orders");
+            if (!user) {
+              navigate("/dishes");
+              handleCloseForm();
+            } else {
+              navigate("/orders");
+            }
           })
           .catch((err) => {
             console.log(err);
@@ -389,10 +450,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   //       console.log(res.data);
   //     });
   // };
-
-  const handleSearchCustomer = () => {
-    console.log("hello");
-  };
+  const handleSearchCustomer = () => {};
   return (
     <BookingModalStyles>
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
@@ -424,16 +482,20 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                       autoComplete="off"
                       // width="auto"
                     />
-                    <Button
-                      padding="6px"
-                      type="button"
-                      bgColor={colors.orange_2}
-                      bgHover={colors.orange_2_hover}
-                      className="btn__search--phone"
-                      onClick={handleSearchCustomer}
-                    >
-                      <i className="icon__search fa fa-search"></i>
-                    </Button>
+                    {user?.LoaiTaiKhoan === 1 ? (
+                      <Button
+                        padding="6px"
+                        type="button"
+                        bgColor={colors.orange_2}
+                        bgHover={colors.orange_2_hover}
+                        className="btn__search--phone"
+                        onClick={handleSearchCustomer}
+                      >
+                        <i className="icon__search fa fa-search"></i>
+                      </Button>
+                    ) : (
+                      ""
+                    )}
                   </div>
                   {errors?.phone && (
                     <div className="error__container">
@@ -449,16 +511,41 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                   </div>
                   <div className="input__container">
                     <Input
-                      type="fullname"
+                      type="text"
                       className="input"
                       autoComplete="off"
                       id="fullname"
+                      placeholder="Trung Hoài"
                       {...register("fullname")}
                     />
                   </div>
                   {errors?.fullname && (
                     <div className="error__container">
                       <div className="error__message">{errors?.fullname?.message}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="data">
+                      Email
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <Input
+                      type="email"
+                      className="input"
+                      autoComplete="off"
+                      id="email"
+                      placeholder="trunghoaiitiuh@gmail.com"
+                      {...register("email")}
+                    />
+                  </div>
+                  {errors?.email && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.email?.message}</div>
                     </div>
                   )}
                 </div>
@@ -485,29 +572,6 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
               <div className="row__container">
                 <div className="value__container">
                   <div className="label__container">
-                    <label className="label" htmlFor="size">
-                      Số lượng người
-                    </label>
-                  </div>
-                  <div className="input__container">
-                    <Input
-                      className="input"
-                      id="size"
-                      placeholder="2"
-                      type="number"
-                      min="1"
-                      max="6"
-                      {...register("size")}
-                    />
-                  </div>
-                  {errors?.size && (
-                    <div className="error__container">
-                      <div className="error__message">{errors?.size?.message}</div>
-                    </div>
-                  )}
-                </div>
-                <div className="value__container">
-                  <div className="label__container">
                     <label className="label" htmlFor="data">
                       Ngày
                     </label>
@@ -521,12 +585,10 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                     </div>
                   )}
                 </div>
-              </div>
-              <div className="row__container">
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="time">
-                      Giờ Vào
+                      Giờ Đến
                     </label>
                   </div>
                   <div className="input__container">
@@ -538,25 +600,129 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                     </div>
                   )}
                 </div>
-                <div className="value__container"></div>
               </div>
             </div>
             <div className="main__infor">
               <div className="type__tabs">
                 <div
-                  onClick={() => handleChangeType(true)}
-                  className={`type__tab left ${bookingType ? "active" : ""}`}
+                  onClick={() => handleChangeType(0)}
+                  className={`type__tab left ${bookingType === 0 ? "active" : ""}`}
                 >
                   Bàn
                 </div>
                 <div
-                  onClick={() => handleChangeType(false)}
-                  className={`type__tab right ${bookingType ? "" : "active"}`}
+                  onClick={() => handleChangeType(1)}
+                  className={`type__tab right ${bookingType === 1 ? "active" : ""}`}
                 >
                   Phòng
                 </div>
               </div>
               <div className="main__values">
+                {bookingType === 0 ? (
+                  <div className="row__container">
+                    <div className="value__container">
+                      <div className="label__container">
+                        <label className="label" htmlFor="size">
+                          Số lượng bàn
+                        </label>
+                      </div>
+                      <div className="input__container">
+                        <Input
+                          className="input"
+                          id="tableSize"
+                          placeholder="2"
+                          type="number"
+                          min="1"
+                          max="10"
+                          name="tableSize"
+                          {...register("tableSize")}
+                        />
+                      </div>
+                      {errors?.tableSize && (
+                        <div className="error__container">
+                          <div className="error__message">{errors?.tableSize?.message}</div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="value__container">
+                      <div className="label__container">
+                        <label className="label" htmlFor="size">
+                          Số lượng người trên một bàn
+                        </label>
+                      </div>
+                      <div className="input__container">
+                        <select
+                          name="peoplePerTable"
+                          className="select__box"
+                          {...register("peoplePerTable")}
+                        >
+                          <option value="2">2</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                          <option value="8">8</option>
+                          <option value="10">10</option>
+                        </select>
+                      </div>
+                      {errors?.peoplePerTable && (
+                        <div className="error__container">
+                          <div className="error__message">{errors?.peoplePerTable?.message}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="row__container">
+                    <div className="value__container">
+                      <div className="label__container">
+                        <label className="label" htmlFor="size">
+                          Số lượng phòng
+                        </label>
+                      </div>
+                      <div className="input__container">
+                        <Input
+                          className="input"
+                          id="roomSize"
+                          placeholder="2"
+                          type="number"
+                          min="1"
+                          max="10"
+                          name="roomSize"
+                          {...register("roomSize")}
+                        />
+                      </div>
+                      {errors?.roomSize && (
+                        <div className="error__container">
+                          <div className="error__message">{errors?.roomSize?.message}</div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="value__container">
+                      <div className="label__container">
+                        <label className="label" htmlFor="size">
+                          Số lượng người trên một phòng
+                        </label>
+                      </div>
+                      <div className="input__container">
+                        <select
+                          name="peoplePerRoom"
+                          className="select__box"
+                          {...register("peoplePerRoom")}
+                        >
+                          <option value="2">2</option>
+                          <option value="5">5</option>
+                          <option value="10">10</option>
+                          <option value="20">20</option>
+                          <option value="40">40</option>
+                        </select>
+                      </div>
+                      {errors?.peoplePerRoom && (
+                        <div className="error__container">
+                          <div className="error__message">{errors?.peoplePerRoom?.message}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className="row__container">
                   {bookingType ? (
                     <div className="value__container">
