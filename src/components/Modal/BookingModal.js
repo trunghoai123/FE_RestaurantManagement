@@ -243,15 +243,19 @@ const schema = yup
   .object({
     phone: yup
       .string("hãy xem lại số điện thoại")
-      .matches(/[0][0-9][0-9]{8}/, "hãy nhập đúng định dạng số điện thoại")
-      .required("hãy nhập số lượng"),
+      .required("hãy nhập số điện thoại")
+      .matches(/[0][0-9][0-9]{8}/, "hãy nhập đúng định dạng số điện thoại"),
     fullname: yup
       .string("hãy xem lại họ tên")
+      .required("hãy nhập họ tên")
       .matches(
         /^(([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\s\'ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]))*$/,
         "hãy kiểm tra lại họ tên"
-      )
-      .required("hãy nhập họ tên"),
+      ),
+    email: yup
+      .string("hãy xem lại email")
+      .required("hãy nhập email")
+      .email("Hãy nhập đúng định dạng email"),
     size: yup.string("hãy xem lại số lượng").required("hãy nhập số lượng"),
     time: yup.string("hãy xem lại thời gian").required("hãy nhập thời gian"),
     date: yup.string("hãy xem lại ngày").required("hãy chọn ngày"),
@@ -278,7 +282,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
     defaultValues: {
       size: "2",
       time: "07:43",
-      date: "2023-03-15",
+      date: "2023-04-15",
       kind: "0",
       note: "Không có gì",
       image: "",
@@ -291,14 +295,17 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   });
   const { user, updateAuthUser } = useAuthContext();
   useEffect(() => {
-    // if (user.LoaiTaiKhoan === 0) {
-    // setValue("fullname", "trung hoai");
-    // setValue("phone", "0906461526");
-    // }
+    if (user) {
+      if (user?.LoaiTaiKhoan === 0) {
+        setValue("fullname", user?.HoTen);
+        setValue("phone", user?.SoDienThoai);
+        setValue("email", user?.Email);
+      }
+    }
   }, [user]);
   const onSubmit = (data) => {
     if (isValid) {
-      const { size, date, time, kind, note, image } = data;
+      const { size, date, time, kind, note, image, email, phone, fullname } = data;
       let startAt = new Date(new Date(date + "T" + time));
       // let addedDate = new Date(
       //   new Date(date + "T" + time).setHours(
@@ -340,17 +347,33 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
           TrangThai: Number(0),
           SoLuongNguoi: Number(size),
           ThoiGianBatDau: startAt,
-          // ThoiGianKetThuc: endAt,
-          MaKhachHang: user._id,
+          ThoiGianKetThuc: null,
+          MaKhachHang: user?._id,
           ListThucDon: clonedCartItems,
-          Email: user.Email,
+          // Email: user.Email,
           ListPhong: null,
           ListBan: null,
+          Email: email,
+          SoDienThoai: phone,
+          HoTen: fullname,
+          GhiChu: note,
         };
+        // LoaiPhieuDat,
+        // TrangThai,
+        // SoLuongNguoi,
+        // ThoiGianBatDau,
+        // ThoiGianKetThuc, (x)
+        // MaKhachHang,
+        // ListThucDon,
+        // ListPhong,
+        // ListBan,
+        // HoTen ,
+        // Email ,
+        // SoDienThoai,
+        // GhiChu
         setLoading(true);
         dispatch(addOrder(order))
           .then((value) => {
-            console.log(value);
             setLoading(false);
             enqueueSnackbar("đã đặt thành công, đang chờ xác nhận", {
               variant: "success",
@@ -390,9 +413,6 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   //     });
   // };
 
-  const handleSearchCustomer = () => {
-    console.log("hello");
-  };
   return (
     <BookingModalStyles>
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
@@ -424,7 +444,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                       autoComplete="off"
                       // width="auto"
                     />
-                    <Button
+                    {/* <Button
                       padding="6px"
                       type="button"
                       bgColor={colors.orange_2}
@@ -433,7 +453,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                       onClick={handleSearchCustomer}
                     >
                       <i className="icon__search fa fa-search"></i>
-                    </Button>
+                    </Button> */}
                   </div>
                   {errors?.phone && (
                     <div className="error__container">
@@ -449,16 +469,41 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                   </div>
                   <div className="input__container">
                     <Input
-                      type="fullname"
+                      type="text"
                       className="input"
                       autoComplete="off"
                       id="fullname"
+                      placeholder="Trung Hoài"
                       {...register("fullname")}
                     />
                   </div>
                   {errors?.fullname && (
                     <div className="error__container">
                       <div className="error__message">{errors?.fullname?.message}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="data">
+                      Email
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <Input
+                      type="email"
+                      className="input"
+                      autoComplete="off"
+                      id="email"
+                      placeholder="trunghoaiitiuh@gmail.com"
+                      {...register("email")}
+                    />
+                  </div>
+                  {errors?.email && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.email?.message}</div>
                     </div>
                   )}
                 </div>

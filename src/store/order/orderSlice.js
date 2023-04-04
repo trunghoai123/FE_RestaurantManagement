@@ -25,9 +25,7 @@ const orderSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(addOrder.pending, (state, action) => {})
-      .addCase(addOrder.fulfilled, (state, action) => {
-        console.log(action.payload);
-      })
+      .addCase(addOrder.fulfilled, (state, action) => {})
       .addCase(addOrder.rejected, (state, action) => {});
   },
 });

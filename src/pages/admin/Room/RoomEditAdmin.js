@@ -126,7 +126,6 @@ const RoomEditAdmin = (props) => {
           </li>
         </DropdownManage>
       </div>
-
       <div className="properties__container">
         <div className="input__container">
           <div className="input__row">
