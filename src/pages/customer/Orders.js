@@ -4,12 +4,11 @@ import styled from "styled-components";
 import { colors } from "variables";
 import Search from "components/Search";
 import Button from "components/Button/Button";
-import ViewOrderDetailModal from "components/Modal/ViewOrderDetailModal";
 import { getCustomerByUserId, getOneMenu, getOrderByUser, getOrderDetailByOrder } from "utils/api";
 import { useAuthContext } from "utils/context/AuthContext";
 import { getDishById } from "store/dish/dishSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
-import ViewModalDetailForm from "components/Order/ViewOrderDetailForm";
+import ViewOrderDetailForm from "components/Order/ViewOrderDetailForm";
 const OrdersStyles = styled.div`
   padding-top: 54px;
   .main__orders {
@@ -101,6 +100,7 @@ const Orders = (props) => {
   const [orders, setOrders] = useState([]);
   const { user } = useAuthContext();
   const { viewOrderDetail, setViewOrderDetail } = useFormStateContext();
+  const [viewingOrder, setViewingOrder] = useState("");
   useEffect(() => {
     const getCustomer = async () => {
       if (user) {
@@ -125,6 +125,7 @@ const Orders = (props) => {
     };
     getCustomer();
   }, [user]);
+  console.log(orders);
   const calculateTotalPrice = async (orderId) => {
     let dishes = [];
     let total = 0;
@@ -155,13 +156,16 @@ const Orders = (props) => {
     setViewOrderDetail(false);
   };
   const handleViewOrderDetail = (id) => {
+    setViewingOrder(id);
     setViewOrderDetail(true);
   };
-
   return (
     <OrdersStyles>
       {viewOrderDetail && (
-        <ViewOrderDetailModal handleCloseForm={handleCloseForm}></ViewOrderDetailModal>
+        <ViewOrderDetailForm
+          orderId={viewingOrder}
+          handleCloseForm={handleCloseForm}
+        ></ViewOrderDetailForm>
       )}
       <div className="main__orders">
         <Search placeHolder="Tìm Kiếm"></Search>
@@ -247,10 +251,7 @@ const Orders = (props) => {
                           <Button
                             className="button button__remove"
                             bgHover={colors.green_1}
-                            onClick={() => {
-                              console.log("hello");
-                              return handleViewOrderDetail(order?.MaPhieuDat);
-                            }}
+                            onClick={() => handleViewOrderDetail(order?._id)}
                             bgColor={colors.green_1_hover}
                           >
                             <div>
@@ -258,7 +259,7 @@ const Orders = (props) => {
                               <i className="icon__item fa fa-eye" aria-hidden="true"></i>
                             </div>
                           </Button>
-                          <Button
+                          {/* <Button
                             className="button button__remove"
                             bgHover={colors.red_1_hover}
                             bgColor={colors.red_1}
@@ -267,7 +268,7 @@ const Orders = (props) => {
                               <span className="text">Hủy</span>
                               <i className="icon__item fa-solid fa-trash-can"></i>
                             </div>
-                          </Button>
+                          </Button> */}
                           <Button className="button button__payment" disabled>
                             <div>
                               <span className="text">Thanh toán cọc</span>

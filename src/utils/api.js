@@ -72,3 +72,8 @@ export const getOneMenu = async (id) => {
     return res.data;
   });
 };
+export const getOrderById = async (id) => {
+  return axiosClient.post(`order/getOrderById`, { id }).then((res) => {
+    return res.data;
+  });
+};

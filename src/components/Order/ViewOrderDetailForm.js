@@ -19,6 +19,7 @@ import { useAuthContext } from "utils/context/AuthContext";
 import SelectBox from "SelectBox/SelectBox";
 import { clearCart } from "store/cart/cartSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
+import { getOrderById, getOrderDetailByOrder } from "utils/api";
 const ViewModalDetailFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -62,6 +63,7 @@ const ViewModalDetailFormStyles = styled.div`
           display: flex;
           justify-content: flex-end;
           .btn__confirm {
+            margin-left: 12px;
           }
         }
       }
@@ -246,7 +248,72 @@ const ViewModalDetailFormStyles = styled.div`
   }
 `;
 
-const ViewModalDetailForm = ({ handleCloseForm = () => {}, cartItems = [] }) => {
+const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    getValues,
+    setValue,
+    formState: { errors, isValid, isLoading, isSubmitting },
+  } = useForm({
+    defaultValues: {},
+  });
+  const [orderDetails, setOrderDetails] = useState([]);
+  const [order, setOrder] = useState();
+  const { user } = useAuthContext();
+  const { viewOrderDetail, setViewOrderDetail } = useFormStateContext();
+  //phone
+  //fullname
+  //email
+  //date
+  //time
+  //kind
+  // level
+  // note
+  useEffect(() => {
+    const getOrder = async () => {
+      const order = await getOrderById(orderId);
+      if (order.data) {
+        const values = order.data;
+        setValue("phone", values?.SoDienThoai);
+        setValue("fullname", values?.HoTen);
+        setValue("note", values?.GhiChu);
+        setValue("email", values?.Email);
+        setValue("date", convertDateToVisualDate(values?.ThoiGianBatDau));
+        setValue("time", convertDateToVisualTime(values?.ThoiGianBatDau));
+        setValue("kind", values?.LoaiPhieuDat === 0 ? "Đặt bàn" : "Đặt phòng");
+        setValue("level", values?.LoaiPhieuDat === 1 ? "Thường" : "Vip");
+        setValue("tableSize", values?.SoLuongBanOrPhong);
+        setValue("roomSize", values?.SoLuongBanOrPhong);
+        setValue("peoplePerTable", values?.SoLuongNguoiTrenBanOrPhong);
+        setValue("peoplePerRoom", values?.SoLuongNguoiTrenBanOrPhong);
+        setValue("note", values?.GhiChu);
+        setOrder(order.data);
+      }
+    };
+    const getOrderDetails = async () => {
+      const orderDetails = await getOrderDetailByOrder(orderId);
+      if (orderDetails.data) {
+        // const values = orderDetails.data;
+        // setValue("phone", );
+        setOrderDetails(orderDetails.data);
+      }
+    };
+    getOrder();
+    getOrderDetails();
+  }, []);
+  const convertDateToVisualDate = (date) => {
+    const day = new Date(date).getDate() + 1;
+    const month = new Date(date).getMonth() + 1;
+    const year = new Date(date).getFullYear();
+    return day + "-" + month + "-" + year;
+  };
+  const convertDateToVisualTime = (time) => {
+    const hour = new Date(time).getHours();
+    const minutes = new Date(time).getMinutes();
+    return hour + ":" + minutes;
+  };
   return (
     <ViewModalDetailFormStyles>
       <form className="main__form">
@@ -254,19 +321,252 @@ const ViewModalDetailForm = ({ handleCloseForm = () => {}, cartItems = [] }) => 
         <div className="modal__main">
           <div className="modal__title">
             <div className="title__container">
-              <h4 className="title__text">Đặt Bàn</h4>
+              <h4 className="title__text">Chi Tiết phiếu đặt</h4>
             </div>
           </div>
           <div className="modal__body">
             {/* {user?.LoaiTaiKhoan === 1 && ( */}
-            <div className="general__infor customer__infor"></div>
+            <div className="general__infor customer__infor">
+              <div className="group__title">Thông tin khách hàng</div>
+              <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="size">
+                      Số điện thoại
+                    </label>
+                  </div>
+                  <div className="input__container phone__input__container">
+                    <Input
+                      className="input shared__place"
+                      id="phone"
+                      type="text"
+                      name="phone"
+                      autoComplete="off"
+                      disabled
+                      {...register("phone")}
+                      // width="auto"
+                    />
+                  </div>
+                </div>
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="data">
+                      Họ và tên
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <Input
+                      {...register("fullname")}
+                      type="text"
+                      className="input"
+                      name="fullname"
+                      id="fullname"
+                      disabled
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="data">
+                      Email
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <Input
+                      {...register("email")}
+                      disabled
+                      type="email"
+                      className="input"
+                      id="email"
+                      name="email"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* )} */}
             <hr></hr>
             <div className="general__infor">
-              <div className="row__container"></div>
+              <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="data">
+                      Ngày
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <Input
+                      {...register("date")}
+                      name="date"
+                      disabled
+                      type="text"
+                      className="input"
+                      id="date"
+                    />
+                  </div>
+                </div>
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="time">
+                      Giờ Đến
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <Input
+                      {...register("time")}
+                      disabled
+                      name="time"
+                      type="text"
+                      className="input"
+                      id="time"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="main__infor">
+              <div className="main__values">
+                <div className="row__container">
+                  <div className="value__container">
+                    <div className="label__container">
+                      <label className="label" htmlFor="size">
+                        Loại phiếu đặt
+                      </label>
+                    </div>
+                    <div className="input__container">
+                      <Input
+                        {...register("kind")}
+                        disabled
+                        name="kind"
+                        className="input"
+                        id="kind"
+                        type="text"
+                      />
+                    </div>
+                  </div>
+                  <div className="value__container">
+                    <div className="label__container">
+                      <label className="label" htmlFor="size">
+                        Hạng
+                      </label>
+                    </div>
+                    <div className="input__container">
+                      <Input
+                        {...register("level")}
+                        disabled
+                        name="level"
+                        className="input"
+                        id="level"
+                        type="text"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="row__container">
+                  <div className="value__container">
+                    <div className="label__container">
+                      <label className="label" htmlFor="size">
+                        Số lượng bàn
+                      </label>
+                    </div>
+                    <div className="input__container">
+                      <Input
+                        {...register("tableSize")}
+                        disabled
+                        name="tableSize"
+                        className="input"
+                        id="tableSize"
+                        type="text"
+                      />
+                    </div>
+                  </div>
+                  <div className="value__container">
+                    <div className="label__container">
+                      <label className="label" htmlFor="size">
+                        Số lượng người mỗi bàn
+                      </label>
+                    </div>
+                    <div className="input__container">
+                      <Input
+                        {...register("peoplePerTable")}
+                        disabled
+                        name="peoplePerTable"
+                        className="input"
+                        id="peoplePerTable"
+                        type="text"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="row__container">
+                  <div className="value__container">
+                    <div className="label__container">
+                      <label className="label" htmlFor="size">
+                        Số lượng phòng
+                      </label>
+                    </div>
+                    <div className="input__container">
+                      <Input
+                        {...register("roomSize")}
+                        className="input"
+                        id="roomSize"
+                        type="text"
+                        name="roomSize"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div className="value__container">
+                    <div className="label__container">
+                      <label className="label" htmlFor="size">
+                        Số lượng người mỗi phòng
+                      </label>
+                    </div>
+                    <div className="input__container">
+                      <Input
+                        {...register("peoplePerRoom")}
+                        className="input"
+                        id="peoplePerRoom"
+                        type="text"
+                        name="peoplePerRoom"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="row__container">
+                  <div className="value__container">
+                    <div className="label__container">
+                      <label className="label">Ghi chú thêm</label>
+                    </div>
+                    <div className="input__container" htmlFor="note">
+                      <TextArea
+                        {...register("note")}
+                        disabled
+                        resize="none"
+                        rows="3"
+                        id="note"
+                        name="note"
+                        className="input"
+                      ></TextArea>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="modal__footer">
             <div className="btn__container">
+              <Button
+                type="submit"
+                bgColor={colors.orange_2}
+                bgHover={colors.orange_2_hover}
+                className="btn__confirm"
+              >
+                <div>Hủy</div>
+              </Button>
               <Button
                 type="submit"
                 bgColor={colors.orange_2}
@@ -283,6 +583,6 @@ const ViewModalDetailForm = ({ handleCloseForm = () => {}, cartItems = [] }) => 
   );
 };
 
-ViewModalDetailForm.propTypes = {};
+ViewOrderDetailForm.propTypes = {};
 
-export default ViewModalDetailForm;
+export default ViewOrderDetailForm;
