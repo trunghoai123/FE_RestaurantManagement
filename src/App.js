@@ -26,6 +26,7 @@ import { AuthContext, AuthProvider } from "utils/context/AuthContext";
 import NotFound from "components/NotFound/NotFound";
 import { FormStateProvider } from "utils/context/FormStateContext";
 import OrderAdmin from "pages/admin/Order/OrderAdmin";
+import OrderDetailAdmin from "pages/admin/Order/OrderDetailAdmin";
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -96,6 +97,10 @@ const router = createBrowserRouter([
       {
         path: "order/update",
         element: <OrderAdmin></OrderAdmin>,
+      },
+      {
+        path: "order/:orderId",
+        element: <OrderDetailAdmin></OrderDetailAdmin>,
       },
       // {
       //   path: "room/:roomId",

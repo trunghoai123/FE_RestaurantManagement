@@ -87,3 +87,9 @@ export const getOrderByAll = async ({LoaiPhieuDat, TrangThai , SoLuongNguoiTrenB
     return res.data;
   });
 };
+
+export const changeStatus = async ({id, TrangThai}) => {
+  return axiosClient.post(`order/changeStatus`,{id, TrangThai}).then((res) => {
+    return res.data;
+  });
+};

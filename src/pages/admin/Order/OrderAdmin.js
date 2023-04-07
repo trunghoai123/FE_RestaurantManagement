@@ -1,30 +1,30 @@
 import React, {useState, useEffect} from "react";
-import { useHistory} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { getOrderByAll } from "utils/api";
 import Loading from "components/Loading/Loading";
 
 
-const TAB_ORDER_STATUS = [
+export const TAB_ORDER_STATUS = [
   {status: 0, value:"Chờ xác nhận"},
   {status: 1, value:"Chờ đặt cọc"},
   {status: 2, value:"Chờ nhận đơn"},
-  {status: 3, value:"Kết thúc"},
+  {status: 3, value:"Thành công"},
   {status: 4, value:"Đã hủy"},
 
 ]
-const ARR_ORDER_STATUS = [
+export const ARR_ORDER_STATUS = [
   "Chờ xác nhận",
   "Chờ đặt cọc",
   "Chờ nhận đơn",
-  "Kết thúc",
+  "Thành công",
   "Đã hủy",
 
 ]
 
 
-const TAB_ORDER_TYPE = [
+export const TAB_ORDER_TYPE = [
   {type: 0, value:"Đơn đặt bàn"},
   {type: 1, value:"Đơn đặt phòng thường"},
   {type: 2, value:"Đơn đặt phòng VIP"},
@@ -38,7 +38,7 @@ const OrderAdmin = (props) => {
   const [loading , setLoading] = useState(false)
   const [selectedTab,setSelectedTab] = useState(ALL_ORDER)
   const [selectedType,setSelectedType] = useState(-1)
-
+  const navigate = useNavigate();
   useEffect(() =>{
     setSelectedType(0)
     setSelectedTab(ALL_ORDER)
@@ -91,6 +91,7 @@ const OrderAdmin = (props) => {
     )})
   }
 
+
   const renderHeader = ()=>{
       return  (
       <tr>
@@ -111,7 +112,7 @@ const OrderAdmin = (props) => {
         return (
           <tr key={idx}>
             <td className="w-50 text-center">{idx + 1}</td>
-            <td className="w-300">
+            <td className="w-250">
               <div><strong>{item.HoTen}</strong></div>
               <div>{item.SoDienThoai}</div>
               <div>{item.Email}</div>
@@ -125,7 +126,10 @@ const OrderAdmin = (props) => {
             </td>
             <td>{ARR_ORDER_STATUS[item.TrangThai]}</td>
             <td>
-              <button>Chi Tiết</button>
+              <button className="btn-order detail" onClick={()=>{
+                navigate(`/admin/order/${item._id}`)
+              }}>Chi Tiết</button>
+              {item.TrangThai != 4 ? <button className="btn-order cancel">Hủy đơn</button>: ""}
             </td>
         </tr>
         )}
@@ -146,7 +150,7 @@ const OrderAdmin = (props) => {
   return (
   <OrderAdminStyles>
     {loading && <Loading/>}
-    <div>Quản lý phiếu đặt</div>
+    <div className="title">Quản lý phiếu đặt</div>
     <div className="list_tab">
       {renderTabType()}
     </div>
@@ -171,7 +175,10 @@ const OrderAdminStyles = styled.div`
   padding: 64px 10px 10px ;
   background-color: #f3f3f3;
   min-height: 90vh;
-
+  .title{
+    font-size: 20px;
+    font-weight: bold;
+  }
 
   .list-order{
     margin-top: 10px;
@@ -197,6 +204,10 @@ const OrderAdminStyles = styled.div`
           max-width: 300px;
           width: 300px;
         }
+        .w-250{
+          max-width: 250px;
+          width: 250px;
+        }
         .text-center{
           text-align: center !important;
         }
@@ -211,6 +222,27 @@ const OrderAdminStyles = styled.div`
           border: 1px solid rgb(220, 180, 110 , 0.4);
           font-size: 14px;
           padding: 10px;
+        }
+
+
+        .btn-order{
+          border: none;
+          outline: none;
+          padding: 5px 10px;
+          color: #fff;
+          border-radius: 10px;
+          font-weight: bold;
+          margin: 0 5px;
+          :hover {
+            opacity: 0.8;
+          }
+          &.detail{
+            background-color: #17a2b8;
+            
+          }
+          &.cancel{
+            background-color: #dc3545;
+          }
         }
       }
     }
