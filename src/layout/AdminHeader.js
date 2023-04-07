@@ -181,7 +181,7 @@ const adminNavbarItems = [
       {
         id: 2,
         title: "Cập nhật",
-        to: "area/update",
+        to: "order/update",
       },
     ],
   },

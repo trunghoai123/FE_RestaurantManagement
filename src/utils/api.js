@@ -72,3 +72,18 @@ export const getOneMenu = async (id) => {
     return res.data;
   });
 };
+
+
+
+//Order Admin
+export const getOrderByAll = async ({LoaiPhieuDat, TrangThai , SoLuongNguoiTrenBanOrPhong 
+  , SoLuongBanOrPhong , ThoiGianBatDau, GhiChu , HoTen , Email ,SoDienThoai ,MaNhanVien ,MaKhachHang }) => {
+  return axiosClient.post(`order/getOrderByAll`,
+  { LoaiPhieuDat, TrangThai ,
+    SoLuongNguoiTrenBanOrPhong ,
+    SoLuongBanOrPhong , ThoiGianBatDau,
+    GhiChu , HoTen , Email ,SoDienThoai,
+    MaNhanVien ,MaKhachHang }).then((res) => {
+    return res.data;
+  });
+};
