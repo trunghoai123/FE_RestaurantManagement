@@ -125,7 +125,6 @@ const Orders = (props) => {
     };
     getCustomer();
   }, [user]);
-  console.log(orders);
   const calculateTotalPrice = async (orderId) => {
     let dishes = [];
     let total = 0;

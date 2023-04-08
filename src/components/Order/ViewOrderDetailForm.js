@@ -20,6 +20,7 @@ import SelectBox from "SelectBox/SelectBox";
 import { clearCart } from "store/cart/cartSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import { getOrderById, getOrderDetailByOrder } from "utils/api";
+import { convertToVND } from "utils/utils";
 const ViewModalDetailFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -64,6 +65,28 @@ const ViewModalDetailFormStyles = styled.div`
           justify-content: flex-end;
           .btn__confirm {
             margin-left: 12px;
+          }
+        }
+        .tooltip__container {
+          position: relative;
+          &:hover {
+            cursor: pointer;
+            .tooltip__content {
+              display: block;
+            }
+          }
+          .tooltip__content {
+            font-size: 13px;
+            display: none;
+            padding: 5px;
+            box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.6);
+            background-color: white;
+            border-radius: 4px;
+            position: absolute;
+            bottom: 20px;
+            left: 0px;
+            width: 200px;
+            /* height: 120px; */
           }
         }
       }
@@ -243,6 +266,20 @@ const ViewModalDetailFormStyles = styled.div`
             }
           }
         }
+        .orders__container {
+          .order__main {
+            .table__body {
+              .table__data {
+                .img__dish {
+                  border: 1px solid gray;
+                  width: 50px;
+                  height: 50px;
+                  object-fit: contain;
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -261,16 +298,9 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
   });
   const [orderDetails, setOrderDetails] = useState([]);
   const [order, setOrder] = useState();
+  const [totalMoney, setTotalMoney] = useState();
   const { user } = useAuthContext();
   const { viewOrderDetail, setViewOrderDetail } = useFormStateContext();
-  //phone
-  //fullname
-  //email
-  //date
-  //time
-  //kind
-  // level
-  // note
   useEffect(() => {
     const getOrder = async () => {
       const order = await getOrderById(orderId);
@@ -292,23 +322,37 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
         setOrder(order.data);
       }
     };
-    const getOrderDetails = async () => {
-      const orderDetails = await getOrderDetailByOrder(orderId);
-      if (orderDetails.data) {
-        // const values = orderDetails.data;
-        // setValue("phone", );
-        setOrderDetails(orderDetails.data);
-      }
-    };
     getOrder();
     getOrderDetails();
   }, []);
+  const getOrderDetails = async () => {
+    const orderDetails = await getOrderDetailByOrder(orderId);
+    if (orderDetails.data) {
+      // const values = orderDetails.data;
+      // setValue("phone", );
+      setOrderDetails(orderDetails.data);
+    }
+  };
+  useEffect(() => {
+    calculateTotalMoney();
+  }, [orderDetails]);
+  const calculateTotalMoney = () => {
+    let total = 0;
+    orderDetails.forEach((order) => {
+      return order?.ListThucDon.forEach((dish) => {
+        const curDish = dish.MaThucDon;
+        total += curDish?.GiaMon * dish?.SoLuong;
+      });
+    });
+    setTotalMoney(total);
+  };
   const convertDateToVisualDate = (date) => {
     const day = new Date(date).getDate() + 1;
     const month = new Date(date).getMonth() + 1;
     const year = new Date(date).getFullYear();
     return day + "-" + month + "-" + year;
   };
+  console.log(order);
   const convertDateToVisualTime = (time) => {
     const hour = new Date(time).getHours();
     const minutes = new Date(time).getMinutes();
@@ -447,28 +491,32 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
                     </div>
                   </div>
                   <div className="value__container">
-                    <div className="label__container">
-                      <label className="label" htmlFor="size">
-                        Hạng
-                      </label>
-                    </div>
-                    <div className="input__container">
-                      <Input
-                        {...register("level")}
-                        disabled
-                        name="level"
-                        className="input"
-                        id="level"
-                        type="text"
-                      />
-                    </div>
+                    {order?.LoaiPhieuDat !== 0 && (
+                      <>
+                        <div className="label__container">
+                          <label className="label" htmlFor="size">
+                            Hạng
+                          </label>
+                        </div>
+                        <div className="input__container">
+                          <Input
+                            {...register("level")}
+                            disabled
+                            name="level"
+                            className="input"
+                            id="level"
+                            type="text"
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="row__container">
                   <div className="value__container">
                     <div className="label__container">
                       <label className="label" htmlFor="size">
-                        Số lượng bàn
+                        Số lượng {order?.LoaiPhieuDat === 0 ? "bàn" : "phòng"}
                       </label>
                     </div>
                     <div className="input__container">
@@ -485,7 +533,7 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
                   <div className="value__container">
                     <div className="label__container">
                       <label className="label" htmlFor="size">
-                        Số lượng người mỗi bàn
+                        Số lượng người mỗi {order?.LoaiPhieuDat === 0 ? "bàn" : "phòng"}
                       </label>
                     </div>
                     <div className="input__container">
@@ -500,7 +548,7 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
                     </div>
                   </div>
                 </div>
-                <div className="row__container">
+                {/* <div className="row__container">
                   <div className="value__container">
                     <div className="label__container">
                       <label className="label" htmlFor="size">
@@ -535,7 +583,7 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
                       />
                     </div>
                   </div>
-                </div>
+                </div> */}
                 <div className="row__container">
                   <div className="value__container">
                     <div className="label__container">
@@ -556,8 +604,91 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
                 </div>
               </div>
             </div>
+            <div className="orders__container">
+              <div className="order__main">
+                <table className="main__table table table-striped">
+                  <thead className="table__head--container">
+                    <tr className="table__row">
+                      <th className="table__head item__id" scope="col">
+                        Tên món
+                      </th>
+                      <th className="table__head" scope="col">
+                        Giá món
+                      </th>
+                      <th className="table__head" scope="col">
+                        Số lượng
+                      </th>
+                      <th className="table__head" scope="col">
+                        Hình ảnh
+                      </th>
+                      <th className="table__head" scope="col">
+                        Thành tiền
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="table__body">
+                    {orderDetails.map((order) => {
+                      return order?.ListThucDon.map((dish) => {
+                        const curDish = dish.MaThucDon;
+                        const totalOnDish = curDish?.GiaMon * dish?.SoLuong;
+                        return (
+                          <tr className="table__row" key={curDish._id}>
+                            <td className="table__data item__id">{curDish?.TenMon}</td>
+                            <td className="table__data">{convertToVND(curDish?.GiaMon)}</td>
+                            <td className="table__data">{dish?.SoLuong}</td>
+                            <td className="table__data">
+                              <img
+                                className="img__dish"
+                                src={curDish?.HinhAnh}
+                                alt={"img" + curDish?.id}
+                              />
+                            </td>
+                            <td className="table__data">{convertToVND(totalOnDish)}</td>
+                          </tr>
+                        );
+                      });
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
           <div className="modal__footer">
+            <h6>
+              Tiền đặt cọc món ăn: {convertToVND((totalMoney * 30) / 100) + " (30%) "}{" "}
+              <span className="tooltip__container">
+                <i class="fa-regular fa-circle-question"></i>
+                <div className="tooltip__content">
+                  Tiền đặt cọc món ăn được tính là 30% tổng giá trị các món ăn
+                </div>
+              </span>
+            </h6>
+            {order?.LoaiPhieuDat !== 0 && (
+              <h6>
+                Tiền đặt cọc phòng:{" "}
+                {order?.LoaiPhieuDat === 1
+                  ? convertToVND(50000 * order?.SoLuongBanOrPhong)
+                  : convertToVND(100000 * order?.SoLuongBanOrPhong)}
+                {` (${order?.SoLuongBanOrPhong} phòng) `}
+                <span className="tooltip__container">
+                  <i class="fa-regular fa-circle-question"></i>
+                  <div className="tooltip__content">
+                    <div>
+                      Phòng thường 50.000 đ/phòng <br />
+                      Phòng VIP 100.000 đ/phòng
+                    </div>
+                  </div>
+                </span>
+              </h6>
+            )}
+            <h6>
+              Tổng tiền phiếu đặt:{" "}
+              {order?.LoaiPhieuDat === 0
+                ? convertToVND((totalMoney * 30) / 100)
+                : order?.LoaiPhieuDat === 1
+                ? convertToVND((totalMoney * 30) / 100 + 50000 * order?.SoLuongBanOrPhong)
+                : convertToVND((totalMoney * 30) / 100 + 100000 * order?.SoLuongBanOrPhong)}
+            </h6>
             <div className="btn__container">
               <Button
                 type="submit"

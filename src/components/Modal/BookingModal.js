@@ -383,7 +383,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
           });
         });
         const order = {
-          LoaiPhieuDat: Number(bookingType) === 0 ? 0 : kind === 0 ? 1 : 2,
+          LoaiPhieuDat: Number(bookingType) === 0 ? 0 : kind === "0" ? 1 : 2,
           TrangThai: Number(0),
           ThoiGianBatDau: startAt,
           ThoiGianKetThuc: null,
