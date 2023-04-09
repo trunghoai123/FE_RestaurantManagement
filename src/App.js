@@ -27,6 +27,7 @@ import NotFound from "components/NotFound/NotFound";
 import { FormStateProvider } from "utils/context/FormStateContext";
 import OrderAdmin from "pages/admin/Order/OrderAdmin";
 import OrderDetailAdmin from "pages/admin/Order/OrderDetailAdmin";
+import AddOrderAdmin from "pages/admin/Order/AddOrderAdmin";
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
       {
         path: "room/update",
         element: <RoomAdmin></RoomAdmin>,
+      },
+      {
+        path: "order/add",
+        element: <AddOrderAdmin></AddOrderAdmin>,
       },
       {
         path: "order/update",

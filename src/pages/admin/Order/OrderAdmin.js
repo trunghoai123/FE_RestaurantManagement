@@ -129,7 +129,6 @@ const OrderAdmin = (props) => {
               <button className="btn-order detail" onClick={()=>{
                 navigate(`/admin/order/${item._id}`)
               }}>Chi Tiết</button>
-              {item.TrangThai != 4 ? <button className="btn-order cancel">Hủy đơn</button>: ""}
             </td>
         </tr>
         )}

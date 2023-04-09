@@ -88,8 +88,37 @@ export const getOrderByAll = async ({LoaiPhieuDat, TrangThai , SoLuongNguoiTrenB
   });
 };
 
-export const changeStatus = async ({id, TrangThai}) => {
+export const changeStatus = async (id, TrangThai) => {
   return axiosClient.post(`order/changeStatus`,{id, TrangThai}).then((res) => {
+    return res.data;
+  });
+};
+
+export const updateOrder = async ({
+  id, LoaiPhieuDat,TrangThai,SoLuongNguoiTrenBanOrPhong,SoLuongBanOrPhong,ThoiGianBatDau,
+  MaKhachHang,ListThucDon,ListPhong,ListBan,HoTen ,Email ,SoDienThoai,GhiChu}) => {
+  return axiosClient.post(`order/updateOrder`,
+  {
+    id, LoaiPhieuDat,TrangThai,SoLuongNguoiTrenBanOrPhong,SoLuongBanOrPhong,ThoiGianBatDau,
+    MaKhachHang,ListThucDon,ListPhong,ListBan,HoTen ,Email ,SoDienThoai,GhiChu}).then((res) => {
+    return res.data;
+  });
+};
+
+export const getTableMatchTimeAndSeat = async ({ SoNguoi , ThoiGianBatDau , LoaiPhieuDat }) => {
+  return axiosClient.post(`table/getTableMatchTimeAndSeat`,{ SoNguoi , ThoiGianBatDau , LoaiPhieuDat }).then((res) => {
+    return res.data;
+  });
+};
+
+export const getRoomMatchTimeAndSeat = async ({ SoNguoi , ThoiGianBatDau , LoaiPhieuDat , MaLoaiPhong }) => {
+  return axiosClient.post(`room/getRoomMatchTimeAndSeat`,{ SoNguoi , ThoiGianBatDau , LoaiPhieuDat , MaLoaiPhong }).then((res) => {
+    return res.data;
+  });
+};
+
+export const getTypeOfRoomById = async (MaLoai) => {
+  return axiosClient.post(`typeOfRoom/getTypeOfRoomById`,{MaLoai}).then((res) => {
     return res.data;
   });
 };
