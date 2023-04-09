@@ -158,6 +158,7 @@ const Orders = (props) => {
     setViewingOrder(id);
     setViewOrderDetail(true);
   };
+
   return (
     <OrdersStyles>
       {viewOrderDetail && (

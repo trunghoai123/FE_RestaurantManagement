@@ -13,7 +13,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCartById, reloadTotalMoney, setTotalMoney } from "store/cart/cartSlice";
 import { useAuthContext } from "utils/context/AuthContext";
 import { useFormStateContext } from "utils/context/FormStateContext";
+import { getAllDish, getAllTypeOfDish, getMenuByAll } from "utils/api";
+import { convertToVND } from "utils/utils";
 const DishesStyles = styled.div`
+  padding-top: 54px;
   .top__actions {
     display: flex;
     align-items: center;
@@ -46,8 +49,14 @@ const DishesStyles = styled.div`
       ::-webkit-scrollbar-thumb:hover {
         background: #555;
       }
+      .all__type {
+        padding: 10px 10px 10px 20px;
+        text-decoration: underline;
+        cursor: pointer;
+        user-select: none;
+      }
       .filter__kind {
-        padding: 20px;
+        padding: 0 20px 20px 20px;
         column-count: 2;
         column-gap: 10px;
         .kind__container {
@@ -55,6 +64,10 @@ const DishesStyles = styled.div`
           border: solid 2px ${colors.gray_1};
           padding: 4px;
           :hover {
+            border: solid 2px ${colors.gold_1};
+            transition: all ease 150ms;
+          }
+          &.active {
             border: solid 2px ${colors.gold_1};
             transition: all ease 150ms;
           }
@@ -141,6 +154,14 @@ const DishesStyles = styled.div`
                 height: 0px;
                 box-shadow: 0px 0px 60px 35px black;
               }
+              ::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                width: 100%;
+                height: 0px;
+                box-shadow: 0px 0px 35px 10px black;
+              }
               .add__container {
                 padding: 6px;
                 background-color: ${colors.orange_2};
@@ -165,10 +186,21 @@ const DishesStyles = styled.div`
               left: 10px;
               text-align: center;
             }
+            .dish__price {
+              width: calc(100% - 20px);
+              padding: 2px;
+              color: white;
+              position: absolute;
+              top: 10px;
+              left: 10px;
+              font-size: 14px;
+              /* text-align: center; */
+            }
           }
         }
       }
       .pagination__container {
+        user-select: none;
         .pagination__list {
           background-color: ${colors.orange_1};
           padding: 8px;
@@ -205,23 +237,50 @@ const DishesStyles = styled.div`
     }
   }
 `;
-
+const itemsPerPage = 4;
 const Dishes = (props) => {
   const [showForm, setShowForm] = useState(false);
   const handleCloseForm = () => setShowForm(false);
   const [dishes, setDishes] = useState();
+  const [dishTypes, setDishTypes] = useState([]);
+  const [itemOffset, setItemOffset] = useState(0);
+  const [search, setSearch] = useState("");
   const dispatch = useDispatch();
+  const [filter, setFilter] = useState({
+    search: "",
+    kindOfDish: "",
+  });
   const { cartItems, totalMoney } = useSelector((state) => state.cart);
   // const [total, setTotal] = useState(0);
   const { user, updateAuthUser } = useAuthContext();
   const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
+  const endOffset = itemOffset + itemsPerPage;
+  // useEffect(() => {
+  let currentItems = [];
+  let pageCount = 0;
+  if (dishes && dishes?.length > 0) {
+    currentItems = dishes.slice(itemOffset, endOffset);
+    pageCount = Math.ceil(dishes.length / itemsPerPage);
+    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+  }
+  // });
   const handleShowModal = () => {
-    // if (user) {
     setShowForm(true);
-    // } else {
-    //   setOpenSignIn(true);
-    // }
   };
+  useEffect(() => {
+    (async () => {
+      try {
+        // {TenMon,GiaMon , DonViTinh , MoTa , MaLoai }
+        const result = await getMenuByAll({ TenMon: filter.search, MaLoai: filter.kindOfDish });
+        if (result?.data) {
+          setDishes(result.data);
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    })();
+  }, [filter]);
   useEffect(() => {
     // console.log(cartItems);
     // if (cartItems && cartItems.length > 0) {
@@ -234,24 +293,70 @@ const Dishes = (props) => {
     // }
     dispatch(reloadTotalMoney());
   }, []);
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-    const fetchDishes = async () => {
+    (async () => {
       try {
-        const result = await axiosClient.get("menu/getAllMenu", {});
-        if (result?.data?.data) {
-          setDishes(result.data.data);
+        const result = await getAllTypeOfDish();
+        if (result?.data) {
+          setDishTypes(result?.data || []);
         }
       } catch (error) {
         console.log(error);
         return;
       }
-    };
-    fetchDishes();
+    })();
   }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    (async () => {
+      try {
+        const result = await getAllDish();
+        if (result?.data) {
+          setDishes(result?.data || []);
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    })();
+  }, []);
+
   const handleAddToCart = (e, id) => {
     e.preventDefault();
     dispatch(addToCartById(id)).then((data) => {});
+  };
+
+  const hanleClickOnDish = (e) => {
+    e.preventDefault();
+  };
+  const handleTypeSearch = (e) => {
+    setSearch(e.target.value);
+  };
+  const handleClickSearch = (e) => {
+    setItemOffset(0);
+    setFilter((oldVal) => {
+      return { ...oldVal, search };
+    });
+  };
+  const handleClickKind = (id) => {
+    setItemOffset(0);
+    setFilter((oldVal) => {
+      return { ...oldVal, search: "", kindOfDish: id };
+    });
+    setSearch("");
+  };
+
+  const handlePageClick = (event) => {
+    const newOffset = (event.selected * itemsPerPage) % dishes.length;
+    console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
+    setItemOffset(newOffset);
+  };
+  const onPageActive = (number) => {
+    const newOffset = (number.selected * itemsPerPage) % dishes.length;
+    console.log(`User requested page number ${number.selected}, which is offset ${newOffset}`);
+    setItemOffset(newOffset);
   };
   return (
     <DishesStyles>
@@ -259,18 +364,30 @@ const Dishes = (props) => {
         <BookingModal cartItems={cartItems} handleCloseForm={handleCloseForm}></BookingModal>
       )}
       <div className="top__actions">
-        <Search placeholder="Tìm Kiếm"></Search>
+        <Search
+          value={search}
+          onClickSearch={handleClickSearch}
+          onChange={handleTypeSearch}
+          placeholder="Tìm Kiếm"
+        ></Search>
       </div>
       <div className="main__container">
         <Cart total={totalMoney} cartList={cartItems} handleShowModal={handleShowModal}></Cart>
         <div className="left__container">
+          <div className="all__type" onClick={() => handleClickKind("")}>
+            Tất cả
+          </div>
           <div className="filter__kind">
-            {kinds.map((kind) => {
+            {dishTypes.map((kind) => {
               return (
-                <div key={kind?.id} className="kind__container">
+                <div
+                  onClick={() => handleClickKind(kind?._id)}
+                  key={kind?._id}
+                  className={`kind__container ${filter?.kindOfDish === kind?._id ? "active" : ""}`}
+                >
                   <div className="kind__item">
-                    <img src={kind.imageUrl} className="kind__image" alt="" />
-                    <div className="kind__item--name">Món {kind.name}</div>
+                    <img src={kind?.imageUrl} className="kind__image" alt="" />
+                    <div className="kind__item--name">{kind?.TenLoai}</div>
                     <div className="overlay"></div>
                   </div>
                 </div>
@@ -280,20 +397,17 @@ const Dishes = (props) => {
         </div>
         <div className="right__container">
           <div className="dishes__container">
-            {dishes?.map((dish) => {
+            {currentItems?.map((dish) => {
               return (
-                <Link to={`/dish/${dish?._id}`} key={dish?._id} className="dish">
+                <Link
+                  onClick={hanleClickOnDish}
+                  to={`/dish/${dish?._id}`}
+                  key={dish?._id}
+                  className="dish"
+                >
                   <div className="dish__container">
                     <div className="img__container">
-                      <img
-                        title={new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(dish?.GiaMon)}
-                        src={dish?.HinhAnh}
-                        className="img"
-                        alt={dish?.name}
-                      />
+                      <img src={dish?.HinhAnh} className="img" alt={dish?.name} />
                       <div className="overlay"></div>
                       <div
                         className="add__container"
@@ -303,21 +417,24 @@ const Dishes = (props) => {
                       </div>
                     </div>
                     <div className="dish__name">{dish?.TenMon}</div>
+                    <div className="dish__price">{convertToVND(dish?.GiaMon)}</div>
                   </div>
                 </Link>
               );
             })}
           </div>
           <div className="pagination__container">
-            {dishes && (
+            {dishes?.length > 0 && (
               <ReactPaginate
+                onPageActive={onPageActive}
+                onPageChange={handlePageClick}
                 className="pagination__list"
                 breakLabel="..."
                 previousLabel={<CaretLeft></CaretLeft>}
-                pageRangeDisplayed={5}
+                pageRangeDisplayed={3}
                 nextLabel={<CaretRight></CaretRight>}
-                pageCount={3}
-                renderOnZeroPageCount={1}
+                pageCount={pageCount}
+                renderOnZeroPageCount={null}
               />
             )}
           </div>
