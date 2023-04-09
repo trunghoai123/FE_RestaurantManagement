@@ -5,9 +5,13 @@ import { colors } from "variables";
 const ViewOrderDetailModalStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
-  z-index: 999;
+  z-index: 9999;
   width: 100%;
   height: 100vh;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
   .main__form {
     .overlay {
       transition: all ease 200ms;

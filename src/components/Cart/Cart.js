@@ -4,9 +4,7 @@ import { CartFill, CheckLg } from "react-bootstrap-icons";
 import Button from "components/Button/Button";
 import { colors } from "variables";
 import styled from "styled-components";
-import { createCart } from "store/cart/cartSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { useFormStateContext } from "utils/context/FormStateContext";
+import { convertToVND } from "utils/utils";
 const CartStyles = styled.div`
   position: relative;
   z-index: 10;
@@ -167,7 +165,6 @@ const CartStyles = styled.div`
     }
   }
 `;
-
 const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
   return (
     <CartStyles>
@@ -211,13 +208,7 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
               );
             })}
         </div>
-        <div className="sum__container">
-          Tổng tiền:{" "}
-          {new Intl.NumberFormat("vi-VN", {
-            style: "currency",
-            currency: "VND",
-          }).format(total)}
-        </div>
+        <div className="sum__container">Tổng tiền: {convertToVND(total)}</div>
         <div className="btn__container">
           <Button
             bgColor={colors.orange_2}

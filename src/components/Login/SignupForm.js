@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { createAccount } from "store/auth/authSlice";
 import { enqueueSnackbar } from "notistack";
 import { useAuthContext } from "utils/context/AuthContext";
+import { useFormStateContext } from "utils/context/FormStateContext";
 const SignupFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -49,6 +50,11 @@ const SignupFormStyles = styled.div`
       height: 90%;
       display: flex;
       flex-direction: column;
+      .btn__to__singup {
+        text-decoration: underline;
+        color: blue;
+        cursor: pointer;
+      }
       .value__container {
         margin-bottom: 8px;
         position: relative;
@@ -116,6 +122,7 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
     },
     resolver: yupResolver(schema),
   });
+  const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
   const dispatch = useDispatch();
   const { user, updateAuthUser } = useAuthContext();
   const onSubmit = (values) => {
@@ -142,6 +149,10 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
       .catch((err) => {
         console.log("error while create account");
       });
+  };
+  const handleSwitchSignUpForm = () => {
+    setOpenSignIn(true);
+    setOpenSignUp(false);
   };
   return (
     <SignupFormStyles>
@@ -214,6 +225,9 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
                   <Button type="submit" bgHover={colors.orange_2_hover} bgColor={colors.orange_2}>
                     <div>Đăng Ký</div>
                   </Button>
+                  <div onClick={handleSwitchSignUpForm} className="btn__to__singup">
+                    Đăng nhập
+                  </div>
                   <hr className="my-4" />
                   <Button bgColor={colors.facebook} bgHover={colors.facebook_hover} type="button">
                     <div>

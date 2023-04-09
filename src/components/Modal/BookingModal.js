@@ -17,6 +17,7 @@ import { redirect, useNavigate } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "utils/context/AuthContext";
 import SelectBox from "SelectBox/SelectBox";
+import { clearCart } from "store/cart/cartSlice";
 const BookingModalStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -382,15 +383,15 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
           });
         });
         const order = {
-          LoaiPhieuDat: Number(bookingType) === 0 ? 0 : kind === 0 ? 1 : 2,
+          LoaiPhieuDat: Number(bookingType) === 0 ? 0 : kind === "0" ? 1 : 2,
           TrangThai: Number(0),
           ThoiGianBatDau: startAt,
           ThoiGianKetThuc: null,
           MaKhachHang: user?._id || null,
           ListThucDon: clonedCartItems,
           // Email: user.Email,
-          ListPhong: null,
-          ListBan: null,
+          ListPhong: [],
+          ListBan: [],
           Email: email,
           SoDienThoai: phone,
           HoTen: fullname,
@@ -411,6 +412,8 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
             enqueueSnackbar("đã đặt thành công, đang chờ xác nhận", {
               variant: "success",
             });
+            localStorage.removeItem("Restaurant-Cart");
+            dispatch(clearCart());
             if (!user) {
               navigate("/dishes");
               handleCloseForm();
@@ -647,7 +650,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                     <div className="value__container">
                       <div className="label__container">
                         <label className="label" htmlFor="size">
-                          Số lượng người trên một bàn
+                          Số lượng người mỗi bàn
                         </label>
                       </div>
                       <div className="input__container">
@@ -699,7 +702,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                     <div className="value__container">
                       <div className="label__container">
                         <label className="label" htmlFor="size">
-                          Số lượng người trên một phòng
+                          Số lượng người mỗi phòng
                         </label>
                       </div>
                       <div className="input__container">
@@ -724,7 +727,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                   </div>
                 )}
                 <div className="row__container">
-                  {bookingType ? (
+                  {bookingType === 0 ? (
                     <div className="value__container">
                       <div className="label__container">
                         <label className="label">Ghi chú thêm</label>
@@ -774,7 +777,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                       )}
                     </div>
                   )}
-                  {!bookingType && (
+                  {bookingType === 1 && (
                     <div className="value__container">
                       <div className="label__container">
                         <label className="label">Ghi chú thêm</label>
