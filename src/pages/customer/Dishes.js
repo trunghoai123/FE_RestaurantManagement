@@ -74,6 +74,7 @@ const DishesStyles = styled.div`
           .kind__item {
             position: relative;
             cursor: pointer;
+            user-select: none;
             :hover {
               .kind__item--name {
                 color: ${colors.gold_1};
@@ -130,6 +131,7 @@ const DishesStyles = styled.div`
         display: flex;
         flex-wrap: wrap;
         .dish {
+          user-select: none;
           width: 25%;
           min-width: 200px;
           .dish__container {
@@ -163,6 +165,7 @@ const DishesStyles = styled.div`
                 box-shadow: 0px 0px 35px 10px black;
               }
               .add__container {
+                z-index: 2;
                 padding: 6px;
                 background-color: ${colors.orange_2};
                 position: absolute;
@@ -187,6 +190,7 @@ const DishesStyles = styled.div`
               text-align: center;
             }
             .dish__price {
+              z-index: 1;
               width: calc(100% - 20px);
               padding: 2px;
               color: white;
@@ -329,7 +333,7 @@ const Dishes = (props) => {
   };
 
   const hanleClickOnDish = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
   };
   const handleTypeSearch = (e) => {
     setSearch(e.target.value);
@@ -400,7 +404,7 @@ const Dishes = (props) => {
             {currentItems?.map((dish) => {
               return (
                 <Link
-                  onClick={hanleClickOnDish}
+                  // onClick={hanleClickOnDish}
                   to={`/dish/${dish?._id}`}
                   key={dish?._id}
                   className="dish"
