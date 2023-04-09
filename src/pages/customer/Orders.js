@@ -4,10 +4,11 @@ import styled from "styled-components";
 import { colors } from "variables";
 import Search from "components/Search";
 import Button from "components/Button/Button";
-import ViewOrderDetailModal from "components/Modal/ViewOrderDetailModal";
 import { getCustomerByUserId, getOneMenu, getOrderByUser, getOrderDetailByOrder } from "utils/api";
 import { useAuthContext } from "utils/context/AuthContext";
 import { getDishById } from "store/dish/dishSlice";
+import { useFormStateContext } from "utils/context/FormStateContext";
+import ViewOrderDetailForm from "components/Order/ViewOrderDetailForm";
 const OrdersStyles = styled.div`
   padding-top: 54px;
   .main__orders {
@@ -94,15 +95,15 @@ const OrdersStyles = styled.div`
 `;
 
 const Orders = (props) => {
-  const [showForm, setShowForm] = useState(false);
+  // const [showForm, setShowForm] = useState(false);
+  // const handleCloseForm = () => setShowForm(false);
   const [orders, setOrders] = useState([]);
-  const handleCloseForm = () => setShowForm(false);
-  const handleViewOrderDetail = (id) => {};
   const { user } = useAuthContext();
+  const { viewOrderDetail, setViewOrderDetail } = useFormStateContext();
+  const [viewingOrder, setViewingOrder] = useState("");
   useEffect(() => {
     const getCustomer = async () => {
       if (user) {
-        calculateTotalPrice("642866df1da55b0b5d28c7f4");
         const data = await getCustomerByUserId(user._id);
         if (data.data) {
           const customer = data.data;
@@ -149,9 +150,23 @@ const Orders = (props) => {
     // }
     return total;
   };
+
+  const handleCloseForm = () => {
+    setViewOrderDetail(false);
+  };
+  const handleViewOrderDetail = (id) => {
+    setViewingOrder(id);
+    setViewOrderDetail(true);
+  };
+
   return (
     <OrdersStyles>
-      {showForm && <ViewOrderDetailModal handleCloseForm={handleCloseForm}></ViewOrderDetailModal>}
+      {viewOrderDetail && (
+        <ViewOrderDetailForm
+          orderId={viewingOrder}
+          handleCloseForm={handleCloseForm}
+        ></ViewOrderDetailForm>
+      )}
       <div className="main__orders">
         <Search placeHolder="Tìm Kiếm"></Search>
         <div className="main__container">
@@ -188,6 +203,12 @@ const Orders = (props) => {
                     <th className="table__head" scope="col">
                       Thời gian đến
                     </th>
+                    <th className="table__head" scope="col">
+                      Loại phiếu đặt
+                    </th>
+                    <th className="table__head" scope="col">
+                      Số lượng bàn/phòng
+                    </th>
                     {/* <th className="table__head" scope="col">
                       Số tiền cần đặt cọc
                     </th>
@@ -202,35 +223,43 @@ const Orders = (props) => {
                     return (
                       <tr className="table__row" key={order._id}>
                         <td className="table__data item__id">
-                          {order._id.substring(0, 6) + "..."}
+                          {order?._id.substring(0, 6) + "..."}
                         </td>
                         <td className="table__data">
-                          {new Date(order.createdAt).getHours() +
+                          {new Date(order?.createdAt).getHours() +
                             ":" +
-                            new Date(order.createdAt).getMinutes() +
+                            new Date(order?.createdAt).getMinutes() +
                             " - " +
-                            new Date(order.createdAt).toLocaleDateString()}
+                            new Date(order?.createdAt).toLocaleDateString()}
                         </td>
                         <td className="table__data">
-                          {new Date(order.ThoiGianBatDau).getHours() +
+                          {new Date(order?.ThoiGianBatDau).getHours() +
                             ":" +
-                            new Date(order.ThoiGianBatDau).getMinutes() +
+                            new Date(order?.ThoiGianBatDau).getMinutes() +
                             " - " +
-                            new Date(order.ThoiGianBatDau).toLocaleDateString()}
+                            new Date(order?.ThoiGianBatDau).toLocaleDateString()}
                         </td>
+                        <td className="table__data">
+                          {order?.LoaiPhieuDat === 0
+                            ? "Đặt bàn"
+                            : order?.LoaiPhieuDat === 1
+                            ? "Đặt phòng thường"
+                            : "Đặt phòng VIP"}
+                        </td>
+                        <td className="table__data">{order?.SoLuongBanOrPhong}</td>
                         <td className="table__data">
                           <Button
                             className="button button__remove"
                             bgHover={colors.green_1}
+                            onClick={() => handleViewOrderDetail(order?._id)}
                             bgColor={colors.green_1_hover}
-                            onClick={() => handleViewOrderDetail("hello")}
                           >
                             <div>
                               <span className="text">Xem</span>
                               <i className="icon__item fa fa-eye" aria-hidden="true"></i>
                             </div>
                           </Button>
-                          <Button
+                          {/* <Button
                             className="button button__remove"
                             bgHover={colors.red_1_hover}
                             bgColor={colors.red_1}
@@ -239,7 +268,7 @@ const Orders = (props) => {
                               <span className="text">Hủy</span>
                               <i className="icon__item fa-solid fa-trash-can"></i>
                             </div>
-                          </Button>
+                          </Button> */}
                           <Button className="button button__payment" disabled>
                             <div>
                               <span className="text">Thanh toán cọc</span>

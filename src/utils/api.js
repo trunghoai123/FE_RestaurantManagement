@@ -72,3 +72,35 @@ export const getOneMenu = async (id) => {
     return res.data;
   });
 };
+
+export const getOrderById = async (id) => {
+  return axiosClient.post(`order/getOrderById`, { id }).then((res) => {
+    return res.data;
+  });
+};
+
+export const getAllDish = async () => {
+  return axiosClient.get(`menu/getAllMenu`).then((res) => {
+    return res.data;
+  });
+  // const res = await axiosClient.get(`menu/getAllMenu`);
+  // return res.data;
+};
+
+export const getAllTypeOfDish = async () => {
+  return axiosClient.get(`typeOfMenu/getAllTypeOfMenu`).then((res) => {
+    return res.data;
+  });
+};
+
+export const getMenuByAll = async (filter) => {
+  return axiosClient.post(`menu/getMenuByAll`, filter).then((res) => {
+    return res.data;
+  });
+};
+
+// export const getMenuByTypeId = async (id) => {
+//   return axiosClient.get(`menu/getMenuByTypeMenuId`, { MaLoai: id }).then((res) => {
+//     return res.data;
+//   });
+// };

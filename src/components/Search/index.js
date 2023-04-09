@@ -28,7 +28,7 @@ const SearchStyles = styled.div`
   }
 `;
 
-const Search = ({ placeHolder, ...rest }) => {
+const Search = ({ placeHolder = "", onClickSearch = () => {}, ...rest }) => {
   return (
     <SearchStyles>
       <div className="input-group input__group">
@@ -37,9 +37,11 @@ const Search = ({ placeHolder, ...rest }) => {
           className="form-control border-end-0 border input"
           type="search"
           id="example-search-input"
+          {...rest}
         />
         <span className="input-group-append tail__container">
           <button
+            onClick={onClickSearch}
             className="btn btn-outline-secondary bg-white border-start-0 border ms-n5"
             type="button"
           >
