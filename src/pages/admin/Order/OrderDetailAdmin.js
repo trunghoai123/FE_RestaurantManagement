@@ -4,9 +4,9 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { changeStatus ,getOrderDetailByOrder} from "utils/api";
 import Loading from "components/Loading/Loading";
-import ModalAddTable from "./ModalAddTable";
-import ModalAddRoom from "./ModalAddRoom";
-import ModalAddMenu from "./ModalAddMenu";
+import ModalAddTable from "./components/ModalAddTable";
+import ModalAddRoom from "./components/ModalAddRoom";
+import ModalAddMenu from "./components/ModalAddMenu";
 import { enqueueSnackbar } from "notistack";
 
 
