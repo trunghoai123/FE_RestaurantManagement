@@ -122,7 +122,7 @@ function OrderDetailAdmin(props) {
     }
   };
   const handleOrderCancel = async () => {
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line no-use-before-define, no-restricted-globals
     const request = confirm("Bạn có chắc chắn muốn hủy đơn ?");
     if (request) {
       setLoading(true);

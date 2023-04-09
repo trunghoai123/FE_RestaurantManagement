@@ -176,12 +176,17 @@ const adminNavbarItems = [
       {
         id: 1,
         title: "Tìm kiếm",
-        to: "area/search",
+        to: "order/search",
+      },
+      {
+        id: 2,
+        title: "Tạo đơn đặt",
+        to: "order/add",
       },
       {
         id: 2,
         title: "Cập nhật",
-        to: "area/update",
+        to: "order/update",
       },
     ],
   },
