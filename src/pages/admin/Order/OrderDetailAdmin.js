@@ -2,13 +2,13 @@ import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { changeStatus ,getOrderDetailByOrder} from "utils/api";
+import { changeStatus ,getOrderDetailByOrder , updateOrder} from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
 import ModalAddMenu from "./components/ModalAddMenu";
 import { enqueueSnackbar } from "notistack";
-
+import {convertDate} from "./OrderAdmin"
 
 
 function OrderDetailAdmin(props) {
@@ -18,6 +18,9 @@ function OrderDetailAdmin(props) {
     const [isModalAddMenu , setIsModalAddMenu] = useState(false)
     const [isModalAddTable , setIsModalAddTable] = useState(false)
     const [isModalAddRoom , setIsModalAddRoom] = useState(false)
+    const [listThucDon, setListThucDon] = useState([])
+    const [listBan, setListBan] = useState([])
+    const [listPhong, setListPhong] = useState([])
 
 
     useEffect(() =>{
@@ -25,8 +28,12 @@ function OrderDetailAdmin(props) {
         const Id = arrLocation[arrLocation.length-1]
         setOrderId(Id)
         getOrderDetail(Id)
-      
+        
     },[window.location.href])
+
+
+
+
 
 
     const getOrderDetail = async(id)=>{
@@ -34,9 +41,12 @@ function OrderDetailAdmin(props) {
         let result = await getOrderDetailByOrder(id)
         if(result && result.data){
             setOrderDetail(result.data[0])
+            setListThucDon(result.data[0].ListThucDon)
+            setListBan(result.data[0].ListBan)
+            setListPhong(result.data[0].ListPhong)
             setLoading(false)
         }else{
-            setData([])
+            setOrderDetail({})
             setLoading(false)
         }
     }
@@ -46,7 +56,7 @@ function OrderDetailAdmin(props) {
             case 0:
                 return (
                     <>
-                        <button className="btn-order handle" onClick={handleOrder}>Xác nhận đơn</button>
+                        <button className="btn-order handle" onClick={handleOrderConfirm}>Xác nhận đơn</button>
                         <button className="btn-order cancel" onClick={handleOrderCancel}>Hủy đơn</button>
                     </>
                 )
@@ -87,17 +97,47 @@ function OrderDetailAdmin(props) {
     }
 
     const totalPrice  = ()=>{
-        return orderDetail?.ListThucDon?.reduce((total , menu) =>                   
+        return listThucDon?.reduce((total , menu) =>                   
         total + (menu?.MaThucDon?.GiaMon * menu?.SoLuong)
         ,0)
+    }
+
+    const handleOrderConfirm = async()=>{
+        if(orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 && listBan.length < orderDetail?.MaPhieuDat?.SoLuongBanOrPhong ){
+            enqueueSnackbar("Cần cập nhật bàn cho đơn hàng đủ với số lượng", {
+                variant: "warning",
+            });
+        }
+        else if(orderDetail?.MaPhieuDat?.LoaiPhieuDat != 0 && listPhong.length < orderDetail?.MaPhieuDat?.SoLuongBanOrPhong ){
+            enqueueSnackbar("Cần cập nhật phòng cho đơn hàng đủ với số lượng", {
+                variant: "warning",
+            });
+        }
+        else{
+            setLoading(true)
+            let status = 1;
+            let id = orderDetail?.MaPhieuDat?._id;
+            let result = await updateOrder({id,TrangThai : status , ListThucDon: listThucDon , ListBan: listBan , ListPhong : listPhong})
+            if(result.success){
+                getOrderDetail(orderId)
+                setLoading(false)
+                enqueueSnackbar("Xác nhận đơn đặt thành công", {
+                    variant: "success",
+                });
+            }else{
+                setLoading(false)
+                enqueueSnackbar("Xác nhận đơn đặt thất bại", {
+                    variant: "error",
+                });
+        }
+
+        }
     }
 
     const handleOrder = async()=>{
         setLoading(true)
         let status = -1;
         let id = orderDetail?.MaPhieuDat?._id;
-        if(orderDetail?.MaPhieuDat?.TrangThai == 0)
-            status = 1;
         if(orderDetail?.MaPhieuDat?.TrangThai == 1)
             status = 2;
         if(orderDetail?.MaPhieuDat?.TrangThai == 2)
@@ -160,12 +200,69 @@ function OrderDetailAdmin(props) {
                     <div className="col">
                         <div className="item">
                             <div className="title">Thông tin đơn đặt</div>
+                            <p className="">Thời gian đặt: {convertDate(orderDetail?.MaPhieuDat?.createdAt)}</p>
+                            <p className="">Thời gian nhận {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}: {convertDate(orderDetail?.MaPhieuDat?.ThoiGianBatDau)}</p>
                             
+                            <p className="">Số {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}: {orderDetail?.MaPhieuDat?.SoLuongBanOrPhong}</p>
+                            <p className="">Số lượng người trên mỗi {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}: {orderDetail?.MaPhieuDat?.SoLuongNguoiTrenBanOrPhong}</p>
+                            <p className="">Ghi chú: {orderDetail?.MaPhieuDat?.GhiChu}</p>
+                            
+
+
                         </div>
                     </div>
                     <div className="col">
                         <div className="item">
                             <div className="title">{`Thông tin ${orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}`}</div>
+                            
+                            {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? 
+                            
+                            (listBan?.length>0 ? 
+                            <ul className="list-menu">
+                                <li>
+                                    <span className="title-table name-col">Mã bàn</span>
+                                    <span className="title-table">Số thứ tự bàn</span>
+                                    <span className="title-table stock-col right">Số chỗ ngồi</span>
+                                </li>
+                                {listBan?.map((item, index) => {
+                                    return (
+                                        <li key={index}>
+                                            <span className="name-col">{item.MaBan}</span>
+                                            <span className="">{item.SoThuTuBan}</span>
+                                            <span className="right stock-col">{item.SoChoNgoi}</span>
+                                        </li>
+                                    )
+                                })}
+                           
+                        </ul> : "Chưa có bàn"  )
+                        
+                        
+                        
+                        :
+
+                        (listPhong?.length>0 ? 
+                            <ul className="list-menu">
+                                <li>
+                                    <span className="title-table name-col">Mã phòng</span>
+                                    <span className="title-table">Tên phòng</span>
+                                    <span className="title-table stock-col right">Số chỗ ngồi</span>
+                                </li>
+                                {listPhong?.map((item, index) => {
+                                    return (
+                                        <li key={index}>
+                                            <span className="name-col">{item.MaPhong}</span>
+                                            <span className="">{item.TenPhong}</span>
+                                            <span className="right stock-col">{item.SoChoNgoiToiDa}</span>
+                                        </li>
+                                    )
+                                })}
+                           
+                        </ul> : "Chưa có phòng"  )
+
+                        }
+                            
+                            
+                            {orderDetail?.MaPhieuDat?.TrangThai == 0 ?
                             <div className="btn-item">
                                 <button className="btn-order info"
                                     onClick={()=>{
@@ -173,13 +270,13 @@ function OrderDetailAdmin(props) {
                                         setIsModalAddTable(true) : setIsModalAddRoom(true)
                                     }}
                                 >{`Cập nhật ${orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}`}</button>
-                            </div>
+                            </div> : ''}
                         </div>
                     </div>
                     <div className="col">
                         <div className="item">
                             <div className="title">Thông tin thực đơn</div>
-                            {orderDetail?.ListThucDon ? 
+                            {listThucDon ? 
                                 <ul className="list-menu">
                                     <li>
                                         <span className="title-table name-col">Tên món</span>
@@ -187,7 +284,7 @@ function OrderDetailAdmin(props) {
                                         <span className="title-table stock-col right">Số lượng</span>
                                         <span className="title-table right">Thành tiền</span>
                                     </li>
-                                    {orderDetail?.ListThucDon?.map((menu, index) => {
+                                    {listThucDon?.map((menu, index) => {
                                         return (
                                             <li key={index}>
                                                 <span className="name-col">{menu.MaThucDon.TenMon}</span>
@@ -203,28 +300,33 @@ function OrderDetailAdmin(props) {
                                     </li>
                                 </ul> : "Không đặt món"    
                             }
+                            {orderDetail?.MaPhieuDat?.TrangThai == 0 ?
                             <div className="btn-item">
                                 <button className="btn-order info"
                                     onClick={()=>{
                                         setIsModalAddMenu(true)
                                     }}
                                 >Cập nhật món</button>
-                            </div>
+                            </div> : ""}
                         </div>
                     </div>
                 </div>
             </div>
-            {isModalAddMenu && <ModalAddMenu setIsShow={setIsModalAddMenu} />}
+            {isModalAddMenu && <ModalAddMenu 
+                setIsModalAddMenu={setIsModalAddMenu}
+                orderId = {orderId}
+                setLoading = {setLoading}
+                listThucDon = {listThucDon}
+                setListThucDon = {setListThucDon}
+                />}
             {isModalAddTable && <ModalAddTable
              setIsModalAddTable={setIsModalAddTable}
              loaiPhieuDat = {orderDetail?.MaPhieuDat?.LoaiPhieuDat}
-             orderId = {orderId}
              setLoading = {setLoading}
              soNguoi = {orderDetail?.MaPhieuDat?.SoLuongNguoiTrenBanOrPhong}
              thoiGianBatDau = {orderDetail?.MaPhieuDat?.ThoiGianBatDau}
-             soBan = {orderDetail?.MaPhieuDat?.SoLuongBanOrPhong}
-             listBan = {orderDetail?.ListBan}
-             getOrderDetail = {getOrderDetail}
+             listBan = {listBan}
+             setListBan = {setListBan}
              />}
              {isModalAddRoom && <ModalAddRoom
              setIsModalAddRoom={setIsModalAddRoom}
@@ -234,8 +336,8 @@ function OrderDetailAdmin(props) {
              soNguoi = {orderDetail?.MaPhieuDat?.SoLuongNguoiTrenBanOrPhong}
              thoiGianBatDau = {orderDetail?.MaPhieuDat?.ThoiGianBatDau}
              soPhong = {orderDetail?.MaPhieuDat?.SoLuongBanOrPhong}
-             listPhong = {orderDetail?.ListPhong}
-             getOrderDetail = {getOrderDetail}
+             listPhong = {listPhong}
+             setListPhong=  {setListPhong}
              />}
         </OrderDetailAdminStyle>
         

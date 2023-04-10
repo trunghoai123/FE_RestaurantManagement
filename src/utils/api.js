@@ -155,3 +155,17 @@ export const getTypeOfRoomById = async (MaLoai) => {
     return res.data;
   });
 };
+
+
+export const addOrder = async ({LoaiPhieuDat,TrangThai,SoLuongNguoiTrenBanOrPhong,SoLuongBanOrPhong,
+  ThoiGianBatDau,MaKhachHang,ListThucDon,ListPhong,ListBan,HoTen ,Email ,SoDienThoai,GhiChu
+}) => {
+  return axiosClient.post(`order/addOrder`,
+  {LoaiPhieuDat,TrangThai,SoLuongNguoiTrenBanOrPhong,SoLuongBanOrPhong,ThoiGianBatDau,
+    MaKhachHang,ListThucDon,ListPhong,ListBan,HoTen ,Email ,SoDienThoai,GhiChu
+  }).then((res) => {
+    return res.data;
+  });
+};
+
+
