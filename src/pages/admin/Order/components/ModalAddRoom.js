@@ -8,7 +8,7 @@ const MaLoaiPhongThuong = 1;
 const MaLoaiPhongVIP = 2;
 
 function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
-    soNguoi , thoiGianBatDau , soPhong , listPhong , getOrderDetail}) {
+    soNguoi , thoiGianBatDau , soPhong , listPhong , setListPhong}) {
     const [data, setData] = useState([])
     const [dataUse , setDataUse] =useState([])
     const [maLoaiPhong, setMaLoaiPhong] =useState("")
@@ -49,22 +49,11 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
         }
     }
     const handleSave= async ()=>{
-        setLoading(true)
-        let result = await updateOrder({id: orderId , ListPhong: dataUse})
-        if(result.success){
-            setLoading(false)
-            setIsModalAddRoom(false)
-            getOrderDetail(orderId)
-            enqueueSnackbar("Cập nhật phòng cho đơn đặt thành công", {
-                variant: "success",
-              });
-        }
-        else{
-            setLoading(false)
-            enqueueSnackbar("Cập nhật phòng cho đơn đặt thất bại", {
-                variant: "error",
-              });
-        }
+        setIsModalAddRoom(false)
+        setListPhong(dataUse)
+        enqueueSnackbar("Cập nhật phòng cho đơn đặt thành công", {
+            variant: "success",
+        });
     }
 
     return ( 

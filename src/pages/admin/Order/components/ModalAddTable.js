@@ -5,8 +5,8 @@ import { updateOrder , getTableMatchTimeAndSeat } from "utils/api";
 import { enqueueSnackbar } from "notistack";
 
 
-function ModalAddTable({setIsModalAddTable, loaiPhieuDat , orderId , setLoading,
-    soNguoi , thoiGianBatDau , soBan , listBan , getOrderDetail}) {
+function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
+    soNguoi , thoiGianBatDau , listBan , setListBan}) {
     const [data, setData] = useState([])
     const [dataUse , setDataUse] =useState([])
 
@@ -30,22 +30,13 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , orderId , setLoading,
         }
     }
     const handleSave= async ()=>{
-        setLoading(true)
-        let result = await updateOrder({id: orderId , ListBan: dataUse})
-        if(result.success){
-            setLoading(false)
-            setIsModalAddTable(false)
-            getOrderDetail(orderId)
-            enqueueSnackbar("Cập nhật bàn cho đơn đặt thành công", {
-                variant: "success",
-              });
-        }
-        else{
-            setLoading(false)
-            enqueueSnackbar("Cập nhật bàn cho đơn đặt thất bại", {
-                variant: "error",
-              });
-        }
+      
+        setIsModalAddTable(false)
+        setListBan(dataUse)
+        enqueueSnackbar("Cập nhật bàn cho đơn đặt thành công", {
+            variant: "success",
+        });
+       
     }
 
     return ( 
