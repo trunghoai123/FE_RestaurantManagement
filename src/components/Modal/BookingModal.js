@@ -21,9 +21,10 @@ import { clearCart } from "store/cart/cartSlice";
 const BookingModalStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
-  z-index: 999;
+  z-index: 9999;
   width: 100%;
   height: 100vh;
+  top: 0;
   .main__form {
     .overlay {
       transition: all ease 200ms;

@@ -5,6 +5,8 @@ import Button from "components/Button/Button";
 import { colors } from "variables";
 import styled from "styled-components";
 import { convertToVND } from "utils/utils";
+import { useDispatch, useSelector } from "react-redux";
+import { removeCartItem } from "store/cart/cartSlice";
 const CartStyles = styled.div`
   position: relative;
   z-index: 10;
@@ -21,12 +23,12 @@ const CartStyles = styled.div`
     position: absolute;
     top: 100%;
     right: 0;
-    width: 260px;
+    width: 360px;
     /* height: 430px; */
     padding: 6px;
     background-color: ${colors.gold_1};
-    transition: all ease 200ms;
-    transform: translateX(260px);
+    transition: all ease 300ms;
+    transform: translateX(360px);
 
     .cart__title {
       padding-bottom: 6px;
@@ -60,7 +62,7 @@ const CartStyles = styled.div`
         display: flex;
         .remove {
           top: 0px;
-          right: 2px;
+          right: 4px;
           position: absolute;
           :hover {
             color: red;
@@ -82,13 +84,19 @@ const CartStyles = styled.div`
           .name__container {
             padding: 4px 4px 4px 6px;
             font-size: 15px;
-            width: 130px;
+            width: 140px;
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
             -webkit-line-clamp: 2; /* number of lines to show */
             line-clamp: 2;
             -webkit-box-orient: vertical;
+          }
+          .price__container {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            padding: 0 12px;
           }
           .quant__container {
             display: flex;
@@ -166,6 +174,17 @@ const CartStyles = styled.div`
   }
 `;
 const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
+  // const { removeCartItem } = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+  const handleRemoveItem = (dishId) => {
+    dispatch(removeCartItem(dishId));
+  };
+  const handleIncreseItem = (dishId) => {
+    dispatch(removeCartItem(dishId));
+  };
+  const handleDecreseItem = (dishId) => {
+    dispatch(removeCartItem(dishId));
+  };
   return (
     <CartStyles>
       <div className="cart__logo__container">
@@ -179,20 +198,24 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
             cartList.map((item, index) => {
               return (
                 <div className="cart__item" key={index}>
-                  <span className="remove">
-                    <i className="fa-solid fa-xmark"></i>
-                  </span>
                   <div className="img__container">
-                    <img className="img__dish" src={item.HinhAnh} alt="" />
+                    <img className="img__dish" src={item?.HinhAnh} alt="" />
                   </div>
                   <div className="infor__container">
-                    <div className="name__container">{item.TenMon}</div>
+                    <div className="name__container">{item?.TenMon}</div>
+                    <div className="price__container">{convertToVND(item?.GiaMon)}</div>
                     <div className="quant__container">
                       <div className="mark__container">
-                        <span className="update__quant">
+                        <span
+                          className="update__quant"
+                          onClick={() => handleIncreseItem(item?._id)}
+                        >
                           <i className="fa-solid fa-minus"></i>
                         </span>
-                        <span className="update__quant">
+                        <span
+                          className="update__quant"
+                          onClick={() => handleIncreseItem(item?._id)}
+                        >
                           <i className="fa-solid fa-plus"></i>
                         </span>
                       </div>
@@ -200,10 +223,13 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
                         onChange={() => {}}
                         className="quantity"
                         type="text"
-                        value={item.SoLuong}
+                        value={item?.SoLuong}
                       />
                     </div>
                   </div>
+                  <span className="remove" onClick={() => handleRemoveItem(item?._id)}>
+                    <i className="fa-solid fa-xmark"></i>
+                  </span>
                 </div>
               );
             })}

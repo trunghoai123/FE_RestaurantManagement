@@ -49,6 +49,15 @@ const cartSlice = createSlice({
         state.totalMoney = sum;
       }
     },
+    removeCartItem(state, action) {
+      console.log(action.payload);
+    },
+    increaseCartItem(state, action) {
+      console.log(action.payload);
+    },
+    decreaseCartItem(state, action) {
+      console.log(action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -93,7 +102,16 @@ const cartSlice = createSlice({
 // Extract the action creators object and the reducer
 const { actions, reducer } = cartSlice;
 // Extract and export each action creator by name
-export const { createCart, updateCart, clearCart, addToCart, setTotalMoney, reloadTotalMoney } =
-  actions;
+export const {
+  createCart,
+  updateCart,
+  clearCart,
+  addToCart,
+  setTotalMoney,
+  reloadTotalMoney,
+  removeCartItem,
+  increaseCartItem,
+  decreaseCartItem,
+} = actions;
 // Export the reducer, either as a default or named export
 export default reducer;

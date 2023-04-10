@@ -54,6 +54,9 @@ const DishesStyles = styled.div`
         text-decoration: underline;
         cursor: pointer;
         user-select: none;
+        &.active {
+          color: ${colors.gold_1};
+        }
       }
       .filter__kind {
         padding: 0 20px 20px 20px;
@@ -213,13 +216,20 @@ const DishesStyles = styled.div`
           display: flex;
           justify-content: center;
           align-items: center;
+
           > li {
+            margin: 0 2px;
             border-radius: 4px;
             list-style-type: none;
             color: white;
             font-weight: 500;
             /* display: flex;
             align-items: center; */
+            &.selected {
+              background-color: ${colors.light_gray_1};
+              color: ${colors.orange_1};
+            }
+
             > a {
               display: flex;
               justify-content: center;
@@ -231,8 +241,20 @@ const DishesStyles = styled.div`
               display: flex;
               align-items: center;
               :hover {
+                border-radius: 4px;
                 background-color: ${colors.light_gray_1};
                 color: ${colors.gold_1};
+              }
+            }
+            &.disabled {
+              color: gray;
+              a {
+                background-color: ${colors.orange_1};
+                color: ${colors.gray_1};
+                :hover {
+                  background-color: ${colors.orange_1};
+                  color: ${colors.gray_1};
+                }
               }
             }
           }
@@ -241,7 +263,7 @@ const DishesStyles = styled.div`
     }
   }
 `;
-const itemsPerPage = 4;
+const itemsPerPage = 8;
 const Dishes = (props) => {
   const [showForm, setShowForm] = useState(false);
   const handleCloseForm = () => setShowForm(false);
@@ -265,7 +287,6 @@ const Dishes = (props) => {
   if (dishes && dishes?.length > 0) {
     currentItems = dishes.slice(itemOffset, endOffset);
     pageCount = Math.ceil(dishes.length / itemsPerPage);
-    console.log(`Loading items from ${itemOffset} to ${endOffset}`);
   }
   // });
   const handleShowModal = () => {
@@ -333,7 +354,7 @@ const Dishes = (props) => {
   };
 
   const hanleClickOnDish = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
   };
   const handleTypeSearch = (e) => {
     setSearch(e.target.value);
@@ -354,12 +375,10 @@ const Dishes = (props) => {
 
   const handlePageClick = (event) => {
     const newOffset = (event.selected * itemsPerPage) % dishes.length;
-    console.log(`User requested page number ${event.selected}, which is offset ${newOffset}`);
     setItemOffset(newOffset);
   };
   const onPageActive = (number) => {
     const newOffset = (number.selected * itemsPerPage) % dishes.length;
-    console.log(`User requested page number ${number.selected}, which is offset ${newOffset}`);
     setItemOffset(newOffset);
   };
   return (
@@ -378,7 +397,10 @@ const Dishes = (props) => {
       <div className="main__container">
         <Cart total={totalMoney} cartList={cartItems} handleShowModal={handleShowModal}></Cart>
         <div className="left__container">
-          <div className="all__type" onClick={() => handleClickKind("")}>
+          <div
+            className={`all__type ${filter?.kindOfDish || "active"}`}
+            onClick={() => handleClickKind("")}
+          >
             Tất cả
           </div>
           <div className="filter__kind">
@@ -390,7 +412,7 @@ const Dishes = (props) => {
                   className={`kind__container ${filter?.kindOfDish === kind?._id ? "active" : ""}`}
                 >
                   <div className="kind__item">
-                    <img src={kind?.imageUrl} className="kind__image" alt="" />
+                    <img src={kind?.HinhAnh} className="kind__image" alt="" />
                     <div className="kind__item--name">{kind?.TenLoai}</div>
                     <div className="overlay"></div>
                   </div>
@@ -404,7 +426,7 @@ const Dishes = (props) => {
             {currentItems?.map((dish) => {
               return (
                 <Link
-                  // onClick={hanleClickOnDish}
+                  onClick={hanleClickOnDish}
                   to={`/dish/${dish?._id}`}
                   key={dish?._id}
                   className="dish"
