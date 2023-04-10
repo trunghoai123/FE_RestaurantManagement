@@ -59,6 +59,17 @@ const AreaUpdateFormStyles = styled.div`
       display: flex;
       flex-direction: column;
       .modal__title {
+        .close__icon {
+          font-size: 24px;
+          position: absolute;
+          right: 5px;
+          top: 0;
+          cursor: pointer;
+          :hover {
+            color: red;
+            transition: all ease 150ms;
+          }
+        }
         .title__container {
           .title__text {
           }
@@ -346,6 +357,9 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">
           <div className="modal__title">
+            <span className="close__icon" onClick={handleCloseForm}>
+              <i className="fa-solid fa-xmark"></i>
+            </span>
             <div className="title__container">
               <h4 className="title__text">
                 {mode?.mode === 1 ? "Cập Nhật Khu Vực" : "Thêm Khu Vực"}

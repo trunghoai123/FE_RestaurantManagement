@@ -6,7 +6,7 @@ import { colors } from "variables";
 import styled from "styled-components";
 import { convertToVND } from "utils/utils";
 import { useDispatch, useSelector } from "react-redux";
-import { removeCartItem } from "store/cart/cartSlice";
+import { decreaseCartItem, increaseCartItem, removeCartItem } from "store/cart/cartSlice";
 const CartStyles = styled.div`
   position: relative;
   z-index: 10;
@@ -180,10 +180,10 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
     dispatch(removeCartItem(dishId));
   };
   const handleIncreseItem = (dishId) => {
-    dispatch(removeCartItem(dishId));
+    dispatch(increaseCartItem(dishId));
   };
   const handleDecreseItem = (dishId) => {
-    dispatch(removeCartItem(dishId));
+    dispatch(decreaseCartItem(dishId));
   };
   return (
     <CartStyles>
@@ -194,6 +194,7 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
       <div className="cart__list__container">
         <div className="cart__title">Giỏ Hàng</div>
         <div className="cart__list">
+          {cartList?.length === 0 && "Chưa chọn món nào!"}
           {cartList &&
             cartList.map((item, index) => {
               return (
@@ -208,7 +209,7 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
                       <div className="mark__container">
                         <span
                           className="update__quant"
-                          onClick={() => handleIncreseItem(item?._id)}
+                          onClick={() => handleDecreseItem(item?._id)}
                         >
                           <i className="fa-solid fa-minus"></i>
                         </span>
@@ -234,7 +235,9 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
               );
             })}
         </div>
-        <div className="sum__container">Tổng tiền: {convertToVND(total)}</div>
+        {cartList?.length > 0 && (
+          <div className="sum__container">Tổng tiền: {convertToVND(total)}</div>
+        )}
         <div className="btn__container">
           <Button
             bgColor={colors.orange_2}

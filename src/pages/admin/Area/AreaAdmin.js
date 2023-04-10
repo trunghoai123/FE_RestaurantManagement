@@ -131,7 +131,7 @@ const AreaAdmin = (props) => {
     <AreaAdminStyles>
       <div className="top__actions">
         <Search placeHolder="Tìm Kiếm"></Search>
-        <DropdownManage>
+        <DropdownManage borderRadius="6px">
           <li>
             <div
               onClick={() => handleOpenUpdate(null)}
@@ -167,7 +167,7 @@ const AreaAdmin = (props) => {
           </tr>
         </thead>
         <tbody className="table__body">
-          {areas?.map((area, index) => {
+          {areas?.map((area) => {
             return (
               <tr className="table__row" key={area?._id}>
                 <td className="table__data item__id">{area.MaKhuVuc}</td>
@@ -183,6 +183,8 @@ const AreaAdmin = (props) => {
                 <td className="table__data">
                   <Button
                     // to={`/admin/area/update/${area?._id}`}
+                    borderRadius="8px"
+                    padding="4px 8px"
                     onClick={() => handleOpenUpdate(area?._id)}
                     className="button button__update"
                     bgHover={colors.orange_1_hover}
@@ -194,6 +196,8 @@ const AreaAdmin = (props) => {
                     </div>
                   </Button>
                   <Button
+                    borderRadius="8px"
+                    padding="4px 8px"
                     className="button button__remove"
                     bgHover={colors.red_1_hover}
                     bgColor={colors.red_1}

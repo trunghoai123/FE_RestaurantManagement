@@ -48,6 +48,17 @@ const BookingModalStyles = styled.div`
       height: 90%;
       display: flex;
       flex-direction: column;
+      .close__icon {
+        font-size: 24px;
+        position: absolute;
+        right: 5px;
+        top: 0;
+        cursor: pointer;
+        :hover {
+          color: red;
+          transition: all ease 150ms;
+        }
+      }
       .modal__title {
         .title__container {
           .title__text {
@@ -460,6 +471,9 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">
+          <span className="close__icon" onClick={handleCloseForm}>
+            <i className="fa-solid fa-xmark"></i>
+          </span>
           <div className="modal__title">
             <div className="title__container">
               <h4 className="title__text">Đặt Bàn</h4>

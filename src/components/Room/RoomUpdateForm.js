@@ -25,7 +25,19 @@ import Input from "components/Input/Input";
 import TextArea from "components/TextArea/TextArea";
 import { convertBase64 } from "utils/utils";
 import axios from "axios";
-import { addNewArea, getAreaByAreaId, getAreaById, updateArea, uploadImage } from "utils/api";
+import {
+  addNewArea,
+  addNewRoom,
+  getAllArea,
+  getAllTypeOfRoom,
+  getAreaByAreaId,
+  getAreaById,
+  getRoomById,
+  getRoomByRoomId,
+  updateArea,
+  updateRoom,
+  uploadImage,
+} from "utils/api";
 import { useState } from "react";
 import { useEffect } from "react";
 const RoomUpdateFormStyles = styled.div`
@@ -59,6 +71,17 @@ const RoomUpdateFormStyles = styled.div`
       display: flex;
       flex-direction: column;
       .modal__title {
+        .close__icon {
+          font-size: 24px;
+          position: absolute;
+          right: 5px;
+          top: 0;
+          cursor: pointer;
+          :hover {
+            color: red;
+            transition: all ease 150ms;
+          }
+        }
         .title__container {
           .title__text {
           }
@@ -164,6 +187,12 @@ const RoomUpdateFormStyles = styled.div`
                     right: 20px;
                   }
                 }
+                .select__box {
+                  width: 100%;
+                  border: 1px solid lightGray;
+                  padding: 6px 12px;
+                  outline: none;
+                }
                 .input__text {
                 }
               }
@@ -199,9 +228,22 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
           return true;
         },
       }),
-      name: yup.string("hãy xem lại tên").required("hãy nhập tên"),
-      detail: yup.string("hãy xem lại chi tiết").required("hãy nhập vị trí cụ thể"),
-      description: yup.string("hãy xem lại mô tả").required("hãy nhập mô tả"),
+      size: yup
+        .string("hãy xem lại số người")
+        .required("hãy nhập số người")
+        .test({
+          name: "check-size",
+          skipAbsent: true,
+          test(value, ctx) {
+            if (isNaN(Number(value)) || Number(value) === 0) {
+              return ctx.createError({ message: "hãy nhập số lượng phù hợp" });
+            }
+            return true;
+          },
+        }),
+      area: yup.string("Hãy kiểm tra lại khu vực").required("Hãy chọn khu vực"),
+      kindOfRoom: yup.string("Hãy kiểm tra lại loại phòng").required("Hãy chọn loại phòng"),
+      status: yup.string("Hãy kiểm tra lại trạng thái").required("Hãy chọn trạng thái"),
     })
     .required();
   const {
@@ -212,39 +254,72 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     setError,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      // email: "hoaitrung@gmail.com",
-      // password: "123123123",
-    },
+    defaultValues: {},
     resolver: yupResolver(schema),
   });
-  const [currentArea, setCurrentArea] = useState(null);
+
+  const [currentRoom, setCurrentRoom] = useState(null);
+  const [isLoadedImage, setIsLoadedImage] = useState(false);
   const [imageSelecting, setImageSelecting] = useState("");
+  const [areas, setAreas] = useState([]);
+  const [roomKinds, setRoomKinds] = useState([]);
+
   useEffect(() => {
     if (mode.mode === 1) {
-      const loadAreaOnUpdate = async () => {
-        try {
-          const data = await getAreaById(mode.id);
-          const area = data.data;
-          setCurrentArea(area);
-          if (area) {
-            setValue("id", area.MaKhuVuc);
-            setValue("name", area.TenKhuVuc);
-            setValue("description", area.MoTa);
-            setValue("detail", area.ViTriCuThe);
-            setImageSelecting(area.HinhAnh);
-            setIsLoadedImage(true);
-          } else {
-          }
-        } catch (error) {
-          console.log(error);
-          return;
-        }
-      };
-      loadAreaOnUpdate();
+      loadRoomOnUpdate();
     }
+    loadAllArea();
+    loadAllKindOfRoom();
   }, []);
-  const [isLoadedImage, setIsLoadedImage] = useState(false);
+  const loadAllKindOfRoom = async () => {
+    try {
+      const data = await getAllTypeOfRoom();
+      if (data?.data) {
+        if (mode.mode === 2) {
+          setValue("kindOfRoom", data.data[2]._id);
+        }
+        setRoomKinds(data.data);
+      }
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
+  const loadRoomOnUpdate = async () => {
+    try {
+      const data = await getRoomById(mode.id);
+      const room = data.data;
+      setCurrentRoom(room);
+      if (room) {
+        console.log(room);
+        setValue("id", room.MaPhong);
+        setValue("size", room.SoChoNgoiToiDa);
+        setValue("area", room.MaKhuVuc);
+        setValue("kindOfRoom", room.MaLoai);
+        setValue("status", room.TrangThai);
+        setImageSelecting(room.HinhAnh);
+        setIsLoadedImage(true);
+      }
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
+
+  const loadAllArea = async () => {
+    try {
+      const data = await getAllArea();
+      if (data?.data) {
+        if (mode.mode === 2) {
+          setValue("area", data.data[0]._id);
+        }
+        setAreas(data.data);
+      }
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
   const onSubmit = async (values) => {
     if (!isLoadedImage) {
       setError("image", { type: "required", message: "Hãy chọn ảnh" });
@@ -253,16 +328,31 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       if (mode.mode === 1) {
         //update
         const updatedArea = {
-          id: currentArea?._id,
-          TenKhuVuc: values.name.trim(),
+          id: currentRoom._id,
+          TenPhong: currentRoom._id,
+          TrangThai: Number(values.status),
+          SoChoNgoiToiDa: values.size,
           HinhAnh: imageSelecting,
-          MoTa: values.description.trim(),
-          ViTriCuThe: values.detail.trim(),
-          SoNguoiToiDa: currentArea?.SoNguoiToiDa,
+          MaLoai: values.kindOfRoom,
+          MaKhuVuc: values.area,
+          //-------------------
+          // id: currentArea?._id,
+          // TenKhuVuc: values.name.trim(),
+          // HinhAnh: imageSelecting,
+          // MoTa: values.description.trim(),
+          // ViTriCuThe: values.detail.trim(),
+          // SoNguoiToiDa: currentArea?.SoNguoiToiDa,
+          //-------------
+          // id,
+          // TenPhong,
+          // TrangThai,
+          // SoChoNgoiToiDa,
+          // HinhAnh,
+          // MaLoai,
+          // MaKhuVuc,
         };
-        console.log(updatedArea);
         try {
-          const addAreaRs = await updateArea(updatedArea);
+          const addAreaRs = await updateRoom(updatedArea);
           if (addAreaRs.data._id) {
             enqueueSnackbar("Cập nhật khu vực thành công", {
               variant: "success",
@@ -275,16 +365,11 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             variant: "error",
           });
         }
-        // id,
-        // TenKhuVuc,
-        // HinhAnh,
-        // MoTa,
-        // ViTriCuThe,
-        // SoNguoiToiDa,
       } else {
-        const checkAreaId = async () => {
+        // mode.mode = 2 - add
+        const checkRoomById = async () => {
           try {
-            const data = await getAreaByAreaId(values.id);
+            const data = await getRoomByRoomId(values.id);
             if (data.data) {
               return true;
             } else {
@@ -295,32 +380,52 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             return false;
           }
         };
-        const checkingRs = await checkAreaId();
+        const checkingRs = await checkRoomById();
         if (!checkingRs) {
-          const newArea = {
-            MaKhuVuc: values.id.trim(),
-            TenKhuVuc: values.name.trim(),
+          console.log({
+            MaLoai: values.kind,
+            MaKhuVuc: values.area,
+          });
+          const newRoom = {
+            MaPhong: values.id.trim(),
+            TenPhong: values.id.trim(),
+            TrangThai: Number(values.status),
+            SoChoNgoiToiDa: Number(values.size),
             HinhAnh: imageSelecting,
-            MoTa: values.description.trim(),
-            ViTriCuThe: values.detail.trim(),
-            SoNguoiToiDa: 0,
+            MaLoai: values.kind,
+            MaKhuVuc: values.area,
+            //-------------
+            // MaKhuVuc: values.id.trim(),
+            // TenKhuVuc: values.name.trim(),
+            // HinhAnh: imageSelecting,
+            // MoTa: values.description.trim(),
+            // ViTriCuThe: values.detail.trim(),
+            // SoNguoiToiDa: 0,
+            // ---------------
+            // MaPhong,
+            // TenPhong,
+            // TrangThai,
+            // SoChoNgoiToiDa,
+            // HinhAnh,
+            // MaLoai,
+            // MaKhuVuc,
           };
           try {
-            const addAreaRs = await addNewArea(newArea);
-            if (addAreaRs.data._id) {
-              enqueueSnackbar("Thêm khu vực thành công", {
+            const addRoomRs = await addNewRoom(newRoom);
+            if (addRoomRs.data._id) {
+              enqueueSnackbar("Thêm phòng thành công", {
                 variant: "success",
               });
               handleCloseForm();
             }
           } catch (error) {
             console.log(error);
-            enqueueSnackbar("Lỗi!. Không thể thêm khu vực", {
+            enqueueSnackbar("Lỗi!. Không thể thêm phòng", {
               variant: "error",
             });
           }
         } else {
-          enqueueSnackbar("Mã khu vực bị trùng", {
+          enqueueSnackbar("Mã phòng bị trùng", {
             variant: "error",
           });
         }
@@ -346,10 +451,11 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">
           <div className="modal__title">
+            <span className="close__icon" onClick={handleCloseForm}>
+              <i className="fa-solid fa-xmark"></i>
+            </span>
             <div className="title__container">
-              <h4 className="title__text">
-                {mode?.mode === 1 ? "Cập Nhật Khu Vực" : "Thêm Khu Vực"}
-              </h4>
+              <h4 className="title__text">{mode?.mode === 1 ? "Cập Nhật Phòng" : "Thêm Phòng"}</h4>
             </div>
           </div>
           <div className="modal__body">
@@ -381,27 +487,101 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="data">
-                      Tên
+                      Số người
                     </label>
                   </div>
                   <div className="input__container">
                     <Input
                       autoComplete="off"
-                      type="text"
+                      type="number"
                       className="input"
-                      id="name"
-                      name="name"
-                      {...register("name")}
+                      min="1"
+                      id="size"
+                      name="size"
+                      {...register("size")}
                     />
                   </div>
-                  {errors?.name && (
+                  {errors?.size && (
                     <div className="error__container">
-                      <div className="error__message">{errors?.name?.message}</div>
+                      <div className="error__message">{errors?.size?.message}</div>
                     </div>
                   )}
                 </div>
               </div>
               <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="size">
+                      Khu vực
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <select name="area" className="select__box" {...register("area")}>
+                      {areas?.length > 0 &&
+                        areas.map((area) => {
+                          return (
+                            <option key={area?._id} className="option" value={area?._id}>
+                              {area?.MaKhuVuc}
+                            </option>
+                          );
+                        })}
+                    </select>
+                  </div>
+                  {errors?.area && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.area?.message}</div>
+                    </div>
+                  )}
+                </div>
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="data">
+                      Loại phòng
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <select name="kindOfRoom" className="select__box" {...register("kindOfRoom")}>
+                      {roomKinds?.length > 0 &&
+                        roomKinds.map((kind) => {
+                          // console.log(kind);
+                          return (
+                            <option key={kind?._id} className="option" value={kind?._id}>
+                              {kind?.TenLoai}
+                            </option>
+                          );
+                        })}
+                    </select>
+                  </div>
+                  {errors?.kindOfRoom && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.kindOfRoom?.message}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="data">
+                      Trạng thái
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <select name="status" className="select__box" {...register("status")}>
+                      <option className="option" value="0">
+                        Còn trống
+                      </option>
+                      <option className="option" value="1">
+                        Đang sử dụng
+                      </option>
+                    </select>
+                  </div>
+                  {errors?.status && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.status?.message}</div>
+                    </div>
+                  )}
+                </div>
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="time">
@@ -431,51 +611,6 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </div>
                   )}
                 </div>
-                <div className="value__container">
-                  <div className="label__container">
-                    <label className="label" htmlFor="time">
-                      Vị trí cụ thế
-                    </label>
-                  </div>
-                  <div className="input__container">
-                    <TextArea
-                      resize="none"
-                      className="input"
-                      id="detail"
-                      name="detail"
-                      {...register("detail")}
-                    ></TextArea>
-                  </div>
-                  {errors?.detail && (
-                    <div className="error__container">
-                      <div className="error__message">{errors?.detail?.message}</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="row__container">
-                <div className="value__container">
-                  <div className="label__container">
-                    <label className="label" htmlFor="time">
-                      Mô tả
-                    </label>
-                  </div>
-                  <div className="input__container">
-                    <TextArea
-                      className="input"
-                      name="description"
-                      id="description"
-                      {...register("description")}
-                      resize="none"
-                    ></TextArea>
-                  </div>
-                  {errors?.description && (
-                    <div className="error__container">
-                      <div className="error__message">{errors?.description?.message}</div>
-                    </div>
-                  )}
-                </div>
-                <div className="value__container"></div>
               </div>
             </div>
           </div>

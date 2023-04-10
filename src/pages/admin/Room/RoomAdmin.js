@@ -6,7 +6,7 @@ import { colors } from "variables";
 import DropdownManage from "components/Dopdown/ButtonDropDown";
 import Search from "components/Search";
 import axiosClient from "utils/axios";
-import { getAllRoom } from "utils/api";
+import { deleteRoomById, getAllRoom } from "utils/api";
 import RoomUpdateForm from "components/Room/RoomUpdateForm";
 import { confirmAlert } from "react-confirm-alert";
 import { enqueueSnackbar } from "notistack";
@@ -85,7 +85,7 @@ const RoomAdmin = (props) => {
       }
     };
     fetchRooms();
-  }, []);
+  }, [mode]);
   const handleOpenUpdate = (id) => {
     if (id) {
       setMode({ id, mode: 1 });
@@ -99,40 +99,40 @@ const RoomAdmin = (props) => {
     setOpenUpdateForm(false);
   };
   const handleDelete = (id) => {
-    // const deleteArea = async (id) => {
-    //   try {
-    //     await deleteAreaById({ id });
-    //     setMode({ ...mode });
-    //     enqueueSnackbar("Đã xóa khu vực", {
-    //       variant: "success",
-    //     });
-    //   } catch (error) {
-    //     console.log(error);
-    //     enqueueSnackbar("Lỗi!. Không thể xóa khu vực", {
-    //       variant: "error",
-    //     });
-    //   }
-    // };
-    // confirmAlert({
-    //   title: "Xác nhận",
-    //   message: "Bạn có muốn xóa khu vực đã chọn không",
-    //   buttons: [
-    //     {
-    //       label: "Có",
-    //       onClick: () => deleteArea(id),
-    //     },
-    //     {
-    //       label: "Không",
-    //       onClick: () => {},
-    //     },
-    //   ],
-    // });
+    const deleteArea = async (id) => {
+      try {
+        await deleteRoomById({ id });
+        setMode({ ...mode });
+        enqueueSnackbar("Đã xóa phòng", {
+          variant: "success",
+        });
+      } catch (error) {
+        console.log(error);
+        enqueueSnackbar("Lỗi!. Không thể xóa phòng", {
+          variant: "error",
+        });
+      }
+    };
+    confirmAlert({
+      title: "Xác nhận",
+      message: "Bạn có muốn xóa phòng đã chọn không",
+      buttons: [
+        {
+          label: "Có",
+          onClick: () => deleteArea(id),
+        },
+        {
+          label: "Không",
+          onClick: () => {},
+        },
+      ],
+    });
   };
   return (
     <RooomAdminStyles>
       <div className="top__actions">
         <Search placeHolder="Tìm Kiếm"></Search>
-        <DropdownManage>
+        <DropdownManage borderRadius="6px">
           <li>
             <div
               onClick={() => handleOpenUpdate(null)}
@@ -150,11 +150,17 @@ const RoomAdmin = (props) => {
             <th className="table__head item__id" scope="col">
               Mã Phòng
             </th>
-            <th className="table__head" scope="col">
+            {/* <th className="table__head" scope="col">
               Tên Phòng
-            </th>
+            </th> */}
             <th className="table__head" scope="col">
               Khu vực
+            </th>
+            <th className="table__head" scope="col">
+              Loại phòng
+            </th>
+            <th className="table__head" scope="col">
+              Trạng thái
             </th>
             <th className="table__head" scope="col">
               Số Chỗ Ngồi Tối Đa
@@ -165,12 +171,16 @@ const RoomAdmin = (props) => {
           </tr>
         </thead>
         <tbody className="table__body">
-          {rooms?.map((room, index) => {
+          {rooms?.map((room) => {
             return (
               <tr className="table__row" key={room?._id}>
                 <td className="table__data item__id">{room?.MaPhong}</td>
-                <td className="table__data">{room?.TenPhong}</td>
+                {/* <td className="table__data">{room?.TenPhong}</td> */}
                 <td className="table__data">{room?.MaKhuVuc?.TenKhuVuc}</td>
+                <td className="table__data">{room?.MaLoai?.TenLoai}</td>
+                <td className="table__data">
+                  {room?.TrangThai === 0 ? "Còn trống" : "Đang sử dụng"}
+                </td>
                 <td className="table__data">{room?.SoChoNgoiToiDa}</td>
                 <td className="table__data data__image">
                   <div className="img__container">
@@ -179,6 +189,8 @@ const RoomAdmin = (props) => {
                 </td>
                 <td className="table__data">
                   <Button
+                    padding="4px 8px"
+                    borderRadius="7px"
                     className="button button__update"
                     bgHover={colors.orange_1_hover}
                     bgColor={colors.orange_1}
@@ -190,6 +202,8 @@ const RoomAdmin = (props) => {
                     </div>
                   </Button>
                   <Button
+                    padding="4px 8px"
+                    borderRadius="7px"
                     onClick={() => handleDelete(room?._id)}
                     className="button button__remove"
                     bgHover={colors.red_1_hover}

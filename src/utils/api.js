@@ -13,6 +13,12 @@ export const getAreaByAreaId = async (MaKhuVuc) => {
   });
 };
 
+export const getRoomByRoomId = async (MaPhong) => {
+  return axiosClient.post(`room/getRoomByRoomId`, { MaPhong }).then((res) => {
+    return res.data;
+  });
+};
+
 export const getAllArea = async () => {
   return axiosClient.get(`area/getAllArea`).then((res) => {
     return res.data;
@@ -24,9 +30,20 @@ export const addNewArea = async (area) => {
     return res.data;
   });
 };
+export const addNewRoom = async (roomData) => {
+  return axiosClient.post(`room/addRoom`, roomData).then((res) => {
+    return res.data;
+  });
+};
 
 export const updateArea = async (area) => {
   return axiosClient.post(`area/updateArea`, area).then((res) => {
+    return res.data;
+  });
+};
+
+export const updateRoom = async (room) => {
+  return axiosClient.post(`room/updateRoom`, room).then((res) => {
     return res.data;
   });
 };
@@ -37,8 +54,20 @@ export const getAreaById = async (id) => {
   });
 };
 
+export const getRoomById = async (id) => {
+  return axiosClient.get(`room/getRoomById/${id}`).then((res) => {
+    return res.data;
+  });
+};
+
 export const deleteAreaById = async (id) => {
   return axiosClient.post(`area/deleteArea`, id).then((res) => {
+    return res.data;
+  });
+};
+
+export const deleteRoomById = async (id) => {
+  return axiosClient.post(`room/deleteRoom`, id).then((res) => {
     return res.data;
   });
 };
@@ -93,6 +122,12 @@ export const getAllTypeOfDish = async () => {
   });
 };
 
+export const getAllTypeOfRoom = async () => {
+  return axiosClient.get(`typeOfRoom/getAllTypeOfRoom`).then((res) => {
+    return res.data;
+  });
+};
+
 export const getMenuByAll = async (filter) => {
   return axiosClient.post(`menu/getMenuByAll`, filter).then((res) => {
     return res.data;
@@ -105,67 +140,142 @@ export const getMenuByAll = async (filter) => {
 //   });
 // };
 
-
-
-
 //Order Admin
-export const getOrderByAll = async ({LoaiPhieuDat, TrangThai , SoLuongNguoiTrenBanOrPhong 
-  , SoLuongBanOrPhong , ThoiGianBatDau, GhiChu , HoTen , Email ,SoDienThoai ,MaNhanVien ,MaKhachHang }) => {
-  return axiosClient.post(`order/getOrderByAll`,
-  { LoaiPhieuDat, TrangThai ,
-    SoLuongNguoiTrenBanOrPhong ,
-    SoLuongBanOrPhong , ThoiGianBatDau,
-    GhiChu , HoTen , Email ,SoDienThoai,
-    MaNhanVien ,MaKhachHang }).then((res) => {
-    return res.data;
-  });
+export const getOrderByAll = async ({
+  LoaiPhieuDat,
+  TrangThai,
+  SoLuongNguoiTrenBanOrPhong,
+  SoLuongBanOrPhong,
+  ThoiGianBatDau,
+  GhiChu,
+  HoTen,
+  Email,
+  SoDienThoai,
+  MaNhanVien,
+  MaKhachHang,
+}) => {
+  return axiosClient
+    .post(`order/getOrderByAll`, {
+      LoaiPhieuDat,
+      TrangThai,
+      SoLuongNguoiTrenBanOrPhong,
+      SoLuongBanOrPhong,
+      ThoiGianBatDau,
+      GhiChu,
+      HoTen,
+      Email,
+      SoDienThoai,
+      MaNhanVien,
+      MaKhachHang,
+    })
+    .then((res) => {
+      return res.data;
+    });
 };
 
 export const changeStatus = async (id, TrangThai) => {
-  return axiosClient.post(`order/changeStatus`,{id, TrangThai}).then((res) => {
+  return axiosClient.post(`order/changeStatus`, { id, TrangThai }).then((res) => {
     return res.data;
   });
 };
 
 export const updateOrder = async ({
-  id, LoaiPhieuDat,TrangThai,SoLuongNguoiTrenBanOrPhong,SoLuongBanOrPhong,ThoiGianBatDau,
-  MaKhachHang,ListThucDon,ListPhong,ListBan,HoTen ,Email ,SoDienThoai,GhiChu}) => {
-  return axiosClient.post(`order/updateOrder`,
-  {
-    id, LoaiPhieuDat,TrangThai,SoLuongNguoiTrenBanOrPhong,SoLuongBanOrPhong,ThoiGianBatDau,
-    MaKhachHang,ListThucDon,ListPhong,ListBan,HoTen ,Email ,SoDienThoai,GhiChu}).then((res) => {
-    return res.data;
-  });
+  id,
+  LoaiPhieuDat,
+  TrangThai,
+  SoLuongNguoiTrenBanOrPhong,
+  SoLuongBanOrPhong,
+  ThoiGianBatDau,
+  MaKhachHang,
+  ListThucDon,
+  ListPhong,
+  ListBan,
+  HoTen,
+  Email,
+  SoDienThoai,
+  GhiChu,
+}) => {
+  return axiosClient
+    .post(`order/updateOrder`, {
+      id,
+      LoaiPhieuDat,
+      TrangThai,
+      SoLuongNguoiTrenBanOrPhong,
+      SoLuongBanOrPhong,
+      ThoiGianBatDau,
+      MaKhachHang,
+      ListThucDon,
+      ListPhong,
+      ListBan,
+      HoTen,
+      Email,
+      SoDienThoai,
+      GhiChu,
+    })
+    .then((res) => {
+      return res.data;
+    });
 };
 
-export const getTableMatchTimeAndSeat = async ({ SoNguoi , ThoiGianBatDau , LoaiPhieuDat }) => {
-  return axiosClient.post(`table/getTableMatchTimeAndSeat`,{ SoNguoi , ThoiGianBatDau , LoaiPhieuDat }).then((res) => {
-    return res.data;
-  });
+export const getTableMatchTimeAndSeat = async ({ SoNguoi, ThoiGianBatDau, LoaiPhieuDat }) => {
+  return axiosClient
+    .post(`table/getTableMatchTimeAndSeat`, { SoNguoi, ThoiGianBatDau, LoaiPhieuDat })
+    .then((res) => {
+      return res.data;
+    });
 };
 
-export const getRoomMatchTimeAndSeat = async ({ SoNguoi , ThoiGianBatDau , LoaiPhieuDat , MaLoaiPhong }) => {
-  return axiosClient.post(`room/getRoomMatchTimeAndSeat`,{ SoNguoi , ThoiGianBatDau , LoaiPhieuDat , MaLoaiPhong }).then((res) => {
-    return res.data;
-  });
+export const getRoomMatchTimeAndSeat = async ({
+  SoNguoi,
+  ThoiGianBatDau,
+  LoaiPhieuDat,
+  MaLoaiPhong,
+}) => {
+  return axiosClient
+    .post(`room/getRoomMatchTimeAndSeat`, { SoNguoi, ThoiGianBatDau, LoaiPhieuDat, MaLoaiPhong })
+    .then((res) => {
+      return res.data;
+    });
 };
 
 export const getTypeOfRoomById = async (MaLoai) => {
-  return axiosClient.post(`typeOfRoom/getTypeOfRoomById`,{MaLoai}).then((res) => {
+  return axiosClient.post(`typeOfRoom/getTypeOfRoomById`, { MaLoai }).then((res) => {
     return res.data;
   });
 };
 
-
-export const addOrder = async ({LoaiPhieuDat,TrangThai,SoLuongNguoiTrenBanOrPhong,SoLuongBanOrPhong,
-  ThoiGianBatDau,MaKhachHang,ListThucDon,ListPhong,ListBan,HoTen ,Email ,SoDienThoai,GhiChu
+export const addOrder = async ({
+  LoaiPhieuDat,
+  TrangThai,
+  SoLuongNguoiTrenBanOrPhong,
+  SoLuongBanOrPhong,
+  ThoiGianBatDau,
+  MaKhachHang,
+  ListThucDon,
+  ListPhong,
+  ListBan,
+  HoTen,
+  Email,
+  SoDienThoai,
+  GhiChu,
 }) => {
-  return axiosClient.post(`order/addOrder`,
-  {LoaiPhieuDat,TrangThai,SoLuongNguoiTrenBanOrPhong,SoLuongBanOrPhong,ThoiGianBatDau,
-    MaKhachHang,ListThucDon,ListPhong,ListBan,HoTen ,Email ,SoDienThoai,GhiChu
-  }).then((res) => {
-    return res.data;
-  });
+  return axiosClient
+    .post(`order/addOrder`, {
+      LoaiPhieuDat,
+      TrangThai,
+      SoLuongNguoiTrenBanOrPhong,
+      SoLuongBanOrPhong,
+      ThoiGianBatDau,
+      MaKhachHang,
+      ListThucDon,
+      ListPhong,
+      ListBan,
+      HoTen,
+      Email,
+      SoDienThoai,
+      GhiChu,
+    })
+    .then((res) => {
+      return res.data;
+    });
 };
-
-

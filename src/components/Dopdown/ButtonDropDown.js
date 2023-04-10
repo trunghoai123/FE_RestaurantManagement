@@ -8,7 +8,7 @@ const DropdownManageStyles = styled.div`
       border-radius: 3px;
     }
     .button__main {
-      border-radius: 0px;
+      border-radius: ${(props) => props.borderRadius};
     }
     .dropdown__item {
       cursor: pointer;
@@ -17,9 +17,9 @@ const DropdownManageStyles = styled.div`
   }
 `;
 
-const DropdownManage = ({ children, ...rest }) => {
+const DropdownManage = ({ borderRadius = "0px", children, ...rest }) => {
   return (
-    <DropdownManageStyles>
+    <DropdownManageStyles borderRadius={borderRadius}>
       <div className="dropdown dropdown__manage">
         <button
           className="btn btn-primary dropdown-toggle button__main"

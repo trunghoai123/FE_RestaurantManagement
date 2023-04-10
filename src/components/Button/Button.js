@@ -8,11 +8,11 @@ const ButtonStyles = styled.button`
   display: inline-block;
   outline: none;
   border: none;
-
   transition: background-color ease 150ms;
   background-color: ${(props) => props.bgColor};
   padding: ${(props) => (props.to ? "0px" : props.padding)};
   color: ${(props) => props.textColor};
+  border-radius: ${(props) => props.borderRadius};
   ${(props) => {
     return props.disabled
       ? css`
@@ -43,6 +43,7 @@ const Button = ({
   bgHover = "black",
   children,
   disabled = false,
+  borderRadius = "0px",
   ...rest
 }) => {
   return (
@@ -53,6 +54,7 @@ const Button = ({
       textColor={textColor}
       className={className}
       disabled={disabled}
+      borderRadius={borderRadius}
       {...rest}
     >
       {to ? (

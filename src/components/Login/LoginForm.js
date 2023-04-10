@@ -51,6 +51,17 @@ const LoginFormStyles = styled.div`
       height: 90%;
       display: flex;
       flex-direction: column;
+      .close__icon {
+        font-size: 24px;
+        position: absolute;
+        right: 5px;
+        top: 0;
+        cursor: pointer;
+        :hover {
+          color: red;
+          transition: all ease 150ms;
+        }
+      }
       .btn__to__singup {
         text-decoration: underline;
         color: blue;
@@ -152,6 +163,9 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
             <MDBCol col="12">
               <MDBCard className="mx-auto">
                 <MDBCardBody className="px-5 w-100 d-flex flex-column">
+                  <span className="close__icon" onClick={handleCloseForm}>
+                    <i className="fa-solid fa-xmark"></i>
+                  </span>
                   <h2 className="fw-bold text-center">Đăng nhập</h2>
                   <div className="value__container">
                     <label htmlFor="email">Tài Khoản</label>

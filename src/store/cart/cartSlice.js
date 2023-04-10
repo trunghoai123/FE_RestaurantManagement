@@ -24,23 +24,15 @@ const cartSlice = createSlice({
     totalMoney: 0,
   },
   reducers: {
-    createCart(state, action) {
-      return state;
-    },
-    addToCart(state, action) {
-      return state;
-    },
-    updateCart(state, action) {},
     clearCart(state, action) {
       state.cartItems = [];
       state.totalMoney = 0;
     },
     setTotalMoney(state, action) {
-      // console.log(action.payload);
       state.totalMoney = action.payload;
     },
     reloadTotalMoney(state, action) {
-      // console.log(action.payload);
+      console.log(state.cartItems);
       if (state.cartItems && state.cartItems.length > 0) {
         let sum = 0;
         state.cartItems.forEach((item) => {
@@ -50,13 +42,68 @@ const cartSlice = createSlice({
       }
     },
     removeCartItem(state, action) {
-      console.log(action.payload);
+      const dishId = action.payload;
+      let newCartItems = [...state.cartItems];
+      if (state.cartItems && state.cartItems.length > 0) {
+        const index = state.cartItems.findIndex((item) => item._id === dishId);
+        if (index !== -1) {
+          newCartItems.splice(index, 1);
+          localStorage.removeItem("Restaurant-Cart");
+          localStorage.setItem("Restaurant-Cart", JSON.stringify(newCartItems));
+          state.cartItems = newCartItems;
+          let sum = 0;
+          state.cartItems.forEach((item) => {
+            sum += item.GiaMon * item.SoLuong;
+          });
+          state.totalMoney = sum;
+        }
+      }
     },
     increaseCartItem(state, action) {
-      console.log(action.payload);
+      const dishId = action.payload;
+      let newCartItems = [...state.cartItems];
+      if (state.cartItems && state.cartItems.length > 0) {
+        const index = state.cartItems.findIndex((item) => item._id === dishId);
+        if (index !== -1) {
+          newCartItems[index] = {
+            ...newCartItems[index],
+            SoLuong: newCartItems[index].SoLuong + 1,
+          };
+          localStorage.removeItem("Restaurant-Cart");
+          localStorage.setItem("Restaurant-Cart", JSON.stringify(newCartItems));
+          state.cartItems = newCartItems;
+          let sum = 0;
+          state.cartItems.forEach((item) => {
+            sum += item.GiaMon * item.SoLuong;
+          });
+          state.totalMoney = sum;
+        }
+      }
     },
     decreaseCartItem(state, action) {
-      console.log(action.payload);
+      const dishId = action.payload;
+      let newCartItems = [...state.cartItems];
+      if (state.cartItems && state.cartItems.length > 0) {
+        const index = state.cartItems.findIndex((item) => item._id === dishId);
+        if (index !== -1) {
+          if (newCartItems[index].SoLuong > 1) {
+            newCartItems[index] = {
+              ...newCartItems[index],
+              SoLuong: newCartItems[index].SoLuong - 1,
+            };
+          } else {
+            newCartItems.splice(index, 1);
+          }
+          localStorage.removeItem("Restaurant-Cart");
+          localStorage.setItem("Restaurant-Cart", JSON.stringify(newCartItems));
+          state.cartItems = newCartItems;
+          let sum = 0;
+          state.cartItems.forEach((item) => {
+            sum += item.GiaMon * item.SoLuong;
+          });
+          state.totalMoney = sum;
+        }
+      }
     },
   },
   extraReducers: (builder) => {
@@ -89,7 +136,6 @@ const cartSlice = createSlice({
             localStorage.setItem("Restaurant-Cart", JSON.stringify(newValues));
           }
           state.cartItems = newValues;
-          console.log(data);
           state.totalMoney += data.GiaMon;
         }
       })
