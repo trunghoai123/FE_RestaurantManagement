@@ -13,6 +13,12 @@ export const getAreaByAreaId = async (MaKhuVuc) => {
   });
 };
 
+export const getRoomByAreaId = async (MaKhuVuc) => {
+  return axiosClient.post(`room/getRoomByAreaId`, { MaKhuVuc }).then((res) => {
+    return res.data;
+  });
+};
+
 export const getRoomByRoomId = async (MaPhong) => {
   return axiosClient.post(`room/getRoomByRoomId`, { MaPhong }).then((res) => {
     return res.data;
@@ -24,14 +30,26 @@ export const getAllArea = async () => {
     return res.data;
   });
 };
+export const getAllTable = async () => {
+  return axiosClient.get(`table/getAllTable`).then((res) => {
+    return res.data;
+  });
+};
 
 export const addNewArea = async (area) => {
   return axiosClient.post(`area/addArea`, area).then((res) => {
     return res.data;
   });
 };
+
 export const addNewRoom = async (roomData) => {
   return axiosClient.post(`room/addRoom`, roomData).then((res) => {
+    return res.data;
+  });
+};
+
+export const addNewTable = async (tableData) => {
+  return axiosClient.post(`table/addTable`, tableData).then((res) => {
     return res.data;
   });
 };
@@ -56,6 +74,18 @@ export const getAreaById = async (id) => {
 
 export const getRoomById = async (id) => {
   return axiosClient.get(`room/getRoomById/${id}`).then((res) => {
+    return res.data;
+  });
+};
+
+export const getTableByTableId = async (MaBan) => {
+  return axiosClient.post(`table/getTableByTableId`, { MaBan }).then((res) => {
+    return res.data;
+  });
+};
+
+export const getTableByRoomId = async (MaPhong) => {
+  return axiosClient.post(`table/getTableByRoomId`, { MaPhong }).then((res) => {
     return res.data;
   });
 };

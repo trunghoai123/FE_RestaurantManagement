@@ -6,6 +6,10 @@ import DropdownManage from "components/Dopdown/ButtonDropDown";
 import { colors } from "variables";
 import Button from "components/Button/Button";
 import axiosClient from "utils/axios";
+import { deleteRoomById, getAllArea, getAllTable } from "utils/api";
+import { confirmAlert } from "react-confirm-alert";
+import { enqueueSnackbar } from "notistack";
+import TableUpdateForm from "components/Table/TableUpdateForm";
 
 const TableAdminStyles = styled.div`
   padding-top: 54px;
@@ -65,13 +69,16 @@ const TableAdminStyles = styled.div`
 `;
 
 const TableAdmin = (props) => {
+  const [openUpdateForm, setOpenUpdateForm] = useState(false);
+  const [mode, setMode] = useState({ mode: 0, id: null });
   const [tables, setTables] = useState();
   useEffect(() => {
     const fetchDishes = async () => {
       try {
-        const result = await axiosClient.get("table/getAllTable", {});
-        if (result?.data?.data) {
-          setTables(result.data.data);
+        const result = await getAllTable();
+        if (result?.data) {
+          console.log(result.data);
+          setTables(result.data);
         }
       } catch (error) {
         console.log(error);
@@ -80,13 +87,59 @@ const TableAdmin = (props) => {
     };
     fetchDishes();
   }, []);
+  const handleOpenUpdate = (id) => {
+    if (id) {
+      setMode({ id, mode: 1 });
+    } else {
+      setMode({ id: null, mode: 2 });
+    }
+    setOpenUpdateForm(true);
+  };
+  const handleCloseUpdateForm = () => {
+    setMode({ id: null, mode: 0 });
+    setOpenUpdateForm(false);
+  };
+  const handleDelete = (id) => {
+    const deleteArea = async (id) => {
+      try {
+        await deleteRoomById({ id });
+        setMode({ ...mode });
+        enqueueSnackbar("Đã xóa phòng", {
+          variant: "success",
+        });
+      } catch (error) {
+        console.log(error);
+        enqueueSnackbar("Lỗi!. Không thể xóa phòng", {
+          variant: "error",
+        });
+      }
+    };
+    confirmAlert({
+      title: "Xác nhận",
+      message: "Bạn có muốn xóa phòng đã chọn không",
+      buttons: [
+        {
+          label: "Có",
+          onClick: () => deleteArea(id),
+        },
+        {
+          label: "Không",
+          onClick: () => {},
+        },
+      ],
+    });
+  };
   return (
     <TableAdminStyles>
       <div className="top__actions">
         <Search placeHolder="Tìm Kiếm"></Search>
-        <DropdownManage>
+        <DropdownManage borderRadius="6px">
           <li>
-            <div className="dropdown-item dropdown__item" href="/">
+            <div
+              onClick={() => handleOpenUpdate(null)}
+              className="dropdown-item dropdown__item"
+              href="/"
+            >
               Thêm Bàn
             </div>
           </li>
@@ -105,6 +158,9 @@ const TableAdmin = (props) => {
               Phòng
             </th>
             <th className="table__head" scope="col">
+              Trạng thái
+            </th>
+            <th className="table__head" scope="col">
               Số Chỗ Ngồi
             </th>
           </tr>
@@ -118,12 +174,18 @@ const TableAdmin = (props) => {
                 </td>
                 <td className="table__data">{table?.SoThuTuBan}</td>
                 <td className="table__data">{table?.MaPhong?.TenPhong}</td>
+                <td className="table__data">
+                  {table?.TrangThai === 0 ? "Còn trống" : "Đang dùng"}
+                </td>
                 <td className="table__data">{table?.SoChoNgoi}</td>
                 <td className="table__data">
                   <Button
+                    padding="4px 8px"
+                    borderRadius="7px"
                     className="button button__update"
                     bgHover={colors.orange_1_hover}
                     bgColor={colors.orange_1}
+                    onClick={() => handleOpenUpdate(table?._id)}
                   >
                     <div>
                       <span className="text">Cập Nhật</span>
@@ -131,6 +193,8 @@ const TableAdmin = (props) => {
                     </div>
                   </Button>
                   <Button
+                    padding="4px 8px"
+                    borderRadius="7px"
                     className="button button__remove"
                     bgHover={colors.red_1_hover}
                     bgColor={colors.red_1}
@@ -146,6 +210,13 @@ const TableAdmin = (props) => {
           })}
         </tbody>
       </table>
+      {openUpdateForm && (
+        <TableUpdateForm
+          setMode={setMode}
+          mode={mode}
+          handleCloseForm={handleCloseUpdateForm}
+        ></TableUpdateForm>
+      )}
     </TableAdminStyles>
   );
 };

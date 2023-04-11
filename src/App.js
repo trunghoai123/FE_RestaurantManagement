@@ -96,6 +96,10 @@ const router = createBrowserRouter([
         element: <RoomAdmin></RoomAdmin>,
       },
       {
+        path: "table/update",
+        element: <TableAdmin></TableAdmin>,
+      },
+      {
         path: "order/add",
         element: <AddOrderAdmin></AddOrderAdmin>,
       },

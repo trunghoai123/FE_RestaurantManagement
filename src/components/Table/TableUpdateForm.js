@@ -4,23 +4,33 @@ import styled from "styled-components";
 import Button from "components/Button/Button";
 import { useForm } from "react-hook-form";
 import { AuthContext, useAuthContext } from "utils/context/AuthContext";
+import { signIn } from "store/auth/authSlice";
 import { enqueueSnackbar } from "notistack";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Input from "components/Input/Input";
 import { convertBase64 } from "utils/utils";
 import {
+  addNewArea,
   addNewRoom,
+  addNewTable,
   getAllArea,
   getAllTypeOfRoom,
+  getAreaByAreaId,
+  getAreaById,
+  getRoomByAreaId,
   getRoomById,
   getRoomByRoomId,
+  getTableByRoomId,
+  getTableByTableId,
+  updateArea,
   updateRoom,
   uploadImage,
 } from "utils/api";
 import { useState } from "react";
 import { useEffect } from "react";
-const RoomUpdateFormStyles = styled.div`
+import { getValue } from "@testing-library/user-event/dist/utils";
+const TableUpdateFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
   z-index: 999;
@@ -193,36 +203,35 @@ const RoomUpdateFormStyles = styled.div`
   }
 `;
 
-const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
+const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const schema = yup
     .object({
-      id: yup.string("hãy xem lại mã").test({
-        name: "check-id",
-        skipAbsent: true,
-        test(value, ctx) {
-          if (mode.mode === 2) {
-            if (value.trim() === "") {
-              return ctx.createError({ message: "hãy nhập mã" });
-            }
-          }
-          return true;
-        },
-      }),
-      size: yup
-        .string("hãy xem lại số người")
-        .required("hãy nhập số người")
-        .test({
-          name: "check-size",
-          skipAbsent: true,
-          test(value, ctx) {
-            if (isNaN(Number(value)) || Number(value) === 0) {
-              return ctx.createError({ message: "hãy nhập số lượng phù hợp" });
-            }
-            return true;
-          },
-        }),
+      id: yup.string("hãy xem lại mã").required("hãy nhập mã"),
+      // .test({
+      //   name: "check-id",
+      //   skipAbsent: true,
+      //   test(value, ctx) {
+      //     if (mode.mode === 2) {
+      //       if (value.trim() === "") {
+      //         return ctx.createError({ message: "hãy nhập mã" });
+      //       }
+      //     }
+      //     return true;
+      //   },
+      // }),
+      size: yup.string("hãy xem lại số chỗ ngồi").required("hãy chọn số chỗ ngồi"),
+      // .test({
+      //   name: "check-size",
+      //   skipAbsent: true,
+      //   test(value, ctx) {
+      //     if (isNaN(Number(value)) || Number(value) === 0) {
+      //       return ctx.createError({ message: "hãy nhập số lượng phù hợp" });
+      //     }
+      //     return true;
+      //   },
+      // }),
       area: yup.string("Hãy kiểm tra lại khu vực").required("Hãy chọn khu vực"),
-      kindOfRoom: yup.string("Hãy kiểm tra lại loại phòng").required("Hãy chọn loại phòng"),
+      room: yup.string("Hãy kiểm tra lại phòng").required("Hãy chọn phòng"),
       status: yup.string("Hãy kiểm tra lại trạng thái").required("Hãy chọn trạng thái"),
     })
     .required();
@@ -234,37 +243,44 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     setError,
     formState: { errors },
   } = useForm({
-    defaultValues: {},
+    // defaultValues: {},
     resolver: yupResolver(schema),
   });
 
   const [currentRoom, setCurrentRoom] = useState(null);
-  const [isLoadedImage, setIsLoadedImage] = useState(false);
-  const [imageSelecting, setImageSelecting] = useState("");
   const [areas, setAreas] = useState([]);
-  const [roomKinds, setRoomKinds] = useState([]);
-
+  const [rooms, setRooms] = useState([]);
   useEffect(() => {
     if (mode.mode === 1) {
       loadRoomOnUpdate();
     }
     loadAllArea();
-    loadAllKindOfRoom();
   }, []);
-  const loadAllKindOfRoom = async () => {
+
+  useEffect(() => {
+    loadAllRoom();
+  }, [areas]);
+
+  const loadAllRoom = async () => {
     try {
-      const data = await getAllTypeOfRoom();
-      if (data?.data) {
-        if (mode.mode === 2) {
-          setValue("kindOfRoom", data.data[2]._id);
+      if (areas && areas?.length > 0) {
+        console.log(areas);
+        const data = await getRoomByAreaId(areas[0]._id);
+
+        if (data?.data && data?.data?.length > 0) {
+          console.log(data);
+          setRooms(data.data);
+          // if (mode.mode === 2) {
+          //   setValue("room", data.data[2]._id);
+          // }
         }
-        setRoomKinds(data.data);
       }
     } catch (error) {
       console.log(error);
       return;
     }
   };
+
   const loadRoomOnUpdate = async () => {
     try {
       const data = await getRoomById(mode.id);
@@ -277,8 +293,6 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
         setValue("area", room.MaKhuVuc);
         setValue("kindOfRoom", room.MaLoai);
         setValue("status", room.TrangThai);
-        setImageSelecting(room.HinhAnh);
-        setIsLoadedImage(true);
       }
     } catch (error) {
       console.log(error);
@@ -300,129 +314,125 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       return;
     }
   };
+
   const onSubmit = async (values) => {
-    if (!isLoadedImage) {
-      setError("image", { type: "required", message: "Hãy chọn ảnh" });
+    clearErrors("image");
+    if (mode.mode === 1) {
+      //update
+      const updatedArea = {
+        id: currentRoom?._id,
+        TenPhong: currentRoom?._id,
+        TrangThai: Number(values.status),
+        SoChoNgoiToiDa: values.size,
+        MaLoai: values.kindOfRoom,
+        MaKhuVuc: values.area,
+        //-------------------
+        // id: currentArea?._id,
+        // TenKhuVuc: values.name.trim(),
+        // HinhAnh: imageSelecting,
+        // MoTa: values.description.trim(),
+        // ViTriCuThe: values.detail.trim(),
+        // SoNguoiToiDa: currentArea?.SoNguoiToiDa,
+        //-------------
+        // id,
+        // TenPhong,
+        // TrangThai,
+        // SoChoNgoiToiDa,
+        // HinhAnh,
+        // MaLoai,
+        // MaKhuVuc,
+      };
+      try {
+        const updateRoom = await updateRoom(updatedArea);
+        if (updateRoom?.data?._id) {
+          enqueueSnackbar("Cập nhật khu vực thành công", {
+            variant: "success",
+          });
+          handleCloseForm();
+        }
+      } catch (error) {
+        console.log(error);
+        enqueueSnackbar("Lỗi!. Không thể cập nhật khu vực", {
+          variant: "error",
+        });
+      }
     } else {
-      clearErrors("image");
-      if (mode.mode === 1) {
-        //update
-        const updatedArea = {
-          id: currentRoom._id,
-          TenPhong: currentRoom._id,
+      // mode.mode = 2 - add
+      const checkTableById = async () => {
+        try {
+          const data = await getTableByTableId(values.id.trim());
+          if (data.data) {
+            return true;
+          } else {
+            return false;
+          }
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
+      };
+      const checkingRs = await checkTableById();
+      if (!checkingRs) {
+        const tablesOfRoom = await getTableByRoomId();
+        let count = 0;
+        for (let i = 0; i < tablesOfRoom.length; i++) {
+          if (tablesOfRoom[i].SoThuTuBan > count) {
+            count = tablesOfRoom[i].SoThuTuBan + 1;
+          }
+        }
+        const newTable = {
+          MaBan: values.id.trim(),
+          SoThuTuBan: count,
           TrangThai: Number(values.status),
-          SoChoNgoiToiDa: values.size,
-          HinhAnh: imageSelecting,
-          MaLoai: values.kindOfRoom,
-          MaKhuVuc: values.area,
-          //-------------------
-          // id: currentArea?._id,
-          // TenKhuVuc: values.name.trim(),
-          // HinhAnh: imageSelecting,
-          // MoTa: values.description.trim(),
-          // ViTriCuThe: values.detail.trim(),
-          // SoNguoiToiDa: currentArea?.SoNguoiToiDa,
-          //-------------
-          // id,
-          // TenPhong,
-          // TrangThai,
-          // SoChoNgoiToiDa,
-          // HinhAnh,
-          // MaLoai,
-          // MaKhuVuc,
+          SoChoNgoi: Number(values.size),
+          MaPhong: values.room,
+          // ----------
+          //   MaPhong: values.id.trim(),
+          //   TenPhong: values.id.trim(),
+          //   TrangThai: Number(values.status),
+          //   SoChoNgoiToiDa: Number(values.size),
+          //   MaLoai: values.kind,
+          //   MaKhuVuc: values.area,
+          // -----
+          //   MaBan,
+          //   SoThuTuBan,
+          //   TrangThai,
+          //   SoChoNgoi,
+          //   MaPhong,
         };
         try {
-          const addAreaRs = await updateRoom(updatedArea);
-          if (addAreaRs.data._id) {
-            enqueueSnackbar("Cập nhật khu vực thành công", {
+          console.log(newTable);
+          const addTableRs = await addNewTable(newTable);
+          if (addTableRs?.data?._id) {
+            enqueueSnackbar("Thêm bàn thành công", {
               variant: "success",
             });
             handleCloseForm();
           }
         } catch (error) {
           console.log(error);
-          enqueueSnackbar("Lỗi!. Không thể cập nhật khu vực", {
+          enqueueSnackbar("Lỗi!. Không thể thêm bàn", {
             variant: "error",
           });
         }
       } else {
-        // mode.mode = 2 - add
-        const checkRoomById = async () => {
-          try {
-            const data = await getRoomByRoomId(values.id.trim());
-            if (data.data) {
-              return true;
-            } else {
-              return false;
-            }
-          } catch (error) {
-            console.log(error);
-            return false;
-          }
-        };
-        const checkingRs = await checkRoomById();
-        if (!checkingRs) {
-          const newRoom = {
-            MaPhong: values.id.trim(),
-            TenPhong: values.id.trim(),
-            TrangThai: Number(values.status),
-            SoChoNgoiToiDa: Number(values.size),
-            HinhAnh: imageSelecting,
-            MaLoai: values.kind,
-            MaKhuVuc: values.area,
-            //-------------
-            // MaKhuVuc: values.id.trim(),
-            // TenKhuVuc: values.name.trim(),
-            // HinhAnh: imageSelecting,
-            // MoTa: values.description.trim(),
-            // ViTriCuThe: values.detail.trim(),
-            // SoNguoiToiDa: 0,
-            // ---------------
-            // MaPhong,
-            // TenPhong,
-            // TrangThai,
-            // SoChoNgoiToiDa,
-            // HinhAnh,
-            // MaLoai,
-            // MaKhuVuc,
-          };
-          try {
-            const addRoomRs = await addNewRoom(newRoom);
-            if (addRoomRs.data._id) {
-              enqueueSnackbar("Thêm phòng thành công", {
-                variant: "success",
-              });
-              handleCloseForm();
-            }
-          } catch (error) {
-            console.log(error);
-            enqueueSnackbar("Lỗi!. Không thể thêm phòng", {
-              variant: "error",
-            });
-          }
-        } else {
-          enqueueSnackbar("Mã phòng bị trùng", {
-            variant: "error",
-          });
-        }
+        enqueueSnackbar("Mã bàn bị trùng", {
+          variant: "error",
+        });
       }
     }
   };
-  const handleChangeImage = async (e) => {
-    if (e.target.files.length > 0) {
-      setIsLoadedImage(true);
-      const base64 = await convertBase64(e.target.files[0]);
-      uploadImage(base64).then((image) => {
-        setImageSelecting(image.data);
-      });
-    } else {
-      setIsLoadedImage(false);
-      setImageSelecting(null);
+  const onChangeArea = async (e) => {
+    console.log(e.target.value);
+    const rooms = await getRoomByAreaId(e.target.value);
+    console.log(rooms);
+    if (rooms?.data) {
+      setRooms(rooms.data);
     }
   };
   const { user, updateAuthUser } = useAuthContext();
   return (
-    <RoomUpdateFormStyles>
+    <TableUpdateFormStyles>
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">
@@ -431,7 +441,7 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
               <i className="fa-solid fa-xmark"></i>
             </span>
             <div className="title__container">
-              <h4 className="title__text">{mode?.mode === 1 ? "Cập Nhật Phòng" : "Thêm Phòng"}</h4>
+              <h4 className="title__text">{mode?.mode === 1 ? "Cập Nhật Bàn" : "Thêm Bàn"}</h4>
             </div>
           </div>
           <div className="modal__body">
@@ -463,19 +473,27 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="data">
-                      Số người
+                      Số chỗ ngồi
                     </label>
                   </div>
                   <div className="input__container">
-                    <Input
-                      autoComplete="off"
-                      type="number"
-                      className="input"
-                      min="1"
-                      id="size"
-                      name="size"
-                      {...register("size")}
-                    />
+                    <select name="size" className="select__box" {...register("size")}>
+                      <option className="option" value={2}>
+                        2
+                      </option>
+                      <option className="option" value={4}>
+                        4
+                      </option>
+                      <option className="option" value={5}>
+                        5
+                      </option>
+                      <option className="option" value={8}>
+                        8
+                      </option>
+                      <option className="option" value={10}>
+                        10
+                      </option>
+                    </select>
                   </div>
                   {errors?.size && (
                     <div className="error__container">
@@ -492,7 +510,12 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </label>
                   </div>
                   <div className="input__container">
-                    <select name="area" className="select__box" {...register("area")}>
+                    <select
+                      name="area"
+                      className="select__box"
+                      {...register("area")}
+                      onChange={onChangeArea}
+                    >
                       {areas?.length > 0 &&
                         areas.map((area) => {
                           return (
@@ -512,25 +535,24 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="data">
-                      Loại phòng
+                      Phòng
                     </label>
                   </div>
                   <div className="input__container">
-                    <select name="kindOfRoom" className="select__box" {...register("kindOfRoom")}>
-                      {roomKinds?.length > 0 &&
-                        roomKinds.map((kind) => {
-                          // console.log(kind);
+                    <select name="room" className="select__box" {...register("room")}>
+                      {rooms?.length > 0 &&
+                        rooms.map((room) => {
                           return (
-                            <option key={kind?._id} className="option" value={kind?._id}>
-                              {kind?.TenLoai}
+                            <option key={room?._id} className="option" value={room?._id}>
+                              {room?.MaPhong}
                             </option>
                           );
                         })}
                     </select>
                   </div>
-                  {errors?.kindOfRoom && (
+                  {errors?.room && (
                     <div className="error__container">
-                      <div className="error__message">{errors?.kindOfRoom?.message}</div>
+                      <div className="error__message">{errors?.room?.message}</div>
                     </div>
                   )}
                 </div>
@@ -558,35 +580,7 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </div>
                   )}
                 </div>
-                <div className="value__container">
-                  <div className="label__container">
-                    <label className="label" htmlFor="time">
-                      Hình ảnh
-                    </label>
-                  </div>
-                  <div className="input__container img__file__container">
-                    <label className="label__upload" htmlFor="image">
-                      <i className="fa-solid fa-upload"></i>
-                    </label>
-                    <Input
-                      width="180px"
-                      isImgFile={true}
-                      type="file"
-                      imgUrl={imageSelecting}
-                      className="input"
-                      name="image"
-                      id="image"
-                      {...register("image", {
-                        onChange: (e) => handleChangeImage(e),
-                      })}
-                    />
-                  </div>
-                  {errors?.image && (
-                    <div className="error__container">
-                      <div className="error__message">{errors?.image?.message}</div>
-                    </div>
-                  )}
-                </div>
+                <div className="value__container"></div>
               </div>
             </div>
           </div>
@@ -604,10 +598,10 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
           </div>
         </div>
       </form>
-    </RoomUpdateFormStyles>
+    </TableUpdateFormStyles>
   );
 };
 
-RoomUpdateForm.propTypes = {};
+TableUpdateForm.propTypes = {};
 
-export default RoomUpdateForm;
+export default TableUpdateForm;
