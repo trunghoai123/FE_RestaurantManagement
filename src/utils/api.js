@@ -78,6 +78,12 @@ export const getRoomById = async (id) => {
   });
 };
 
+export const getTableById = async (id) => {
+  return axiosClient.get(`table/getTableById/${id}`).then((res) => {
+    return res.data;
+  });
+};
+
 export const getTableByTableId = async (MaBan) => {
   return axiosClient.post(`table/getTableByTableId`, { MaBan }).then((res) => {
     return res.data;

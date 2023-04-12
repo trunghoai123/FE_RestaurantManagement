@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { colors } from "variables";
 import styled from "styled-components";
 import Button from "components/Button/Button";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { AuthContext, useAuthContext } from "utils/context/AuthContext";
 import { signIn } from "store/auth/authSlice";
 import { enqueueSnackbar } from "notistack";
@@ -21,6 +21,7 @@ import {
   getRoomByAreaId,
   getRoomById,
   getRoomByRoomId,
+  getTableById,
   getTableByRoomId,
   getTableByTableId,
   updateArea,
@@ -247,15 +248,16 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     resolver: yupResolver(schema),
   });
 
-  const [currentRoom, setCurrentRoom] = useState(null);
+  const [currentTable, setCurrentTable] = useState(null);
   const [areas, setAreas] = useState([]);
   const [rooms, setRooms] = useState([]);
   useEffect(() => {
-    if (mode.mode === 1) {
-      loadRoomOnUpdate();
+    if (mode.mode === 1 && areas?.length > 0) {
+      loadTableOnUpdate();
+    } else {
+      loadAllArea();
     }
-    loadAllArea();
-  }, []);
+  }, [areas]);
 
   useEffect(() => {
     loadAllRoom();
@@ -264,12 +266,13 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const loadAllRoom = async () => {
     try {
       if (areas && areas?.length > 0) {
-        console.log(areas);
         const data = await getRoomByAreaId(areas[0]._id);
-
         if (data?.data && data?.data?.length > 0) {
-          console.log(data);
           setRooms(data.data);
+          // if (mode.mode === 1) {
+          //   console.log(data.data);
+          //   setValue("room", data.data[0].MaBan);
+          // }
           // if (mode.mode === 2) {
           //   setValue("room", data.data[2]._id);
           // }
@@ -281,25 +284,29 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     }
   };
 
-  const loadRoomOnUpdate = async () => {
+  const loadTableOnUpdate = async () => {
     try {
-      const data = await getRoomById(mode.id);
-      const room = data.data;
-      setCurrentRoom(room);
-      if (room) {
-        console.log(room);
-        setValue("id", room.MaPhong);
-        setValue("size", room.SoChoNgoiToiDa);
-        setValue("area", room.MaKhuVuc);
-        setValue("kindOfRoom", room.MaLoai);
-        setValue("status", room.TrangThai);
+      // const data = await getTableById(mode.id);
+      const data = await getTableByTableId(mode.id);
+      const table = data.data;
+      setCurrentTable(table);
+      if (table) {
+        // setValue("area", table.MaKhuVuc.MaKhuVuc);
+        const area = await getAreaById(table.MaPhong.MaKhuVuc);
+        if (area?.data) {
+          console.log(area.data.MaKhuVuc === areas[0].MaKhuVuc);
+          setValue("area", area.data.MaKhuVuc);
+          setValue("room", table.MaPhong.MaPhong);
+          setValue("id", table.MaBan);
+          setValue("size", table.SoChoNgoi);
+          setValue("status", table.TrangThai === 0 ? 0 : 1);
+        }
       }
     } catch (error) {
       console.log(error);
       return;
     }
   };
-
   const loadAllArea = async () => {
     try {
       const data = await getAllArea();
@@ -320,8 +327,8 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     if (mode.mode === 1) {
       //update
       const updatedArea = {
-        id: currentRoom?._id,
-        TenPhong: currentRoom?._id,
+        id: currentTable?._id,
+        TenPhong: currentTable?._id,
         TrangThai: Number(values.status),
         SoChoNgoiToiDa: values.size,
         MaLoai: values.kindOfRoom,
@@ -375,9 +382,11 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       if (!checkingRs) {
         const tablesOfRoom = await getTableByRoomId();
         let count = 0;
-        for (let i = 0; i < tablesOfRoom.length; i++) {
-          if (tablesOfRoom[i].SoThuTuBan > count) {
-            count = tablesOfRoom[i].SoThuTuBan + 1;
+        if (tablesOfRoom?.data) {
+          for (let i = 0; i < tablesOfRoom.data.length; i++) {
+            if (tablesOfRoom.data[i].SoThuTuBan > count) {
+              count = tablesOfRoom.data[i].SoThuTuBan + 1;
+            }
           }
         }
         const newTable = {
@@ -423,10 +432,10 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     }
   };
   const onChangeArea = async (e) => {
-    console.log(e.target.value);
     const rooms = await getRoomByAreaId(e.target.value);
     console.log(rooms);
     if (rooms?.data) {
+      // setValue("room", rooms.data[0]);
       setRooms(rooms.data);
     }
   };

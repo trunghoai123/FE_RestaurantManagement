@@ -173,7 +173,7 @@ const TableAdmin = (props) => {
                   {table?.MaBan}
                 </td>
                 <td className="table__data">{table?.SoThuTuBan}</td>
-                <td className="table__data">{table?.MaPhong?.TenPhong}</td>
+                <td className="table__data">{table?.MaPhong?.MaPhong}</td>
                 <td className="table__data">
                   {table?.TrangThai === 0 ? "Còn trống" : "Đang dùng"}
                 </td>
@@ -185,7 +185,7 @@ const TableAdmin = (props) => {
                     className="button button__update"
                     bgHover={colors.orange_1_hover}
                     bgColor={colors.orange_1}
-                    onClick={() => handleOpenUpdate(table?._id)}
+                    onClick={() => handleOpenUpdate(table?.MaBan)}
                   >
                     <div>
                       <span className="text">Cập Nhật</span>
