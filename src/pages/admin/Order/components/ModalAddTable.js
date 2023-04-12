@@ -52,7 +52,7 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
                             <h5>{`Danh sách bàn hợp lệ`}</h5>
                             <ul>
                                 {
-                                data?.map((item, idx)=>{
+                               data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
                                             <div className="item">

@@ -12,6 +12,7 @@ export const TAB_ORDER_STATUS = [
   {status: 2, value:"Chờ nhận đơn"},
   {status: 3, value:"Thành công"},
   {status: 4, value:"Đã hủy"},
+  {status: 5, value:"Không nhận đơn"},
 
 ]
 export const ARR_ORDER_STATUS = [
@@ -20,7 +21,7 @@ export const ARR_ORDER_STATUS = [
   "Chờ nhận đơn",
   "Thành công",
   "Đã hủy",
-
+  "Không nhận đơn"
 ]
 
 
@@ -39,7 +40,7 @@ export const convertDate = (mongoDate) =>{
   const day = String(date.getDate()).padStart(2, "0");
   const hour = String(date.getHours()).padStart(2, "0");
   const minute = String(date.getMinutes()).padStart(2, "0");
-  return `${year}-${month}-${day} ${hour}:${minute}`;
+  return `${hour} giờ ${minute} phút ${day}-${month}-${year}`;
 }
 
 const ALL_ORDER = -1
@@ -135,8 +136,8 @@ const OrderAdmin = (props) => {
               <div>{`${selectedType == 0 ? "Số bàn" : "Số phòng"}: ${item.SoLuongBanOrPhong ? item.SoLuongBanOrPhong : 0}`} </div>
               <div>{`${selectedType == 0 ? "Số người/bàn" : "Số người/phòng"}: ${item.SoLuongNguoiTrenBanOrPhong ? item.SoLuongNguoiTrenBanOrPhong : 0}`}</div>
             </td>
-            <td>{ARR_ORDER_STATUS[item.TrangThai]}</td>
-            <td>
+            <td className="w-150 text-center"><strong>{ARR_ORDER_STATUS[item.TrangThai]}</strong></td>
+            <td className="w-150 text-center">
               <button className="btn-order detail" onClick={()=>{
                 navigate(`/admin/order/${item._id}`)
               }}>Chi Tiết</button>

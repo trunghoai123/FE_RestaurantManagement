@@ -69,7 +69,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                             <h5>{`Danh sách phòng hợp lệ`}</h5>
                             <ul>
                                 {
-                                data?.map((item, idx)=>{
+                                data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
                                             <div className="item">
