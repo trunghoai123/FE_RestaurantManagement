@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 import { colors } from "variables";
 import styled from "styled-components";
 import Button from "components/Button/Button";
@@ -204,78 +204,187 @@ const TableUpdateFormStyles = styled.div`
   }
 `;
 
+const schema = yup
+  .object({
+    id: yup.string("hãy xem lại mã").required("hãy nhập mã"),
+    // .test({
+    //   name: "check-id",
+    //   skipAbsent: true,
+    //   test(value, ctx) {
+    //     if (mode.mode === 2) {
+    //       if (value.trim() === "") {
+    //         return ctx.createError({ message: "hãy nhập mã" });
+    //       }
+    //     }
+    //     return true;
+    //   },
+    // }),
+    size: yup.string("hãy xem lại số chỗ ngồi").required("hãy chọn số chỗ ngồi"),
+    // .test({
+    //   name: "check-size",
+    //   skipAbsent: true,
+    //   test(value, ctx) {
+    //     if (isNaN(Number(value)) || Number(value) === 0) {
+    //       return ctx.createError({ message: "hãy nhập số lượng phù hợp" });
+    //     }
+    //     return true;
+    //   },
+    // }),
+    // area: yup.string("Hãy kiểm tra lại khu vực").required("Hãy chọn khu vực"),
+    // room: yup.string("Hãy kiểm tra lại phòng").required("Hãy chọn phòng"),
+    status: yup.string("Hãy kiểm tra lại trạng thái").required("Hãy chọn trạng thái"),
+  })
+  .required();
+
 const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
-  const schema = yup
-    .object({
-      id: yup.string("hãy xem lại mã").required("hãy nhập mã"),
-      // .test({
-      //   name: "check-id",
-      //   skipAbsent: true,
-      //   test(value, ctx) {
-      //     if (mode.mode === 2) {
-      //       if (value.trim() === "") {
-      //         return ctx.createError({ message: "hãy nhập mã" });
-      //       }
-      //     }
-      //     return true;
-      //   },
-      // }),
-      size: yup.string("hãy xem lại số chỗ ngồi").required("hãy chọn số chỗ ngồi"),
-      // .test({
-      //   name: "check-size",
-      //   skipAbsent: true,
-      //   test(value, ctx) {
-      //     if (isNaN(Number(value)) || Number(value) === 0) {
-      //       return ctx.createError({ message: "hãy nhập số lượng phù hợp" });
-      //     }
-      //     return true;
-      //   },
-      // }),
-      area: yup.string("Hãy kiểm tra lại khu vực").required("Hãy chọn khu vực"),
-      room: yup.string("Hãy kiểm tra lại phòng").required("Hãy chọn phòng"),
-      status: yup.string("Hãy kiểm tra lại trạng thái").required("Hãy chọn trạng thái"),
-    })
-    .required();
   const {
     register,
     handleSubmit,
     setValue,
     clearErrors,
+    getValues,
     setError,
     formState: { errors },
   } = useForm({
-    // defaultValues: {},
+    defaultValues: {
+      id: "",
+      size: 2,
+      status: 0,
+    },
     resolver: yupResolver(schema),
   });
 
   const [currentTable, setCurrentTable] = useState(null);
   const [areas, setAreas] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [area, setArea] = useState();
+  const [room, setRoom] = useState();
+  const areaRef = useRef(null);
   useEffect(() => {
-    if (mode.mode === 1 && areas?.length > 0) {
-      loadTableOnUpdate();
-    } else {
-      loadAllArea();
-    }
-  }, [areas]);
+    const loadAllRoom = async (area) => {
+      try {
+        const data = await getRoomByAreaId(area._id);
+        if (data?.data) {
+          setRooms(data.data);
+          setRoom(data.data[0]);
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    };
+    const loadAllArea = async () => {
+      try {
+        const data = await getAllArea();
+        if (data?.data) {
+          setAreas(data.data);
+          if (mode.mode === 2) {
+            setArea(data.data[0]);
+            await loadAllRoom(data.data[0]);
+          } else {
+            const updatingArea = await getAreaById(mode.id);
+            console.log(updatingArea);
+            if (updatingArea?.data) {
+              areaRef.current.value = updatingArea.data._id;
+            }
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    };
+    loadAllArea();
+  }, []);
 
-  useEffect(() => {
-    loadAllRoom();
-  }, [areas]);
+  // useEffect(() => {
+  //   const loadAllArea = async () => {
+  //     try {
+  //       const data = await getAllArea();
+  //       if (data?.data) {
+  //         setAreas(data.data);
+  //         setArea(data.data[0]);
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //       return;
+  //     }
+  //   };
+  //   loadAllArea();
+  // }, []);
+
+  // useEffect(() => {
+  //   const loadValues = async () => {
+  //     if (areas?.length !== 0) {
+  //       if (mode.mode === 1) {
+  //         if (getValue("area")) {
+  //           // first time loading
+  //           setValue("area", areas[0]._id);
+  //           const data = await getRoomByAreaId(areas[0]._id);
+  //           if (data?.data && data?.data?.length > 0) {
+  //             setRooms(data.data);
+  //           }
+  //         } else {
+  //           // onChange area
+  //           const data = await getRoomByAreaId(getValues("area"));
+  //           if (data?.data && data?.data?.length > 0) {
+  //             setRooms(data.data);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   };
+  //   loadValues();
+  // }, [areas]);
+
+  // useEffect(() => {
+  //   const loadValues = async () => {
+  //     if (rooms?.length !== 0) {
+  //       if (mode.mode === 1) {
+  //         if (getValue("room")) {
+  //           // first time loading
+  //           setValue("room", rooms[0]._id);
+  //           const data = await getRoomByAreaId(areas[0]._id);
+  //           if (data?.data && data?.data?.length > 0) {
+  //             setRooms(data.data);
+  //           }
+  //         } else {
+  //           // onChange area
+  //           const data = await getRoomByAreaId(getValues("area"));
+  //           if (data?.data && data?.data?.length > 0) {
+  //             setRooms(data.data);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   };
+  //   loadValues();
+  // }, [rooms]);
+
+  // useEffect(() => {
+  //   if (mode.mode === 1 && areas?.length > 0) {
+  //     // setValue("area", areas[0].MaKhuVuc);
+  //     // console.log(areas[0].MaKhuVuc === "A1");
+  //     loadTableOnUpdate();
+  //   } else {
+  //     loadAllArea();
+  //   }
+  // }, [areas]);
+
+  // useEffect(() => {
+  //   if (mode.mode === 1 && rooms?.length !== 0) {
+  //     loadRoomOnUpdate();
+  //   } else {
+  //     loadAllRoom();
+  //   }
+  // }, [rooms]);
 
   const loadAllRoom = async () => {
     try {
       if (areas && areas?.length > 0) {
-        const data = await getRoomByAreaId(areas[0]._id);
+        const data = await getRoomByAreaId(getValues("area"));
         if (data?.data && data?.data?.length > 0) {
           setRooms(data.data);
-          // if (mode.mode === 1) {
-          //   console.log(data.data);
-          //   setValue("room", data.data[0].MaBan);
-          // }
-          // if (mode.mode === 2) {
-          //   setValue("room", data.data[2]._id);
-          // }
         }
       }
     } catch (error) {
@@ -284,6 +393,22 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     }
   };
 
+  const loadRoomOnUpdate = async () => {
+    try {
+      if (getValues("room")) {
+      } else {
+        const data = await getTableByTableId(mode.id);
+        const table = data.data;
+        if (table && mode.mode === 1) {
+          setValue("room", table.MaPhong.MaPhong);
+        }
+      }
+      // const data = await getTableById(mode.id);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
   const loadTableOnUpdate = async () => {
     try {
       // const data = await getTableById(mode.id);
@@ -294,9 +419,9 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
         // setValue("area", table.MaKhuVuc.MaKhuVuc);
         const area = await getAreaById(table.MaPhong.MaKhuVuc);
         if (area?.data) {
-          console.log(area.data.MaKhuVuc === areas[0].MaKhuVuc);
-          setValue("area", area.data.MaKhuVuc);
-          setValue("room", table.MaPhong.MaPhong);
+          // console.log(area);
+          setValue("area", table.MaPhong.MaKhuVuc);
+          // setValue("room", table.MaPhong.MaPhong);
           setValue("id", table.MaBan);
           setValue("size", table.SoChoNgoi);
           setValue("status", table.TrangThai === 0 ? 0 : 1);
@@ -307,23 +432,27 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       return;
     }
   };
-  const loadAllArea = async () => {
-    try {
-      const data = await getAllArea();
-      if (data?.data) {
-        if (mode.mode === 2) {
-          setValue("area", data.data[0]._id);
-        }
-        setAreas(data.data);
+
+  const onChangeArea = async (e) => {
+    const rooms = await getRoomByAreaId(e.target.value);
+    if (rooms?.data) {
+      const changedArea = await getAreaById(e.target.value);
+      if (changedArea?.data) {
+        setArea(changedArea.data);
+        areaRef.current.value = changedArea.data._id;
       }
-    } catch (error) {
-      console.log(error);
-      return;
+      setRooms(rooms.data);
+      setRoom(rooms.data[0]);
     }
   };
 
+  const onChangeRoom = async (e) => {
+    const room = await getRoomById(e.target.value);
+    if (room?.data) {
+      setRoom(room.data);
+    }
+  };
   const onSubmit = async (values) => {
-    clearErrors("image");
     if (mode.mode === 1) {
       //update
       const updatedArea = {
@@ -382,19 +511,20 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       if (!checkingRs) {
         const tablesOfRoom = await getTableByRoomId();
         let count = 0;
+        console.log(tablesOfRoom);
         if (tablesOfRoom?.data) {
           for (let i = 0; i < tablesOfRoom.data.length; i++) {
-            if (tablesOfRoom.data[i].SoThuTuBan > count) {
+            if (tablesOfRoom.data[i].SoThuTuBan >= count) {
               count = tablesOfRoom.data[i].SoThuTuBan + 1;
             }
           }
         }
         const newTable = {
           MaBan: values.id.trim(),
+          SoChoNgoi: Number(values.size),
           SoThuTuBan: count,
           TrangThai: Number(values.status),
-          SoChoNgoi: Number(values.size),
-          MaPhong: values.room,
+          MaPhong: room._id,
           // ----------
           //   MaPhong: values.id.trim(),
           //   TenPhong: values.id.trim(),
@@ -431,14 +561,7 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       }
     }
   };
-  const onChangeArea = async (e) => {
-    const rooms = await getRoomByAreaId(e.target.value);
-    console.log(rooms);
-    if (rooms?.data) {
-      // setValue("room", rooms.data[0]);
-      setRooms(rooms.data);
-    }
-  };
+
   const { user, updateAuthUser } = useAuthContext();
   return (
     <TableUpdateFormStyles>
@@ -522,8 +645,10 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     <select
                       name="area"
                       className="select__box"
-                      {...register("area")}
                       onChange={onChangeArea}
+                      ref={areaRef}
+                      // value={area?._id}
+                      //  {...register("area")}
                     >
                       {areas?.length > 0 &&
                         areas.map((area) => {
@@ -548,7 +673,13 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </label>
                   </div>
                   <div className="input__container">
-                    <select name="room" className="select__box" {...register("room")}>
+                    <select
+                      name="room"
+                      className="select__box"
+                      onChange={onChangeRoom}
+                      value={room?._id}
+                      //  {...register("room")}
+                    >
                       {rooms?.length > 0 &&
                         rooms.map((room) => {
                           return (

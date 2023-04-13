@@ -77,7 +77,6 @@ const TableAdmin = (props) => {
       try {
         const result = await getAllTable();
         if (result?.data) {
-          console.log(result.data);
           setTables(result.data);
         }
       } catch (error) {
@@ -185,7 +184,7 @@ const TableAdmin = (props) => {
                     className="button button__update"
                     bgHover={colors.orange_1_hover}
                     bgColor={colors.orange_1}
-                    onClick={() => handleOpenUpdate(table?.MaBan)}
+                    onClick={() => handleOpenUpdate(table?._id)}
                   >
                     <div>
                       <span className="text">Cập Nhật</span>
