@@ -66,6 +66,12 @@ export const updateRoom = async (room) => {
   });
 };
 
+export const updateTable = async (table) => {
+  return axiosClient.post(`table/updateTable`, table).then((res) => {
+    return res.data;
+  });
+};
+
 export const getAreaById = async (id) => {
   return axiosClient.get(`area/getAreaById/${id}`).then((res) => {
     return res.data;
@@ -104,6 +110,12 @@ export const deleteAreaById = async (id) => {
 
 export const deleteRoomById = async (id) => {
   return axiosClient.post(`room/deleteRoom`, id).then((res) => {
+    return res.data;
+  });
+};
+
+export const deleteTableById = async (id) => {
+  return axiosClient.post(`table/deleteTable`, id).then((res) => {
     return res.data;
   });
 };

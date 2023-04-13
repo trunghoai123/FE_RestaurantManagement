@@ -334,14 +334,14 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
         try {
           const addAreaRs = await updateRoom(updatedArea);
           if (addAreaRs.data._id) {
-            enqueueSnackbar("Cập nhật khu vực thành công", {
+            enqueueSnackbar("Cập nhật phòng thành công", {
               variant: "success",
             });
             handleCloseForm();
           }
         } catch (error) {
           console.log(error);
-          enqueueSnackbar("Lỗi!. Không thể cập nhật khu vực", {
+          enqueueSnackbar("Lỗi!. Không thể cập nhật phòng", {
             variant: "error",
           });
         }

@@ -26,6 +26,7 @@ import {
   getTableByTableId,
   updateArea,
   updateRoom,
+  updateTable,
   uploadImage,
 } from "utils/api";
 import { useState } from "react";
@@ -85,6 +86,7 @@ const TableUpdateFormStyles = styled.div`
           display: flex;
           justify-content: flex-end;
           .btn__confirm {
+            margin-left: 8px;
           }
         }
       }
@@ -220,6 +222,7 @@ const schema = yup
     //   },
     // }),
     size: yup.string("hãy xem lại số chỗ ngồi").required("hãy chọn số chỗ ngồi"),
+    number: yup.string("hãy xem lại số thứ tự bàn").required("hãy chọn số thứ tự bàn"),
     // .test({
     //   name: "check-size",
     //   skipAbsent: true,
@@ -250,6 +253,7 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       id: "",
       size: 2,
       status: 0,
+      number: 1,
     },
     resolver: yupResolver(schema),
   });
@@ -257,16 +261,17 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const [currentTable, setCurrentTable] = useState(null);
   const [areas, setAreas] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [area, setArea] = useState();
-  const [room, setRoom] = useState();
-  const areaRef = useRef(null);
+  const [selectedArea, setSelectedArea] = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [isLoadedArea, setIsLoadedArea] = useState(1);
+  const [isLoadedRoom, setIsLoadedRoom] = useState(1);
   useEffect(() => {
     const loadAllRoom = async (area) => {
       try {
         const data = await getRoomByAreaId(area._id);
         if (data?.data) {
           setRooms(data.data);
-          setRoom(data.data[0]);
+          setSelectedRoom(data.data[0]);
         }
       } catch (error) {
         console.log(error);
@@ -279,105 +284,71 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
         if (data?.data) {
           setAreas(data.data);
           if (mode.mode === 2) {
-            setArea(data.data[0]);
+            setSelectedArea(data.data[0]);
             await loadAllRoom(data.data[0]);
+            setIsLoadedArea(3);
           } else {
-            const updatingArea = await getAreaById(mode.id);
-            console.log(updatingArea);
-            if (updatingArea?.data) {
-              areaRef.current.value = updatingArea.data._id;
-            }
+            setIsLoadedArea(2);
           }
         }
       } catch (error) {
         console.log(error);
+        setIsLoadedArea(2);
         return;
       }
     };
-    loadAllArea();
-  }, []);
+    if (isLoadedArea === 1) {
+      loadAllArea();
+    } else if (isLoadedArea === 2) {
+      const loadData = async () => {
+        const tableData = await getTableById(mode.id);
+        const table = tableData.data;
+        if (table) {
+          const room = await getRoomById(table.MaPhong);
+          if (room?.data?._id) {
+            const area = await getAreaById(room.data.MaKhuVuc);
+            if (area?.data?._id) {
+              // setValue("area", room.MaKhuVuc);
+              // setValue("room", room._id);
+              setValue("id", table.MaBan);
+              setValue("size", table.SoChoNgoi);
+              setValue("status", table.TrangThai === 0 ? 0 : 1);
+              setValue("number", table.SoThuTuBan);
+              setSelectedArea(area.data);
+              setIsLoadedRoom(2);
+            }
+          }
+        }
+      };
+      loadData();
+    }
+  }, [areas]);
 
-  // useEffect(() => {
-  //   const loadAllArea = async () => {
-  //     try {
-  //       const data = await getAllArea();
-  //       if (data?.data) {
-  //         setAreas(data.data);
-  //         setArea(data.data[0]);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //       return;
-  //     }
-  //   };
-  //   loadAllArea();
-  // }, []);
-
-  // useEffect(() => {
-  //   const loadValues = async () => {
-  //     if (areas?.length !== 0) {
-  //       if (mode.mode === 1) {
-  //         if (getValue("area")) {
-  //           // first time loading
-  //           setValue("area", areas[0]._id);
-  //           const data = await getRoomByAreaId(areas[0]._id);
-  //           if (data?.data && data?.data?.length > 0) {
-  //             setRooms(data.data);
-  //           }
-  //         } else {
-  //           // onChange area
-  //           const data = await getRoomByAreaId(getValues("area"));
-  //           if (data?.data && data?.data?.length > 0) {
-  //             setRooms(data.data);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   };
-  //   loadValues();
-  // }, [areas]);
-
-  // useEffect(() => {
-  //   const loadValues = async () => {
-  //     if (rooms?.length !== 0) {
-  //       if (mode.mode === 1) {
-  //         if (getValue("room")) {
-  //           // first time loading
-  //           setValue("room", rooms[0]._id);
-  //           const data = await getRoomByAreaId(areas[0]._id);
-  //           if (data?.data && data?.data?.length > 0) {
-  //             setRooms(data.data);
-  //           }
-  //         } else {
-  //           // onChange area
-  //           const data = await getRoomByAreaId(getValues("area"));
-  //           if (data?.data && data?.data?.length > 0) {
-  //             setRooms(data.data);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   };
-  //   loadValues();
-  // }, [rooms]);
-
-  // useEffect(() => {
-  //   if (mode.mode === 1 && areas?.length > 0) {
-  //     // setValue("area", areas[0].MaKhuVuc);
-  //     // console.log(areas[0].MaKhuVuc === "A1");
-  //     loadTableOnUpdate();
-  //   } else {
-  //     loadAllArea();
-  //   }
-  // }, [areas]);
-
-  // useEffect(() => {
-  //   if (mode.mode === 1 && rooms?.length !== 0) {
-  //     loadRoomOnUpdate();
-  //   } else {
-  //     loadAllRoom();
-  //   }
-  // }, [rooms]);
+  useEffect(() => {
+    const loadRooms = async () => {
+      const data = await getRoomByAreaId(selectedArea._id);
+      if (data?.data) {
+        setRooms(data.data);
+      }
+      setIsLoadedRoom(3);
+    };
+    const selectRoom = async () => {
+      const tableData = await getTableById(mode.id);
+      const table = tableData.data;
+      if (table) {
+        const room = await getRoomById(table.MaPhong);
+        if (room?.data?._id) {
+          setSelectedRoom(room.data);
+        }
+      }
+    };
+    if (isLoadedRoom === 2) {
+      loadRooms();
+    } else if (isLoadedRoom === 3) {
+      selectRoom();
+      setIsLoadedRoom(1);
+    }
+  }, [selectedArea, rooms]);
 
   const loadAllRoom = async () => {
     try {
@@ -409,6 +380,7 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       return;
     }
   };
+
   const loadTableOnUpdate = async () => {
     try {
       // const data = await getTableById(mode.id);
@@ -434,129 +406,128 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   };
 
   const onChangeArea = async (e) => {
-    const rooms = await getRoomByAreaId(e.target.value);
-    if (rooms?.data) {
-      const changedArea = await getAreaById(e.target.value);
-      if (changedArea?.data) {
-        setArea(changedArea.data);
-        areaRef.current.value = changedArea.data._id;
-      }
-      setRooms(rooms.data);
-      setRoom(rooms.data[0]);
+    // setSelectedArea()
+    const { value } = e.target;
+    const area = await getAreaById(value);
+    if (area?.data) {
+      setSelectedArea(area.data);
+    }
+    const gotRooms = await getRoomByAreaId(value);
+    if (gotRooms?.data) {
+      setRooms(gotRooms.data);
+      setSelectedRoom(gotRooms.data[0]);
     }
   };
 
   const onChangeRoom = async (e) => {
     const room = await getRoomById(e.target.value);
     if (room?.data) {
-      setRoom(room.data);
+      setSelectedRoom(room.data);
     }
   };
+
   const onSubmit = async (values) => {
-    if (mode.mode === 1) {
-      //update
-      const updatedArea = {
-        id: currentTable?._id,
-        TenPhong: currentTable?._id,
-        TrangThai: Number(values.status),
-        SoChoNgoiToiDa: values.size,
-        MaLoai: values.kindOfRoom,
-        MaKhuVuc: values.area,
-        //-------------------
-        // id: currentArea?._id,
-        // TenKhuVuc: values.name.trim(),
-        // HinhAnh: imageSelecting,
-        // MoTa: values.description.trim(),
-        // ViTriCuThe: values.detail.trim(),
-        // SoNguoiToiDa: currentArea?.SoNguoiToiDa,
-        //-------------
-        // id,
-        // TenPhong,
-        // TrangThai,
-        // SoChoNgoiToiDa,
-        // HinhAnh,
-        // MaLoai,
-        // MaKhuVuc,
-      };
-      try {
-        const updateRoom = await updateRoom(updatedArea);
-        if (updateRoom?.data?._id) {
-          enqueueSnackbar("Cập nhật khu vực thành công", {
-            variant: "success",
-          });
-          handleCloseForm();
-        }
-      } catch (error) {
-        console.log(error);
-        enqueueSnackbar("Lỗi!. Không thể cập nhật khu vực", {
-          variant: "error",
-        });
-      }
-    } else {
-      // mode.mode = 2 - add
-      const checkTableById = async () => {
-        try {
-          const data = await getTableByTableId(values.id.trim());
-          if (data.data) {
-            return true;
-          } else {
-            return false;
-          }
-        } catch (error) {
-          console.log(error);
-          return false;
-        }
-      };
-      const checkingRs = await checkTableById();
-      if (!checkingRs) {
-        const tablesOfRoom = await getTableByRoomId();
-        let count = 0;
-        console.log(tablesOfRoom);
-        if (tablesOfRoom?.data) {
-          for (let i = 0; i < tablesOfRoom.data.length; i++) {
-            if (tablesOfRoom.data[i].SoThuTuBan >= count) {
-              count = tablesOfRoom.data[i].SoThuTuBan + 1;
-            }
-          }
-        }
-        const newTable = {
-          MaBan: values.id.trim(),
+    if (selectedRoom?._id && selectedArea?._id) {
+      if (mode.mode === 1) {
+        //update
+        const updatedTableValue = {
+          id: mode.id,
           SoChoNgoi: Number(values.size),
-          SoThuTuBan: count,
+          SoThuTuBan: Number(values.number),
           TrangThai: Number(values.status),
-          MaPhong: room._id,
-          // ----------
-          //   MaPhong: values.id.trim(),
-          //   TenPhong: values.id.trim(),
-          //   TrangThai: Number(values.status),
-          //   SoChoNgoiToiDa: Number(values.size),
-          //   MaLoai: values.kind,
-          //   MaKhuVuc: values.area,
-          // -----
-          //   MaBan,
-          //   SoThuTuBan,
-          //   TrangThai,
-          //   SoChoNgoi,
-          //   MaPhong,
+          MaPhong: selectedRoom._id,
+          // {id,SoThuTuBan , TrangThai  , SoChoNgoi , MaPhong}
         };
         try {
-          console.log(newTable);
-          const addTableRs = await addNewTable(newTable);
-          if (addTableRs?.data?._id) {
-            enqueueSnackbar("Thêm bàn thành công", {
+          const updatedTable = await updateTable(updatedTableValue);
+          if (updatedTable?.data?._id) {
+            enqueueSnackbar("Cập nhật bàn thành công", {
               variant: "success",
             });
             handleCloseForm();
           }
         } catch (error) {
           console.log(error);
-          enqueueSnackbar("Lỗi!. Không thể thêm bàn", {
+          enqueueSnackbar("Lỗi!. Không thể cập nhật bàn", {
             variant: "error",
           });
         }
       } else {
-        enqueueSnackbar("Mã bàn bị trùng", {
-          variant: "error",
+        // mode.mode = 2 - add
+        const checkTableById = async () => {
+          try {
+            const data = await getTableByTableId(values.id.trim());
+            if (data.data) {
+              return true;
+            } else {
+              return false;
+            }
+          } catch (error) {
+            console.log(error);
+            return false;
+          }
+        };
+        const checkingRs = await checkTableById();
+        if (!checkingRs) {
+          const tablesOfRoom = await getTableByRoomId();
+          // let count = 0;
+          // console.log(tablesOfRoom);
+          // if (tablesOfRoom?.data) {
+          //   for (let i = 0; i < tablesOfRoom.data.length; i++) {
+          //     if (tablesOfRoom.data[i].SoThuTuBan >= count) {
+          //       count = tablesOfRoom.data[i].SoThuTuBan + 1;
+          //     }
+          //   }
+          // }
+          const newTable = {
+            MaBan: values.id.trim(),
+            SoChoNgoi: Number(values.size),
+            SoThuTuBan: Number(values.number),
+            TrangThai: Number(values.status),
+            MaPhong: selectedRoom._id,
+            // ----------
+            //   MaPhong: values.id.trim(),
+            //   TenPhong: values.id.trim(),
+            //   TrangThai: Number(values.status),
+            //   SoChoNgoiToiDa: Number(values.size),
+            //   MaLoai: values.kind,
+            //   MaKhuVuc: values.area,
+            // -----
+            //   MaBan,
+            //   SoThuTuBan,
+            //   TrangThai,
+            //   SoChoNgoi,
+            //   MaPhong,
+          };
+          try {
+            console.log(newTable);
+            const addTableRs = await addNewTable(newTable);
+            if (addTableRs?.data?._id) {
+              enqueueSnackbar("Thêm bàn thành công", {
+                variant: "success",
+              });
+              handleCloseForm();
+            }
+          } catch (error) {
+            console.log(error);
+            enqueueSnackbar("Lỗi!. Không thể thêm bàn", {
+              variant: "error",
+            });
+          }
+        } else {
+          enqueueSnackbar("Mã bàn bị trùng", {
+            variant: "error",
+          });
+        }
+      }
+    } else {
+      if (!selectedArea?._id) {
+        enqueueSnackbar("Hãy chọn khu vực", {
+          variant: "warning",
+        });
+      } else {
+        enqueueSnackbar("Hãy chọn phòng", {
+          variant: "warning",
         });
       }
     }
@@ -646,8 +617,7 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                       name="area"
                       className="select__box"
                       onChange={onChangeArea}
-                      ref={areaRef}
-                      // value={area?._id}
+                      value={selectedArea?._id}
                       //  {...register("area")}
                     >
                       {areas?.length > 0 &&
@@ -677,7 +647,7 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                       name="room"
                       className="select__box"
                       onChange={onChangeRoom}
-                      value={room?._id}
+                      value={selectedRoom?._id}
                       //  {...register("room")}
                     >
                       {rooms?.length > 0 &&
@@ -720,12 +690,43 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </div>
                   )}
                 </div>
-                <div className="value__container"></div>
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="size">
+                      Số thứ tự
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <Input
+                      className="input"
+                      id="number"
+                      type="number"
+                      name="number"
+                      min="0"
+                      autoComplete="off"
+                      {...register("number")}
+                    />
+                  </div>
+                  {errors?.number && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.number?.message}</div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
           <div className="modal__footer">
             <div className="btn__container">
+              <Button
+                type="button"
+                bgColor={colors.red_1}
+                bgHover={colors.red_1_hover}
+                className="btn__cancel"
+                onClick={handleCloseForm}
+              >
+                <div>Hủy</div>
+              </Button>
               <Button
                 type="submit"
                 bgColor={colors.orange_2}

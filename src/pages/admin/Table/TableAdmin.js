@@ -6,7 +6,7 @@ import DropdownManage from "components/Dopdown/ButtonDropDown";
 import { colors } from "variables";
 import Button from "components/Button/Button";
 import axiosClient from "utils/axios";
-import { deleteRoomById, getAllArea, getAllTable } from "utils/api";
+import { deleteRoomById, deleteTableById, getAllArea, getAllTable } from "utils/api";
 import { confirmAlert } from "react-confirm-alert";
 import { enqueueSnackbar } from "notistack";
 import TableUpdateForm from "components/Table/TableUpdateForm";
@@ -85,7 +85,7 @@ const TableAdmin = (props) => {
       }
     };
     fetchDishes();
-  }, []);
+  }, [mode]);
   const handleOpenUpdate = (id) => {
     if (id) {
       setMode({ id, mode: 1 });
@@ -101,14 +101,14 @@ const TableAdmin = (props) => {
   const handleDelete = (id) => {
     const deleteArea = async (id) => {
       try {
-        await deleteRoomById({ id });
+        await deleteTableById({ id });
         setMode({ ...mode });
-        enqueueSnackbar("Đã xóa phòng", {
+        enqueueSnackbar("Đã xóa bàn", {
           variant: "success",
         });
       } catch (error) {
         console.log(error);
-        enqueueSnackbar("Lỗi!. Không thể xóa phòng", {
+        enqueueSnackbar("Lỗi!. Không thể xóa bàn", {
           variant: "error",
         });
       }
@@ -197,6 +197,7 @@ const TableAdmin = (props) => {
                     className="button button__remove"
                     bgHover={colors.red_1_hover}
                     bgColor={colors.red_1}
+                    onClick={() => handleDelete(table?._id)}
                   >
                     <div>
                       <span className="text">Xóa</span>
