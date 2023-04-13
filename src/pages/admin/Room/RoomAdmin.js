@@ -11,7 +11,7 @@ import RoomUpdateForm from "components/Room/RoomUpdateForm";
 import { confirmAlert } from "react-confirm-alert";
 import { enqueueSnackbar } from "notistack";
 
-const RooomAdminStyles = styled.div`
+const RoomAdminStyles = styled.div`
   padding-top: 54px;
   .top__actions {
     display: flex;
@@ -129,7 +129,7 @@ const RoomAdmin = (props) => {
     });
   };
   return (
-    <RooomAdminStyles>
+    <RoomAdminStyles>
       <div className="top__actions">
         <Search placeHolder="Tìm Kiếm"></Search>
         <DropdownManage borderRadius="6px">
@@ -227,7 +227,7 @@ const RoomAdmin = (props) => {
           handleCloseForm={handleCloseUpdateForm}
         ></RoomUpdateForm>
       )}
-    </RooomAdminStyles>
+    </RoomAdminStyles>
   );
 };
 

@@ -170,6 +170,22 @@ const adminNavbarItems = [
     ],
   },
   {
+    title: "Thực đơn",
+    id: 4,
+    subNavs: [
+      {
+        id: 1,
+        title: "Tìm kiếm",
+        to: "dish/search",
+      },
+      {
+        id: 2,
+        title: "Cập nhật",
+        to: "dish/update",
+      },
+    ],
+  },
+  {
     title: "Phiếu đặt",
     id: 5,
     subNavs: [

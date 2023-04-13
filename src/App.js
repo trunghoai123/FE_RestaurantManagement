@@ -28,6 +28,7 @@ import { FormStateProvider } from "utils/context/FormStateContext";
 import OrderAdmin from "pages/admin/Order/OrderAdmin";
 import OrderDetailAdmin from "pages/admin/Order/OrderDetailAdmin";
 import AddOrderAdmin from "pages/admin/Order/AddOrderAdmin";
+import DishAdmin from "pages/admin/Dish/DishAdmin";
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -106,6 +107,10 @@ const router = createBrowserRouter([
       {
         path: "order/update",
         element: <OrderAdmin></OrderAdmin>,
+      },
+      {
+        path: "dish/update",
+        element: <DishAdmin></DishAdmin>,
       },
       {
         path: "order/:orderId",

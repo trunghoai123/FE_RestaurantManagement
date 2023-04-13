@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import Search from "components/Search";
-import DropdownManage from "components/Dopdown/ButtonDropDown";
-import { colors } from "variables";
 import Button from "components/Button/Button";
+import { colors } from "variables";
+import DropdownManage from "components/Dopdown/ButtonDropDown";
+import Search from "components/Search";
 import axiosClient from "utils/axios";
-import { deleteRoomById, deleteTableById, getAllArea, getAllTable } from "utils/api";
+import { deleteRoomById, getAllDish, getAllRoom } from "utils/api";
+import RoomUpdateForm from "components/Room/RoomUpdateForm";
 import { confirmAlert } from "react-confirm-alert";
 import { enqueueSnackbar } from "notistack";
-import TableUpdateForm from "components/Table/TableUpdateForm";
+import DishUpdateForm from "components/Dish/DishUpdateForm";
+import { convertToVND } from "utils/utils";
 
-const TableAdminStyles = styled.div`
+const DishAdminStyles = styled.div`
   padding-top: 54px;
   .top__actions {
     display: flex;
@@ -68,23 +70,23 @@ const TableAdminStyles = styled.div`
   }
 `;
 
-const TableAdmin = (props) => {
+const DishAdmin = (props) => {
+  const [dishs, setRoms] = useState();
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [mode, setMode] = useState({ mode: 0, id: null });
-  const [tables, setTables] = useState();
   useEffect(() => {
-    const fetchDishes = async () => {
+    const fetchRooms = async () => {
       try {
-        const result = await getAllTable();
+        const result = await getAllDish();
         if (result?.data) {
-          setTables(result.data);
+          setRoms(result.data);
         }
       } catch (error) {
         console.log(error);
         return;
       }
     };
-    fetchDishes();
+    fetchRooms();
   }, [mode]);
   const handleOpenUpdate = (id) => {
     if (id) {
@@ -94,6 +96,13 @@ const TableAdmin = (props) => {
     }
     setOpenUpdateForm(true);
   };
+  const handleOpenView = (id) => {
+    if (id) {
+      setMode({ id, mode: 3 });
+    }
+    setOpenUpdateForm(true);
+  };
+
   const handleCloseUpdateForm = () => {
     setMode({ id: null, mode: 0 });
     setOpenUpdateForm(false);
@@ -101,21 +110,21 @@ const TableAdmin = (props) => {
   const handleDelete = (id) => {
     const deleteArea = async (id) => {
       try {
-        await deleteTableById({ id });
+        await deleteRoomById({ id });
         setMode({ ...mode });
-        enqueueSnackbar("Đã xóa bàn", {
+        enqueueSnackbar("Đã xóa phòng", {
           variant: "success",
         });
       } catch (error) {
         console.log(error);
-        enqueueSnackbar("Lỗi!. Không thể xóa bàn", {
+        enqueueSnackbar("Lỗi!. Không thể xóa phòng", {
           variant: "error",
         });
       }
     };
     confirmAlert({
       title: "Xác nhận",
-      message: "Bạn có muốn xóa bàn đã chọn không",
+      message: "Bạn có muốn xóa phòng đã chọn không",
       buttons: [
         {
           label: "Có",
@@ -129,7 +138,7 @@ const TableAdmin = (props) => {
     });
   };
   return (
-    <TableAdminStyles>
+    <DishAdminStyles>
       <div className="top__actions">
         <Search placeHolder="Tìm Kiếm"></Search>
         <DropdownManage borderRadius="6px">
@@ -139,7 +148,7 @@ const TableAdmin = (props) => {
               className="dropdown-item dropdown__item"
               href="/"
             >
-              Thêm Bàn
+              Thêm Món
             </div>
           </li>
         </DropdownManage>
@@ -148,35 +157,39 @@ const TableAdmin = (props) => {
         <thead className="table__head--container">
           <tr className="table__row">
             <th className="table__head item__id" scope="col">
-              Mã Bàn
+              Mã
+            </th>
+            {/* <th className="table__head" scope="col">
+              Tên Phòng
+            </th> */}
+            <th className="table__head" scope="col">
+              Tên Món
             </th>
             <th className="table__head" scope="col">
-              Số Thứ Tự
+              Loại
             </th>
             <th className="table__head" scope="col">
-              Phòng
+              Giá
             </th>
             <th className="table__head" scope="col">
-              Trạng thái
-            </th>
-            <th className="table__head" scope="col">
-              Số Chỗ Ngồi
+              Hình Ảnh
             </th>
           </tr>
         </thead>
         <tbody className="table__body">
-          {tables?.map((table, index) => {
+          {dishs?.map((dish) => {
+            console.log(dish);
             return (
-              <tr className="table__row" key={table?._id}>
-                <td className="table__data item__id" title={table?.MaBan}>
-                  {table?.MaBan}
+              <tr className="table__row" key={dish?._id}>
+                <td className="table__data item__id">{dish?._id}</td>
+                <td className="table__data">{dish?.TenMon}</td>
+                <td className="table__data">{dish?.MaLoai?.TenLoai}</td>
+                <td className="table__data">{convertToVND(dish?.GiaMon)}</td>
+                <td className="table__data data__image">
+                  <div className="img__container">
+                    <img className="data__img" src={dish?.HinhAnh} alt="area-img" />
+                  </div>
                 </td>
-                <td className="table__data">{table?.SoThuTuBan}</td>
-                <td className="table__data">{table?.MaPhong?.MaPhong}</td>
-                <td className="table__data">
-                  {table?.TrangThai === 0 ? "Còn trống" : "Đang dùng"}
-                </td>
-                <td className="table__data">{table?.SoChoNgoi}</td>
                 <td className="table__data">
                   <Button
                     padding="4px 8px"
@@ -184,7 +197,7 @@ const TableAdmin = (props) => {
                     className="button button__update"
                     bgHover={colors.orange_1_hover}
                     bgColor={colors.orange_1}
-                    onClick={() => handleOpenUpdate(table?._id)}
+                    onClick={() => handleOpenUpdate(dish?._id)}
                   >
                     <div>
                       <span className="text">Cập Nhật</span>
@@ -194,14 +207,27 @@ const TableAdmin = (props) => {
                   <Button
                     padding="4px 8px"
                     borderRadius="7px"
+                    onClick={() => handleDelete(dish?._id)}
                     className="button button__remove"
                     bgHover={colors.red_1_hover}
                     bgColor={colors.red_1}
-                    onClick={() => handleDelete(table?._id)}
                   >
                     <div>
                       <span className="text">Xóa</span>
                       <i className="icon__item fa-solid fa-trash-can"></i>
+                    </div>
+                  </Button>
+                  <Button
+                    padding="4px 8px"
+                    borderRadius="7px"
+                    onClick={() => handleOpenView(dish?._id)}
+                    className="button button__view"
+                    bgHover={colors.green_1}
+                    bgColor={colors.green_1_hover}
+                  >
+                    <div>
+                      <span className="text">Xem</span>
+                      <i className="icon__item fa-solid fa-eye"></i>
                     </div>
                   </Button>
                 </td>
@@ -211,16 +237,16 @@ const TableAdmin = (props) => {
         </tbody>
       </table>
       {openUpdateForm && (
-        <TableUpdateForm
+        <DishUpdateForm
           setMode={setMode}
           mode={mode}
           handleCloseForm={handleCloseUpdateForm}
-        ></TableUpdateForm>
+        ></DishUpdateForm>
       )}
-    </TableAdminStyles>
+    </DishAdminStyles>
   );
 };
 
-TableAdmin.propTypes = {};
+DishAdmin.propTypes = {};
 
-export default TableAdmin;
+export default DishAdmin;
