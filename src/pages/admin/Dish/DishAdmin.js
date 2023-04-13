@@ -178,7 +178,6 @@ const DishAdmin = (props) => {
         </thead>
         <tbody className="table__body">
           {dishs?.map((dish) => {
-            console.log(dish);
             return (
               <tr className="table__row" key={dish?._id}>
                 <td className="table__data item__id">{dish?._id}</td>

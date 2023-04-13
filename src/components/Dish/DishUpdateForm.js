@@ -12,6 +12,7 @@ import { convertBase64 } from "utils/utils";
 import {
   addNewRoom,
   getAllArea,
+  getAllTypeOfDish,
   getAllTypeOfRoom,
   getRoomById,
   getRoomByRoomId,
@@ -20,6 +21,7 @@ import {
 } from "utils/api";
 import { useState } from "react";
 import { useEffect } from "react";
+import TextArea from "components/TextArea/TextArea";
 const DishUpdateFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -242,16 +244,31 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const [currentRoom, setCurrentRoom] = useState(null);
   const [isLoadedImage, setIsLoadedImage] = useState(false);
   const [imageSelecting, setImageSelecting] = useState("");
-  const [areas, setAreas] = useState([]);
+  // const [dishes, setDishes] = useState([]);
+  const [dishTypes, setDishTypes] = useState([]);
   const [roomKinds, setRoomKinds] = useState([]);
 
   useEffect(() => {
-    if (mode.mode === 1) {
-      loadRoomOnUpdate();
-    }
-    loadAllArea();
-    loadAllKindOfRoom();
+    const loadAllDishTypes = async () => {
+      try {
+        const data = await getAllTypeOfDish();
+        console.log(data);
+        if (data?.data) {
+          setDishTypes(data.data);
+          // if( mode === 3){
+          // }
+          // if (mode.mode === 2) {
+          //   setValue("area", data.data[0]._id);
+          // }
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    };
+    loadAllDishTypes();
   }, []);
+
   const loadAllKindOfRoom = async () => {
     try {
       const data = await getAllTypeOfRoom();
@@ -287,20 +304,20 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     }
   };
 
-  const loadAllArea = async () => {
-    try {
-      const data = await getAllArea();
-      if (data?.data) {
-        if (mode.mode === 2) {
-          setValue("area", data.data[0]._id);
-        }
-        setAreas(data.data);
-      }
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  };
+  // const loadAllArea = async () => {
+  //   try {
+  //     const data = await getAllArea();
+  //     if (data?.data) {
+  //       if (mode.mode === 2) {
+  //         setValue("area", data.data[0]._id);
+  //       }
+  //       setDishes(data.data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     return;
+  //   }
+  // };
   const onSubmit = async (values) => {
     if (!isLoadedImage) {
       setError("image", { type: "required", message: "Hãy chọn ảnh" });
@@ -316,21 +333,6 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
           HinhAnh: imageSelecting,
           MaLoai: values.kindOfRoom,
           MaKhuVuc: values.area,
-          //-------------------
-          // id: currentArea?._id,
-          // TenKhuVuc: values.name.trim(),
-          // HinhAnh: imageSelecting,
-          // MoTa: values.description.trim(),
-          // ViTriCuThe: values.detail.trim(),
-          // SoNguoiToiDa: currentArea?.SoNguoiToiDa,
-          //-------------
-          // id,
-          // TenPhong,
-          // TrangThai,
-          // SoChoNgoiToiDa,
-          // HinhAnh,
-          // MaLoai,
-          // MaKhuVuc,
         };
         try {
           const addAreaRs = await updateRoom(updatedArea);
@@ -371,21 +373,6 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             HinhAnh: imageSelecting,
             MaLoai: values.kind,
             MaKhuVuc: values.area,
-            //-------------
-            // MaKhuVuc: values.id.trim(),
-            // TenKhuVuc: values.name.trim(),
-            // HinhAnh: imageSelecting,
-            // MoTa: values.description.trim(),
-            // ViTriCuThe: values.detail.trim(),
-            // SoNguoiToiDa: 0,
-            // ---------------
-            // MaPhong,
-            // TenPhong,
-            // TrangThai,
-            // SoChoNgoiToiDa,
-            // HinhAnh,
-            // MaLoai,
-            // MaKhuVuc,
           };
           try {
             const addRoomRs = await addNewRoom(newRoom);
@@ -432,7 +419,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
               <i className="fa-solid fa-xmark"></i>
             </span>
             <div className="title__container">
-              <h4 className="title__text">{mode?.mode === 1 ? "Cập Nhật Phòng" : "Thêm Phòng"}</h4>
+              <h4 className="title__text">{mode?.mode === 1 ? "Cập Nhật Món" : "Thêm Món"}</h4>
             </div>
           </div>
           <div className="modal__body">
@@ -464,7 +451,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="data">
-                      Số người
+                      Tên món
                     </label>
                   </div>
                   <div className="input__container">
@@ -473,14 +460,14 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                       type="number"
                       className="input"
                       min="1"
-                      id="size"
-                      name="size"
-                      {...register("size")}
+                      id="name"
+                      name="name"
+                      {...register("name")}
                     />
                   </div>
-                  {errors?.size && (
+                  {errors?.name && (
                     <div className="error__container">
-                      <div className="error__message">{errors?.size?.message}</div>
+                      <div className="error__message">{errors?.name?.message}</div>
                     </div>
                   )}
                 </div>
@@ -489,16 +476,40 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="size">
-                      Khu vực
+                      Giá món
                     </label>
                   </div>
                   <div className="input__container">
-                    <select name="area" className="select__box" {...register("area")}>
-                      {areas?.length > 0 &&
-                        areas.map((area) => {
+                    <div className="input__container">
+                      <Input
+                        autoComplete="off"
+                        type="text"
+                        className="input"
+                        id="price"
+                        name="price"
+                        {...register("price")}
+                      />
+                    </div>
+                  </div>
+                  {errors?.price && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.price?.message}</div>
+                    </div>
+                  )}
+                </div>
+                <div className="value__container">
+                  <div className="label__container">
+                    <label className="label" htmlFor="size">
+                      Loại
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <select name="area" className="select__box" {...register("dishTypes")}>
+                      {dishTypes?.length > 0 &&
+                        dishTypes.map((dish) => {
                           return (
-                            <option key={area?._id} className="option" value={area?._id}>
-                              {area?.MaKhuVuc}
+                            <option key={dish?._id} className="option" value={dish?._id}>
+                              {dish?.TenLoai}
                             </option>
                           );
                         })}
@@ -510,52 +521,24 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </div>
                   )}
                 </div>
-                <div className="value__container">
-                  <div className="label__container">
-                    <label className="label" htmlFor="data">
-                      Loại phòng
-                    </label>
-                  </div>
-                  <div className="input__container">
-                    <select name="kindOfRoom" className="select__box" {...register("kindOfRoom")}>
-                      {roomKinds?.length > 0 &&
-                        roomKinds.map((kind) => {
-                          // console.log(kind);
-                          return (
-                            <option key={kind?._id} className="option" value={kind?._id}>
-                              {kind?.TenLoai}
-                            </option>
-                          );
-                        })}
-                    </select>
-                  </div>
-                  {errors?.kindOfRoom && (
-                    <div className="error__container">
-                      <div className="error__message">{errors?.kindOfRoom?.message}</div>
-                    </div>
-                  )}
-                </div>
               </div>
               <div className="row__container">
                 <div className="value__container">
                   <div className="label__container">
-                    <label className="label" htmlFor="data">
-                      Trạng thái
-                    </label>
+                    <label className="label">Chi tiết</label>
                   </div>
-                  <div className="input__container">
-                    <select name="status" className="select__box" {...register("status")}>
-                      <option className="option" value="0">
-                        Còn trống
-                      </option>
-                      <option className="option" value="1">
-                        Đang sử dụng
-                      </option>
-                    </select>
+                  <div className="input__container" htmlFor="note">
+                    <TextArea
+                      resize="none"
+                      rows="3"
+                      id="details"
+                      className="input"
+                      {...register("details")}
+                    ></TextArea>
                   </div>
-                  {errors?.status && (
+                  {errors?.details && (
                     <div className="error__container">
-                      <div className="error__message">{errors?.status?.message}</div>
+                      <div className="error__message">{errors?.details?.message}</div>
                     </div>
                   )}
                 </div>
