@@ -22,6 +22,7 @@ import {
 import { useState } from "react";
 import { useEffect } from "react";
 import TextArea from "components/TextArea/TextArea";
+import { getValue } from "@testing-library/user-event/dist/utils";
 const DishUpdateFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -211,28 +212,17 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
           return true;
         },
       }),
-      size: yup
-        .string("hãy xem lại số người")
-        .required("hãy nhập số người")
-        .test({
-          name: "check-size",
-          skipAbsent: true,
-          test(value, ctx) {
-            if (isNaN(Number(value)) || Number(value) === 0) {
-              return ctx.createError({ message: "hãy nhập số lượng phù hợp" });
-            }
-            return true;
-          },
-        }),
-      area: yup.string("Hãy kiểm tra lại khu vực").required("Hãy chọn khu vực"),
-      kindOfRoom: yup.string("Hãy kiểm tra lại loại phòng").required("Hãy chọn loại phòng"),
-      status: yup.string("Hãy kiểm tra lại trạng thái").required("Hãy chọn trạng thái"),
+      name: yup.string("Hãy kiểm tra lại tên món").required("Hãy nhập tên món"),
+      dishType: yup.string("Hãy kiểm tra loại món").required("chọn loại món"),
+      price: yup.string("Hãy kiểm tra lại giá món").required("Hãy nhập giá món"),
+      detail: yup.string("Hãy kiểm tra lại chi tiết"),
     })
     .required();
   const {
     register,
     handleSubmit,
     setValue,
+    getValues,
     clearErrors,
     setError,
     formState: { errors },
@@ -240,11 +230,11 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     defaultValues: {},
     resolver: yupResolver(schema),
   });
-
+  console.log(getValues("dishType"));
   const [currentRoom, setCurrentRoom] = useState(null);
   const [isLoadedImage, setIsLoadedImage] = useState(false);
   const [imageSelecting, setImageSelecting] = useState("");
-  // const [dishes, setDishes] = useState([]);
+  const [dishTypeStatus, setDishTypeStatus] = useState(0);
   const [dishTypes, setDishTypes] = useState([]);
   const [roomKinds, setRoomKinds] = useState([]);
 
@@ -255,19 +245,21 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
         console.log(data);
         if (data?.data) {
           setDishTypes(data.data);
-          // if( mode === 3){
-          // }
-          // if (mode.mode === 2) {
-          //   setValue("area", data.data[0]._id);
-          // }
         }
+        setDishTypeStatus(1);
       } catch (error) {
+        setDishTypeStatus(1);
         console.log(error);
         return;
       }
     };
-    loadAllDishTypes();
-  }, []);
+    if (dishTypeStatus === 0) {
+      loadAllDishTypes();
+    } else if (dishTypeStatus === 1) {
+      setValue("dishType", dishTypes[0]._id);
+      setDishTypeStatus(2);
+    }
+  }, [dishTypes]);
 
   const loadAllKindOfRoom = async () => {
     try {
@@ -504,7 +496,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </label>
                   </div>
                   <div className="input__container">
-                    <select name="area" className="select__box" {...register("dishTypes")}>
+                    <select name="area" className="select__box" {...register("dishType")}>
                       {dishTypes?.length > 0 &&
                         dishTypes.map((dish) => {
                           return (

@@ -171,7 +171,7 @@ const adminNavbarItems = [
   },
   {
     title: "Thực đơn",
-    id: 4,
+    id: 5,
     subNavs: [
       {
         id: 1,
@@ -187,7 +187,7 @@ const adminNavbarItems = [
   },
   {
     title: "Phiếu đặt",
-    id: 5,
+    id: 6,
     subNavs: [
       {
         id: 1,
@@ -208,7 +208,7 @@ const adminNavbarItems = [
   },
   {
     title: "Hóa Đơn",
-    id: 6,
+    id: 7,
     subNavs: [
       {
         id: 1,
