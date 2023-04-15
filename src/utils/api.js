@@ -42,6 +42,12 @@ export const addNewArea = async (area) => {
   });
 };
 
+export const addNewDish = async (tableData) => {
+  return axiosClient.post(`menu/addMenu`, tableData).then((res) => {
+    return res.data;
+  });
+};
+
 export const addNewRoom = async (roomData) => {
   return axiosClient.post(`room/addRoom`, roomData).then((res) => {
     return res.data;
@@ -68,6 +74,12 @@ export const updateRoom = async (room) => {
 
 export const updateTable = async (table) => {
   return axiosClient.post(`table/updateTable`, table).then((res) => {
+    return res.data;
+  });
+};
+
+export const updateDish = async (dish) => {
+  return axiosClient.post(`menu/updateMenu`, dish).then((res) => {
     return res.data;
   });
 };
@@ -116,6 +128,12 @@ export const deleteRoomById = async (id) => {
 
 export const deleteTableById = async (id) => {
   return axiosClient.post(`table/deleteTable`, id).then((res) => {
+    return res.data;
+  });
+};
+
+export const deleteDishById = async (id) => {
+  return axiosClient.post(`menu/deleteMenu`, id).then((res) => {
     return res.data;
   });
 };

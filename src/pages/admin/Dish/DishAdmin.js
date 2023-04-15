@@ -6,7 +6,7 @@ import { colors } from "variables";
 import DropdownManage from "components/Dopdown/ButtonDropDown";
 import Search from "components/Search";
 import axiosClient from "utils/axios";
-import { deleteRoomById, getAllDish, getAllRoom } from "utils/api";
+import { deleteDishById, deleteRoomById, getAllDish, getAllRoom } from "utils/api";
 import RoomUpdateForm from "components/Room/RoomUpdateForm";
 import { confirmAlert } from "react-confirm-alert";
 import { enqueueSnackbar } from "notistack";
@@ -110,21 +110,21 @@ const DishAdmin = (props) => {
   const handleDelete = (id) => {
     const deleteArea = async (id) => {
       try {
-        await deleteRoomById({ id });
+        await deleteDishById({ id });
         setMode({ ...mode });
-        enqueueSnackbar("Đã xóa phòng", {
+        enqueueSnackbar("Đã xóa món", {
           variant: "success",
         });
       } catch (error) {
         console.log(error);
-        enqueueSnackbar("Lỗi!. Không thể xóa phòng", {
+        enqueueSnackbar("Lỗi!. Không thể xóa món", {
           variant: "error",
         });
       }
     };
     confirmAlert({
       title: "Xác nhận",
-      message: "Bạn có muốn xóa phòng đã chọn không",
+      message: "Bạn có muốn xóa món đã chọn không",
       buttons: [
         {
           label: "Có",
@@ -160,7 +160,7 @@ const DishAdmin = (props) => {
               Mã
             </th>
             {/* <th className="table__head" scope="col">
-              Tên Phòng
+              Tên món
             </th> */}
             <th className="table__head" scope="col">
               Tên Món
@@ -170,6 +170,9 @@ const DishAdmin = (props) => {
             </th>
             <th className="table__head" scope="col">
               Giá
+            </th>
+            <th className="table__head" scope="col">
+              Đơn Vị Tính
             </th>
             <th className="table__head" scope="col">
               Hình Ảnh
@@ -184,6 +187,7 @@ const DishAdmin = (props) => {
                 <td className="table__data">{dish?.TenMon}</td>
                 <td className="table__data">{dish?.MaLoai?.TenLoai}</td>
                 <td className="table__data">{convertToVND(dish?.GiaMon)}</td>
+                <td className="table__data">{dish?.DonViTinh}</td>
                 <td className="table__data data__image">
                   <div className="img__container">
                     <img className="data__img" src={dish?.HinhAnh} alt="area-img" />

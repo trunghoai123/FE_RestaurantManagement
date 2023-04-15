@@ -10,12 +10,15 @@ import * as yup from "yup";
 import Input from "components/Input/Input";
 import { convertBase64 } from "utils/utils";
 import {
+  addNewDish,
   addNewRoom,
   getAllArea,
   getAllTypeOfDish,
   getAllTypeOfRoom,
+  getOneMenu,
   getRoomById,
   getRoomByRoomId,
+  updateDish,
   updateRoom,
   uploadImage,
 } from "utils/api";
@@ -216,6 +219,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       dishType: yup.string("Hãy kiểm tra loại món").required("chọn loại món"),
       price: yup.string("Hãy kiểm tra lại giá món").required("Hãy nhập giá món"),
       detail: yup.string("Hãy kiểm tra lại chi tiết"),
+      unit: yup.string("Hãy kiểm tra lại chi tiết").required("Hãy nhập đơn vị tính"),
     })
     .required();
   const {
@@ -230,7 +234,6 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     defaultValues: {},
     resolver: yupResolver(schema),
   });
-  console.log(getValues("dishType"));
   const [currentRoom, setCurrentRoom] = useState(null);
   const [isLoadedImage, setIsLoadedImage] = useState(false);
   const [imageSelecting, setImageSelecting] = useState("");
@@ -239,25 +242,57 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const [roomKinds, setRoomKinds] = useState([]);
 
   useEffect(() => {
-    const loadAllDishTypes = async () => {
+    const loadUpdatingDish = async () => {
       try {
-        const data = await getAllTypeOfDish();
-        console.log(data);
+        const data = await getOneMenu(mode.id);
         if (data?.data) {
-          setDishTypes(data.data);
+          setValue("name", data.data.TenMon);
+          setValue("price", data.data.GiaMon);
+          setValue("dishType", data.data.MaLoai);
+          setValue("details", data.data.MoTa);
+          setImageSelecting(data.data.HinhAnh);
+          setValue("id", data.data._id);
+          setValue("unit", data.data.DonViTinh);
+          setIsLoadedImage(true);
         }
-        setDishTypeStatus(1);
+        if (mode.mode === 1) {
+          setDishTypeStatus(2);
+        } else if (mode.mode === 2) {
+          setDishTypeStatus(1);
+        }
       } catch (error) {
         setDishTypeStatus(1);
         console.log(error);
         return;
       }
     };
+    const loadAllDishTypes = async () => {
+      try {
+        const data = await getAllTypeOfDish();
+        if (data?.data) {
+          setDishTypes(data.data);
+        }
+        if (mode.mode === 1 || mode.mode === 3) {
+          // updating and viewing
+          setDishTypeStatus(2);
+        } else if (mode.mode === 2) {
+          // adding
+          setDishTypeStatus(1);
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    };
     if (dishTypeStatus === 0) {
       loadAllDishTypes();
+      setDishTypeStatus(1);
     } else if (dishTypeStatus === 1) {
       setValue("dishType", dishTypes[0]._id);
-      setDishTypeStatus(2);
+      setDishTypeStatus(3);
+    } else if (dishTypeStatus === 2) {
+      loadUpdatingDish();
+      setDishTypeStatus(3);
     }
   }, [dishTypes]);
 
@@ -317,71 +352,66 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       clearErrors("image");
       if (mode.mode === 1) {
         //update
-        const updatedArea = {
-          id: currentRoom._id,
-          TenPhong: currentRoom._id,
-          TrangThai: Number(values.status),
-          SoChoNgoiToiDa: values.size,
+        const updatedDish = {
+          id: values.id,
+          TenMon: values.name,
+          GiaMon: values.price,
+          DonViTinh: values.unit,
+          MoTa: values.details,
           HinhAnh: imageSelecting,
-          MaLoai: values.kindOfRoom,
-          MaKhuVuc: values.area,
+          MaLoai: values.dishType,
         };
+        console.log(updatedDish);
         try {
-          const addAreaRs = await updateRoom(updatedArea);
+          const addAreaRs = await updateDish(updatedDish);
           if (addAreaRs.data._id) {
-            enqueueSnackbar("Cập nhật phòng thành công", {
+            enqueueSnackbar("Cập nhật món thành công", {
               variant: "success",
             });
             handleCloseForm();
           }
         } catch (error) {
           console.log(error);
-          enqueueSnackbar("Lỗi!. Không thể cập nhật phòng", {
+          enqueueSnackbar("Lỗi!. Không thể cập nhật món", {
             variant: "error",
           });
         }
       } else {
-        // mode.mode = 2 - add
-        const checkRoomById = async () => {
-          try {
-            const data = await getRoomByRoomId(values.id.trim());
-            if (data.data) {
-              return true;
-            } else {
-              return false;
-            }
-          } catch (error) {
-            console.log(error);
-            return false;
-          }
-        };
-        const checkingRs = await checkRoomById();
+        const checkingRs = false;
         if (!checkingRs) {
-          const newRoom = {
-            MaPhong: values.id.trim(),
-            TenPhong: values.id.trim(),
-            TrangThai: Number(values.status),
-            SoChoNgoiToiDa: Number(values.size),
+          const newDish = {
+            TenMon: values.name,
+            GiaMon: values.price,
+            DonViTinh: values.unit,
+            MoTa: values.details,
             HinhAnh: imageSelecting,
-            MaLoai: values.kind,
-            MaKhuVuc: values.area,
+            MaLoai: values.dishType,
+            // MaPhong: values.id.trim(),
+            // TenPhong: values.id.trim(),
+            // TrangThai: Number(values.status),
+            // SoChoNgoiToiDa: Number(values.size),,l
+            // HinhAnh: imageSelecting,
+            // MaLoai: values.kind,
+            // MaKhuVuc: values.area,
+            // TenMon, GiaMon, DonViTinh,MoTa, HinhAnh, MaLoai
           };
           try {
-            const addRoomRs = await addNewRoom(newRoom);
-            if (addRoomRs.data._id) {
-              enqueueSnackbar("Thêm phòng thành công", {
+            console.log(newDish);
+            const addDishRs = await addNewDish(newDish);
+            if (addDishRs.data._id) {
+              enqueueSnackbar("Thêm món thành công", {
                 variant: "success",
               });
               handleCloseForm();
             }
           } catch (error) {
             console.log(error);
-            enqueueSnackbar("Lỗi!. Không thể thêm phòng", {
+            enqueueSnackbar("Lỗi!. Không thể thêm món", {
               variant: "error",
             });
           }
         } else {
-          enqueueSnackbar("Mã phòng bị trùng", {
+          enqueueSnackbar("Mã món bị trùng", {
             variant: "error",
           });
         }
@@ -425,7 +455,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                   </div>
                   <div className="input__container">
                     <Input
-                      disabled={mode?.mode === 1 ? true : false}
+                      disabled={true}
                       className="input"
                       id="id"
                       type="text"
@@ -448,8 +478,9 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                   </div>
                   <div className="input__container">
                     <Input
+                      disabled={mode.mode === 3}
                       autoComplete="off"
-                      type="number"
+                      type="text"
                       className="input"
                       min="1"
                       id="name"
@@ -474,6 +505,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                   <div className="input__container">
                     <div className="input__container">
                       <Input
+                        disabled={mode.mode === 3}
                         autoComplete="off"
                         type="text"
                         className="input"
@@ -496,7 +528,12 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </label>
                   </div>
                   <div className="input__container">
-                    <select name="area" className="select__box" {...register("dishType")}>
+                    <select
+                      disabled={mode.mode === 3}
+                      name="area"
+                      className="select__box"
+                      {...register("dishType")}
+                    >
                       {dishTypes?.length > 0 &&
                         dishTypes.map((dish) => {
                           return (
@@ -521,6 +558,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                   </div>
                   <div className="input__container" htmlFor="note">
                     <TextArea
+                      disabled={mode.mode === 3}
                       resize="none"
                       rows="3"
                       id="details"
@@ -536,6 +574,33 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                 </div>
                 <div className="value__container">
                   <div className="label__container">
+                    <label className="label" htmlFor="size">
+                      Đơn vị tính
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <div className="input__container">
+                      <Input
+                        disabled={mode.mode === 3}
+                        autoComplete="off"
+                        type="text"
+                        className="input"
+                        id="unit"
+                        name="unit"
+                        {...register("unit")}
+                      />
+                    </div>
+                  </div>
+                  {errors?.unit && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.unit?.message}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
                     <label className="label" htmlFor="time">
                       Hình ảnh
                     </label>
@@ -545,6 +610,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                       <i className="fa-solid fa-upload"></i>
                     </label>
                     <Input
+                      disabled={mode.mode === 3}
                       width="180px"
                       isImgFile={true}
                       type="file"
@@ -563,6 +629,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </div>
                   )}
                 </div>
+                <div className="value__container"></div>
               </div>
             </div>
           </div>
@@ -570,21 +637,23 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             <div className="btn__container">
               <Button
                 type="button"
-                bgColor={colors.red_1}
-                bgHover={colors.red_1_hover}
+                bgColor={mode.mode === 3 ? colors.green_1 : colors.red_1}
+                bgHover={mode.mode === 3 ? colors.green_1_hover : colors.red_1_hover}
                 className="btn__cancel"
                 onClick={handleCloseForm}
               >
-                <div>Hủy</div>
+                <div>{mode.mode !== 3 ? "Hủy" : "Xong"}</div>
               </Button>
-              <Button
-                type="submit"
-                bgColor={colors.orange_2}
-                bgHover={colors.orange_2_hover}
-                className="btn__confirm"
-              >
-                <div>Xác Nhận</div>
-              </Button>
+              {mode.mode !== 3 && (
+                <Button
+                  type="submit"
+                  bgColor={colors.orange_2}
+                  bgHover={colors.orange_2_hover}
+                  className="btn__confirm"
+                >
+                  <div>Xác Nhận</div>
+                </Button>
+              )}
             </div>
           </div>
         </div>
