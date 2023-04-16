@@ -15,6 +15,7 @@ import { useAuthContext } from "utils/context/AuthContext";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import { getAllDish, getAllTypeOfDish, getMenuByAll } from "utils/api";
 import { convertToVND } from "utils/utils";
+import DishViewDetails from "components/Dish/DishViewDetails";
 const DishesStyles = styled.div`
   padding-top: 54px;
   .top__actions {
@@ -272,6 +273,7 @@ const Dishes = (props) => {
   const [itemOffset, setItemOffset] = useState(0);
   const [search, setSearch] = useState("");
   const dispatch = useDispatch();
+  const [isViewingDish, setIsViewingDish] = useState(null);
   const [filter, setFilter] = useState({
     search: "",
     kindOfDish: "",
@@ -351,11 +353,20 @@ const Dishes = (props) => {
   const handleAddToCart = (e, id) => {
     e.preventDefault();
     dispatch(addToCartById(id)).then((data) => {});
+    if (isViewingDish) {
+      setIsViewingDish(null);
+    }
   };
 
-  const hanleClickOnDish = (e) => {
+  const hanleClickOnDish = (e, dish) => {
     e.preventDefault();
+    setIsViewingDish(dish);
   };
+
+  const handleCloseView = () => {
+    setIsViewingDish(null);
+  };
+
   const handleTypeSearch = (e) => {
     setSearch(e.target.value);
   };
@@ -385,6 +396,13 @@ const Dishes = (props) => {
     <DishesStyles>
       {showForm && (
         <BookingModal cartItems={cartItems} handleCloseForm={handleCloseForm}></BookingModal>
+      )}
+      {isViewingDish && (
+        <DishViewDetails
+          addToCart={handleAddToCart}
+          dish={isViewingDish}
+          handleClose={handleCloseView}
+        ></DishViewDetails>
       )}
       <div className="top__actions">
         <Search
@@ -426,7 +444,7 @@ const Dishes = (props) => {
             {currentItems?.map((dish) => {
               return (
                 <Link
-                  onClick={hanleClickOnDish}
+                  onClick={(e) => hanleClickOnDish(e, dish)}
                   to={`/dish/${dish?._id}`}
                   key={dish?._id}
                   className="dish"

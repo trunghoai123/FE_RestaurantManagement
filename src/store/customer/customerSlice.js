@@ -14,9 +14,7 @@ const customerSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getCustomerByPhone.pending, (state, action) => {})
-      .addCase(getCustomerByPhone.fulfilled, (state, action) => {
-        console.log(action.payload);
-      })
+      .addCase(getCustomerByPhone.fulfilled, (state, action) => {})
       .addCase(getCustomerByPhone.rejected, (state, action) => {});
   },
 });

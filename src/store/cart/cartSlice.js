@@ -32,7 +32,6 @@ const cartSlice = createSlice({
       state.totalMoney = action.payload;
     },
     reloadTotalMoney(state, action) {
-      console.log(state.cartItems);
       if (state.cartItems && state.cartItems.length > 0) {
         let sum = 0;
         state.cartItems.forEach((item) => {

@@ -171,7 +171,7 @@ const HomePage = (props) => {
       <div className="section__discovery">
         <div className="discovery">
           <div className="service__title">
-            <div className="title__text">DISCOVERY</div>
+            <div className="title__text">KHÁM PHÁ</div>
           </div>
           <div className="service__main">
             <div className="main__left">

@@ -153,7 +153,7 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
           enqueueSnackbar("Đã tạo tài khoản thành công", {
             variant: "success",
           });
-          updateAuthUser(data.payload.account);
+          updateAuthUser({ ...data.payload.account, ...data.payload.tokens });
           handleCloseForm();
         }
       })

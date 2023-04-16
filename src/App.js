@@ -29,6 +29,7 @@ import OrderAdmin from "pages/admin/Order/OrderAdmin";
 import OrderDetailAdmin from "pages/admin/Order/OrderDetailAdmin";
 import AddOrderAdmin from "pages/admin/Order/AddOrderAdmin";
 import DishAdmin from "pages/admin/Dish/DishAdmin";
+import Profile from "pages/customer/Profile";
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
         path: "service",
         element: <Service></Service>,
       },
+      {
+        path: "profile",
+        element: <Profile></Profile>,
+      },
     ],
   },
   {
@@ -88,10 +93,6 @@ const router = createBrowserRouter([
         path: "area/update",
         element: <AreaAdmin></AreaAdmin>,
       },
-      // {
-      //   path: "area/update",
-      //   element: <AreaEditAdmin></AreaEditAdmin>,
-      // },
       {
         path: "room/update",
         element: <RoomAdmin></RoomAdmin>,
@@ -115,18 +116,6 @@ const router = createBrowserRouter([
       {
         path: "order/:orderId",
         element: <OrderDetailAdmin></OrderDetailAdmin>,
-      },
-      // {
-      //   path: "room/:roomId",
-      //   element: <RoomEditAdmin></RoomEditAdmin>,
-      // },
-      {
-        path: "table",
-        element: <TableAdmin></TableAdmin>,
-      },
-      {
-        path: "booking",
-        element: <Dishes></Dishes>,
       },
     ],
   },

@@ -131,7 +131,7 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
             variant: "warning",
           });
         } else {
-          updateAuthUser(data.payload.account);
+          updateAuthUser({ ...data.payload.account, ...data.payload.tokens });
           handleCloseForm();
           if (data.payload.account.LoaiTaiKhoan === 1) {
             enqueueSnackbar("Đăng nhập thành công với quyền nhân viên", {

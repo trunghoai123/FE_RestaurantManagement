@@ -21,7 +21,7 @@ import { clearCart } from "store/cart/cartSlice";
 const BookingModalStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
-  z-index: 9999;
+  z-index: 999;
   width: 100%;
   height: 100vh;
   top: 0;
@@ -264,7 +264,7 @@ const schema = yup
     phone: yup
       .string("hãy xem lại số điện thoại")
       .required("hãy nhập số điện thoại")
-      .matches(/[0][1-9][0-9]{8}/, "hãy nhập đúng định dạng số điện thoại"),
+      .matches(/[0][1-9][0-9]{8}\b/, "Số điện thoại sai"),
     fullname: yup
       .string("hãy xem lại họ tên")
       .required("hãy nhập họ tên")

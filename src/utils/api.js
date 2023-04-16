@@ -84,6 +84,18 @@ export const updateDish = async (dish) => {
   });
 };
 
+export const updateCustomer = async (cusInfo) => {
+  return axiosClient.post(`customer/updateCustomer`, cusInfo).then((res) => {
+    return res.data;
+  });
+};
+
+export const updateAccount = async (cusInfo) => {
+  return axiosClient.post(`customer/updateCustomer`, cusInfo).then((res) => {
+    return res.data;
+  });
+};
+
 export const getAreaById = async (id) => {
   return axiosClient.get(`area/getAreaById/${id}`).then((res) => {
     return res.data;
@@ -95,11 +107,18 @@ export const getRoomById = async (id) => {
     return res.data;
   });
 };
-
 export const getTableById = async (id) => {
   return axiosClient.get(`table/getTableById/${id}`).then((res) => {
     return res.data;
   });
+};
+
+export const getUserByAccessToken = async (AccessToken) => {
+  return axiosClient
+    .post(`account/getAccountCustomerByAccessToken`, { AccessToken })
+    .then((res) => {
+      return res.data;
+    });
 };
 
 export const getTableByTableId = async (MaBan) => {

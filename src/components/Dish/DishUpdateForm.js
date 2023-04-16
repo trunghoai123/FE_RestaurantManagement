@@ -203,18 +203,19 @@ const DishUpdateFormStyles = styled.div`
 const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const schema = yup
     .object({
-      id: yup.string("hãy xem lại mã").test({
-        name: "check-id",
-        skipAbsent: true,
-        test(value, ctx) {
-          if (mode.mode === 2) {
-            if (value.trim() === "") {
-              return ctx.createError({ message: "hãy nhập mã" });
-            }
-          }
-          return true;
-        },
-      }),
+      id: yup.string("hãy xem lại mã"),
+      // .test({
+      //   name: "check-id",
+      //   skipAbsent: true,
+      //   test(value, ctx) {
+      //     if (mode.mode === 2) {
+      //       if (value.trim() === "") {
+      //         return ctx.createError({ message: "hãy nhập mã" });
+      //       }
+      //     }
+      //     return true;
+      //   },
+      // }),
       name: yup.string("Hãy kiểm tra lại tên món").required("Hãy nhập tên món"),
       dishType: yup.string("Hãy kiểm tra loại món").required("chọn loại món"),
       price: yup.string("Hãy kiểm tra lại giá món").required("Hãy nhập giá món"),
@@ -234,6 +235,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     defaultValues: {},
     resolver: yupResolver(schema),
   });
+  console.log(getValues("id"));
   const [currentRoom, setCurrentRoom] = useState(null);
   const [isLoadedImage, setIsLoadedImage] = useState(false);
   const [imageSelecting, setImageSelecting] = useState("");

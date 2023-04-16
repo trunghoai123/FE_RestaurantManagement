@@ -95,7 +95,7 @@ const NavbarItem = ({ navItem }) => {
   };
   return (
     <NavbarItemStyles key={navItem?.id} className="link__container menu__list">
-      <span onClick={handleExpand} className="navlink" to={"/admin/area"}>
+      <span key={navItem?.id} onClick={handleExpand} className="navlink" to={"/admin/area"}>
         {navItem?.title}
         {navItem?.subNavs?.length > 0 && (
           <div className="down__icon__container">
