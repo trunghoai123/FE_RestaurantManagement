@@ -26,17 +26,22 @@ function AddOrderAdmin() {
     const [listPhongThuong, setListPhongThuong] = useState([])
     const [listPhongVIP, setListPhongVIP] = useState([])
     const [loaiPhieuDat, setLoaiPhieuDat] = useState(LOAIPHIEUDAT.BAN)
-    const [thoiGianBatDau , setThoiGianBatDau] = useState()
+    const [thoiGianBatDau , setThoiGianBatDau] = useState(new Date())
     const [hoTen, setHoTen] = useState("")
     const [msgHT, setMsgHT] = useState("")
     const [msgEmail, setMsgEmail] = useState("")
+    const [msgNum, setMsgNum] = useState("")
+    const [msgNumPeo, setMsgNumPeo] = useState("")
+    const [msgDate, setMsgDate] = useState("")
     const [msgSDT, setMsgSDT] = useState("")
     const [email, setEmail] = useState("")
     const [soDienThoai, setSoDienThoai] = useState("")
     const [ghiChu, setGhiChu] = useState("")
-    const [soLuongNguoiTrenBanOrPhong, setSoLuongNguoiTrenBanOrPhong] = useState(2)
-    const [soLuongBanOrPhong, setSoLuongBanOrPhong] = useState(1)
+    const [soLuongNguoiTrenBanOrPhong, setSoLuongNguoiTrenBanOrPhong] = useState(0)
+    const [soLuongBanOrPhong, setSoLuongBanOrPhong] = useState(0)
     const TrangThai = 0;
+    
+    console.log(thoiGianBatDau)
 
 
 
@@ -67,7 +72,39 @@ function AddOrderAdmin() {
         }else{
             setMsgSDT("")
         }
+        if(!soLuongBanOrPhong){
+            setMsgNum("Chưa chọn số lượng")
+            check =  false
+        }else{
+            setMsgNum("")
+        }
+        if(!soLuongNguoiTrenBanOrPhong){
+            setMsgNumPeo("Chưa chọn số lượng")
+            check =  false
+        }else{
+            setMsgNumPeo("")
+        }
+        if(thoiGianBatDau){
+            let now = new Date()
+            let time = new Date(thoiGianBatDau)
+            if(time.getTime() <= now.getTime()){
+                setMsgDate("Chọn ngày ở tương lai")
+                check =  false
+            }
+            else{
+                setMsgDate("")
+            }
+        }else{
+            setMsgDate("Chưa chọn ngày đặt")
+            check =  false
 
+        }
+        // if(!soLuongBanOrPhong < listBan?.length){
+        //     enqueueSnackbar("", {
+        //         variant: "warning",
+        //       });
+        //     check =  false
+        // }
 
 
         return check;
@@ -108,12 +145,22 @@ function AddOrderAdmin() {
     }
 
     const handleOpenModal = () => {
-        if(soLuongNguoiTrenBanOrPhong>=2 && thoiGianBatDau){
+        if(soLuongNguoiTrenBanOrPhong && thoiGianBatDau && soLuongBanOrPhong){
             loaiPhieuDat == 0 ? 
             setIsModalAddTable(true) : setIsModalAddRoom(true)
         }
-        if(!soLuongBanOrPhong || !thoiGianBatDau){
-            enqueueSnackbar(`Vui lòng chọn thời gian`, {
+        if(!soLuongBanOrPhong ){
+            enqueueSnackbar(`Vui lòng chọn số lượng`, {
+                variant: "warning",
+            });
+        }
+        if(!soLuongNguoiTrenBanOrPhong ){
+            enqueueSnackbar(`Vui lòng chọn số người`, {
+                variant: "warning",
+            });
+        }
+        if(!thoiGianBatDau ){
+            enqueueSnackbar(`Vui lòng chọn ngày`, {
                 variant: "warning",
             });
         }
@@ -190,34 +237,61 @@ function AddOrderAdmin() {
                                 }}>Đơn đặt phòng VIP</button>
                             </div>
 
-                                <div className="row-item">
+                                <div className="row-item order pb5">
                                     <span className="label">
                                     Số {loaiPhieuDat ==0 ? 'bàn':'phòng'}: 
                                     </span>
-                                    <input type="number" defaultValue={1} min={1} placeholder={`Số ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`} onChange={(e)=>{
+                                    <input className="time-format  date" type="number" min={1} placeholder={`Số ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`} onChange={(e)=>{
                                         setSoLuongBanOrPhong(e.target.value)
                                     }}/>
+                                    {msgNum && <span className="error right">{msgNum}</span>}
                                 </div>
-                                <div className="row-item"> 
+                                <div className="row-item order pb5"> 
                                     <span className="label">
                                     Số người trên mỗi {loaiPhieuDat ==0 ? 'bàn':'phòng'}: 
                                     </span>  
-                                    <input type="number" defaultValue={2} min={2} placeholder={`Số người trên mỗi ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`}
+                                    <input className="time-format  date" type="number" min={2} placeholder={`Số người trên mỗi ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`}
                                         onChange={(e)=>{
                                             setSoLuongNguoiTrenBanOrPhong(e.target.value)
                                         }}
                                     />
+                                    {msgNumPeo && <span className="error right">{msgNumPeo}</span>}
+
                                 </div>
-                                <div className="row-item">
+                                <div className="row-item order">
                                     <span className="label">
                                         Thời gian đặt: 
                                     </span>
-                                    <input type="date" onChange={(e)=>{
+                                    <input type="date" className="time-format date" onChange={(e)=>{
                                             setThoiGianBatDau(e.target.value)
+                                            setListBan([])
+                                            setListPhongThuong([])
+                                            setListPhongVIP([])
                                         }}/>
                                    
+                                   <input type="number" onChange={(e)=>{
+                                            let date = new Date(thoiGianBatDau)
+                                            date.setHours(e.target.value)
+                                            setThoiGianBatDau(date)
+
+                                        }} className="time-format mr-time" min={0} defaultValue={7} max={23} step={1} />
+                                    <span >
+                                        giờ 
+                                    </span>
+
+                                    <input type="number" onChange={(e)=>{
+                                            let date = new Date(thoiGianBatDau)
+                                            date.setMinutes(e.target.value)
+                                            setThoiGianBatDau(date)
+                                        }} className="time-format mr-time" min={0} defaultValue={0} max={45} step={15} />
+                                    <span className="">
+                                        phút 
+                                    </span>
+
+                                    {msgDate && <span className="error left">{msgDate}</span>}
+
                                 </div>
-                            <div className="row-item">
+                            <div className="row-item order">
                                 <span className="label">
                                     Ghi chú:
                                 </span> 
@@ -419,6 +493,28 @@ const OrderAdminStyle = styled.div`
                         display: flex;
                         align-items: flex-start;
                         position: relative;
+                        &.pb5{
+                            padding-bottom: 5px ;
+                        }
+                        &.order{
+                            .label{
+                                width: 35%;
+                            }
+                        }
+                        .mr-time{
+                            margin:0 10px;
+                        }
+
+                        
+                        .time-format{
+                            border: 1px solid rgb(220, 180, 110 , 1);
+                            outline: none;
+                            border-radius: 10px;
+
+                            &.date{
+                                padding: 5px;
+                            }
+                        }
 
                         .error{
                             position: absolute;
@@ -426,6 +522,14 @@ const OrderAdminStyle = styled.div`
                             font-size: 12px;
                             color: red;
                             left: 26.5%;
+                            &.left{
+                                left: 35.5%;
+                            }
+                            &.right{
+                                left: unset;
+                                right: 100px;
+                                top: 20%;
+                            }
                         }
 
                         textarea{
