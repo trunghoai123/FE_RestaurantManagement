@@ -79,6 +79,34 @@ const cartSlice = createSlice({
         }
       }
     },
+    addToCartWidthAmount(state, action) {
+      const { amount, dish } = action.payload;
+      const dishId = dish._id;
+      let newCartItems = [...state.cartItems];
+      const index = state.cartItems.findIndex((item) => item._id === dishId);
+      if (index !== -1) {
+        newCartItems[index] = {
+          ...newCartItems[index],
+          SoLuong: newCartItems[index].SoLuong + amount,
+        };
+        state.cartItems = newCartItems;
+        let sum = 0;
+        state.cartItems.forEach((item) => {
+          sum += item.GiaMon * item.SoLuong;
+        });
+        state.totalMoney = sum;
+      } else {
+        newCartItems.push({ ...dish, SoLuong: amount });
+        state.cartItems = newCartItems;
+        let sum = 0;
+        state.cartItems.forEach((item) => {
+          sum += item.GiaMon * item.SoLuong;
+        });
+        state.totalMoney = sum;
+      }
+      localStorage.removeItem("Restaurant-Cart");
+      localStorage.setItem("Restaurant-Cart", JSON.stringify(newCartItems));
+    },
     decreaseCartItem(state, action) {
       const dishId = action.payload;
       let newCartItems = [...state.cartItems];
@@ -157,6 +185,7 @@ export const {
   removeCartItem,
   increaseCartItem,
   decreaseCartItem,
+  addToCartWidthAmount,
 } = actions;
 // Export the reducer, either as a default or named export
 export default reducer;

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { colors } from "variables";
 import Button from "components/Button/Button";
 import Input from "components/Input/Input";
 import { convertToVND } from "utils/utils";
+import { useDispatch } from "react-redux";
+import { addToCartWidthAmount } from "store/cart/cartSlice";
 
 const DishViewDetailsStyles = styled.div`
   transition: all ease 200ms;
@@ -93,7 +95,15 @@ const DishViewDetailsStyles = styled.div`
     }
   }
 `;
-const DishViewDetails = ({ handleClose = () => {}, dish, addToCart = () => {} }) => {
+
+const DishViewDetails = ({ handleClose = () => {}, dish, handleApplyAmount = () => {} }) => {
+  const dispatch = useDispatch();
+  const [amount, setAmount] = useState(1);
+  const changeAmount = (e) => {
+    if (!isNaN(Number(e.target.value))) {
+      setAmount(Number(e.target.value));
+    }
+  };
   return (
     <DishViewDetailsStyles>
       <div className="main__form">
@@ -117,10 +127,7 @@ const DishViewDetails = ({ handleClose = () => {}, dish, addToCart = () => {} })
                 <div className="value__container">
                   <span className="info__title">Giá: </span>
                   <span className="infor__value">{convertToVND(dish?.GiaMon)}</span>
-                </div>
-                <div className="value__container">
-                  <span className="info__title">Đơn vị tính: </span>
-                  <span className="infor__value">{dish?.DonViTinh}</span>
+                  <span className="infor__value"> - {dish?.DonViTinh}</span>
                 </div>
                 <div className="value__container long__value">
                   <span className="info__title">Mô tả: </span>
@@ -131,8 +138,16 @@ const DishViewDetails = ({ handleClose = () => {}, dish, addToCart = () => {} })
           </div>
           <div className="modal__footer">
             <div className="btn__container">
+              <Input
+                onChange={changeAmount}
+                value={amount}
+                min="1"
+                max="100"
+                type="number"
+                width="100px"
+              />
               <Button
-                onClick={(e) => addToCart(e, dish._id)}
+                onClick={() => handleApplyAmount(amount, dish)}
                 type="submit"
                 bgColor={colors.orange_2}
                 bgHover={colors.orange_2_hover}

@@ -13,6 +13,7 @@ const ButtonStyles = styled.button`
   padding: ${(props) => (props.to ? "0px" : props.padding)};
   color: ${(props) => props.textColor};
   border-radius: ${(props) => props.borderRadius};
+  margin: ${(props) => props.margin};
   ${(props) => {
     return props.disabled
       ? css`
@@ -44,6 +45,7 @@ const Button = ({
   children,
   disabled = false,
   borderRadius = "0px",
+  margin = "0px",
   ...rest
 }) => {
   return (
@@ -55,6 +57,7 @@ const Button = ({
       className={className}
       disabled={disabled}
       borderRadius={borderRadius}
+      margin={margin}
       {...rest}
     >
       {to ? (

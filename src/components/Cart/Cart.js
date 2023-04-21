@@ -185,6 +185,7 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
   const handleDecreseItem = (dishId) => {
     dispatch(decreaseCartItem(dishId));
   };
+
   return (
     <CartStyles>
       <div className="cart__logo__container">
@@ -221,6 +222,7 @@ const Cart = ({ handleShowModal = () => {}, cartList = [], total = 0 }) => {
                         </span>
                       </div>
                       <input
+                        style={{ cursor: "default", userSelect: "none" }}
                         onChange={() => {}}
                         className="quantity"
                         type="text"

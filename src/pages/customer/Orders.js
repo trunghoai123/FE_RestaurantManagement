@@ -4,7 +4,13 @@ import styled from "styled-components";
 import { colors } from "variables";
 import Search from "components/Search";
 import Button from "components/Button/Button";
-import { getCustomerByUserId, getOneMenu, getOrderByUser, getOrderDetailByOrder } from "utils/api";
+import {
+  getCustomerByUserId,
+  getOneMenu,
+  getOrderByAll,
+  getOrderByUser,
+  getOrderDetailByOrder,
+} from "utils/api";
 import { useAuthContext } from "utils/context/AuthContext";
 import { getDishById } from "store/dish/dishSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
@@ -99,15 +105,48 @@ const Orders = (props) => {
   // const handleCloseForm = () => setShowForm(false);
   const [orders, setOrders] = useState([]);
   const { user } = useAuthContext();
+  const [orderState, setOrderState] = useState(0);
+  // * 0 chờ xác nhận
+  // * 1 chờ đặt cọc
+  // * 2 chờ nhận đơn
+  // * 3 kết thúc
+  // * 4 Đã hủy
   const { viewOrderDetail, setViewOrderDetail } = useFormStateContext();
   const [viewingOrder, setViewingOrder] = useState("");
+  // useEffect(() => {
+  //   const getCustomer = async () => {
+  //     if (user) {
+  //       const data = await getCustomerByUserId(user._id);
+  //       if (data.data) {
+  //         const customer = data.data;
+  //         const orderList = await getOrderByUser(customer.MaTaiKhoan);
+  //         if (orderList.data) {
+  //           // const clonedList = [];
+  //           // for (let i = 0; i < orderList.data.length; i++) {
+  //           //   const totalPrice = await calculateTotalPrice(orderList.data[i]);
+  //           //   console.log(totalPrice);
+  //           //   clonedList.push({ ...orderList.data[i], total: totalPrice });
+
+  //           //   console.log(totalPrice);
+  //           // }
+  //           // setOrders(clonedList);
+  //           setOrders(orderList.data);
+  //         }
+  //       }
+  //     }
+  //   };
+  //   getCustomer();
+  // }, [user]);
   useEffect(() => {
     const getCustomer = async () => {
       if (user) {
         const data = await getCustomerByUserId(user._id);
         if (data.data) {
           const customer = data.data;
-          const orderList = await getOrderByUser(customer.MaTaiKhoan);
+          const orderList = await getOrderByAll({
+            MaKhachHang: customer.MaKhachHang,
+            TrangThai: orderState,
+          });
           if (orderList.data) {
             // const clonedList = [];
             // for (let i = 0; i < orderList.data.length; i++) {
@@ -124,7 +163,7 @@ const Orders = (props) => {
       }
     };
     getCustomer();
-  }, [user]);
+  }, [user, orderState]);
   const calculateTotalPrice = async (orderId) => {
     let dishes = [];
     let total = 0;
@@ -158,7 +197,9 @@ const Orders = (props) => {
     setViewingOrder(id);
     setViewOrderDetail(true);
   };
-
+  const handleChangeState = (state) => {
+    setOrderState(state);
+  };
   return (
     <OrdersStyles>
       {viewOrderDetail && (
@@ -172,19 +213,34 @@ const Orders = (props) => {
         <div className="main__container">
           <div className="state__tabs">
             <div className="tabs__container">
-              <div className="tab__item active">
+              <div
+                onClick={() => handleChangeState(0)}
+                className={`tab__item ${orderState === 0 ? "active" : ""}`}
+              >
                 <div className="item__text">Đang xử lý</div>
               </div>
-              <div className="tab__item">
+              <div
+                onClick={() => handleChangeState(1)}
+                className={`tab__item ${orderState === 1 ? "active" : ""}`}
+              >
                 <div className="item__text">Đang chờ đặt cọc</div>
               </div>
-              <div className="tab__item">
+              <div
+                onClick={() => handleChangeState(2)}
+                className={`tab__item ${orderState === 2 ? "active" : ""}`}
+              >
                 <div className="item__text">Đã thanh toán</div>
               </div>
-              <div className="tab__item">
+              <div
+                onClick={() => handleChangeState(3)}
+                className={`tab__item ${orderState === 3 ? "active" : ""}`}
+              >
                 <div className="item__text">Đã nhận</div>
               </div>
-              <div className="tab__item">
+              <div
+                onClick={() => handleChangeState(4)}
+                className={`tab__item ${orderState === 4 ? "active" : ""}`}
+              >
                 <div className="item__text">Đã hủy</div>
               </div>
             </div>

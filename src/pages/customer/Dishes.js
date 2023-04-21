@@ -10,12 +10,19 @@ import Search from "components/Search";
 import BookingModal from "components/Modal/BookingModal";
 import Cart from "components/Cart/Cart";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCartById, reloadTotalMoney, setTotalMoney } from "store/cart/cartSlice";
+import {
+  addToCartById,
+  reloadTotalMoney,
+  addToCartWidthAmount,
+  setTotalMoney,
+} from "store/cart/cartSlice";
 import { useAuthContext } from "utils/context/AuthContext";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import { getAllDish, getAllTypeOfDish, getMenuByAll } from "utils/api";
 import { convertToVND } from "utils/utils";
 import DishViewDetails from "components/Dish/DishViewDetails";
+import Button from "components/Button/Button";
+import { confirmAlert } from "react-confirm-alert";
 const DishesStyles = styled.div`
   padding-top: 54px;
   .top__actions {
@@ -350,6 +357,11 @@ const Dishes = (props) => {
     })();
   }, []);
 
+  const handleApplyAmount = (amount, dish) => {
+    dispatch(addToCartWidthAmount({ amount, dish }));
+    setIsViewingDish(false);
+  };
+
   const handleAddToCart = (e, id) => {
     e.preventDefault();
     dispatch(addToCartById(id)).then((data) => {});
@@ -360,7 +372,14 @@ const Dishes = (props) => {
 
   const hanleClickOnDish = (e, dish) => {
     e.preventDefault();
-    setIsViewingDish(dish);
+    if (
+      e.target.classList.contains("add__container") ||
+      e.target.classList.contains("icon__add") ||
+      e.target.tagName === "path"
+    ) {
+    } else {
+      setIsViewingDish(dish);
+    }
   };
 
   const handleCloseView = () => {
@@ -370,12 +389,14 @@ const Dishes = (props) => {
   const handleTypeSearch = (e) => {
     setSearch(e.target.value);
   };
+
   const handleClickSearch = (e) => {
     setItemOffset(0);
     setFilter((oldVal) => {
       return { ...oldVal, search };
     });
   };
+
   const handleClickKind = (id) => {
     setItemOffset(0);
     setFilter((oldVal) => {
@@ -388,10 +409,32 @@ const Dishes = (props) => {
     const newOffset = (event.selected * itemsPerPage) % dishes.length;
     setItemOffset(newOffset);
   };
+
   const onPageActive = (number) => {
     const newOffset = (number.selected * itemsPerPage) % dishes.length;
     setItemOffset(newOffset);
   };
+
+  const handleConfirm = () => {
+    if (cartItems.length < 1) {
+      confirmAlert({
+        title: "Xác nhận",
+        message: "Chưa chọn món nào!, bạn có thể chọn thêm món ăn trước khi đặt bàn",
+        buttons: [
+          {
+            label: "Chọn món",
+            onClick: () => {},
+          },
+          {
+            label: "Đặt bàn",
+            // color: colors.orange_1,
+            onClick: () => handleShowModal(),
+          },
+        ],
+      });
+    }
+  };
+
   return (
     <DishesStyles>
       {showForm && (
@@ -399,7 +442,7 @@ const Dishes = (props) => {
       )}
       {isViewingDish && (
         <DishViewDetails
-          addToCart={handleAddToCart}
+          handleApplyAmount={handleApplyAmount}
           dish={isViewingDish}
           handleClose={handleCloseView}
         ></DishViewDetails>
@@ -411,6 +454,14 @@ const Dishes = (props) => {
           onChange={handleTypeSearch}
           placeholder="Tìm Kiếm"
         ></Search>
+        <Button
+          margin="0 20px 0 0"
+          onClick={handleConfirm}
+          bgColor={colors.orange_1}
+          bgHover={colors.orange_1_hover}
+        >
+          <div>Đặt bàn</div>
+        </Button>
       </div>
       <div className="main__container">
         <Cart total={totalMoney} cartList={cartItems} handleShowModal={handleShowModal}></Cart>

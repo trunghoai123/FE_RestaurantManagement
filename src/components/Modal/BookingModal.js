@@ -419,7 +419,6 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
         setLoading(true);
         dispatch(addOrder(order))
           .then((value) => {
-            console.log(value);
             setLoading(false);
             enqueueSnackbar("đã đặt thành công, đang chờ xác nhận", {
               variant: "success",
@@ -465,6 +464,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   //       console.log(res.data);
   //     });
   // };
+
   const handleSearchCustomer = () => {};
   return (
     <BookingModalStyles>
@@ -606,7 +606,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="time">
-                      Giờ Đến
+                      Giờ Nhận
                     </label>
                   </div>
                   <div className="input__container">
