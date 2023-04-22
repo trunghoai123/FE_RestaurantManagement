@@ -16,7 +16,6 @@ import { enqueueSnackbar } from "notistack";
 import { redirect, useNavigate } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "utils/context/AuthContext";
-import SelectBox from "SelectBox/SelectBox";
 import { clearCart } from "store/cart/cartSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import { getOrderById, getOrderDetailByOrder } from "utils/api";

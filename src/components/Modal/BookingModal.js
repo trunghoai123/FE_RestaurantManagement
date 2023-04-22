@@ -16,7 +16,6 @@ import { enqueueSnackbar } from "notistack";
 import { redirect, useNavigate } from "react-router";
 import axios from "axios";
 import { useAuthContext } from "utils/context/AuthContext";
-import SelectBox from "SelectBox/SelectBox";
 import { clearCart } from "store/cart/cartSlice";
 const BookingModalStyles = styled.div`
   transition: all ease 200ms;
@@ -730,7 +729,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
                           <option value="5">5</option>
                           <option value="10">10</option>
                           <option value="20">20</option>
-                          <option value="40">40</option>
+                          <option value="40">30</option>
                         </select>
                       </div>
                       {errors?.peoplePerRoom && (

@@ -14,6 +14,7 @@ const ButtonStyles = styled.button`
   color: ${(props) => props.textColor};
   border-radius: ${(props) => props.borderRadius};
   margin: ${(props) => props.margin};
+  width: ${(props) => props.width};
   ${(props) => {
     return props.disabled
       ? css`
@@ -46,6 +47,7 @@ const Button = ({
   disabled = false,
   borderRadius = "0px",
   margin = "0px",
+  width = "auto",
   ...rest
 }) => {
   return (
@@ -58,6 +60,7 @@ const Button = ({
       disabled={disabled}
       borderRadius={borderRadius}
       margin={margin}
+      width={width}
       {...rest}
     >
       {to ? (

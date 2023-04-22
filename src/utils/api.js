@@ -219,6 +219,24 @@ export const getMenuByAll = async (filter) => {
   });
 };
 
+export const getAreaByAll = async (filter) => {
+  return axiosClient.post(`area/getAreaByAll`, filter).then((res) => {
+    return res.data;
+  });
+};
+
+export const getRoomByAll = async (filter) => {
+  return axiosClient.post(`room/getRoomByAll`, filter).then((res) => {
+    return res.data;
+  });
+};
+
+export const getTableByAll = async (filter) => {
+  return axiosClient.post(`table/getTableByAll`, filter).then((res) => {
+    return res.data;
+  });
+};
+
 // export const getMenuByTypeId = async (id) => {
 //   return axiosClient.get(`menu/getMenuByTypeMenuId`, { MaLoai: id }).then((res) => {
 //     return res.data;

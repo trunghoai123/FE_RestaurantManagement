@@ -30,6 +30,9 @@ import OrderDetailAdmin from "pages/admin/Order/OrderDetailAdmin";
 import AddOrderAdmin from "pages/admin/Order/AddOrderAdmin";
 import DishAdmin from "pages/admin/Dish/DishAdmin";
 import Profile from "pages/customer/Profile";
+import AreaSearch from "pages/admin/Area/AreaSearch";
+import RoomSearch from "pages/admin/Room/RoomSearch";
+import TableSearch from "pages/admin/Table/TableSearch";
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -94,12 +97,24 @@ const router = createBrowserRouter([
         element: <AreaAdmin></AreaAdmin>,
       },
       {
+        path: "area/search",
+        element: <AreaSearch></AreaSearch>,
+      },
+      {
         path: "room/update",
         element: <RoomAdmin></RoomAdmin>,
       },
       {
+        path: "room/search",
+        element: <RoomSearch></RoomSearch>,
+      },
+      {
         path: "table/update",
         element: <TableAdmin></TableAdmin>,
+      },
+      {
+        path: "table/search",
+        element: <TableSearch></TableSearch>,
       },
       {
         path: "order/add",

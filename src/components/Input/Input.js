@@ -36,12 +36,12 @@ const Input = React.forwardRef(
     return (
       <InputTextStyles
         width={width}
+        padding={padding}
         type={type}
         name={name}
         placeholder={placeholder}
         isImgFile={isImgFile}
         imgUrl={imgUrl}
-        padding={padding}
         ref={ref}
         {...rest}
       />
