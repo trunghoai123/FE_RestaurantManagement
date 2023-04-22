@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { updateOrder , getMenuByAll } from "utils/api";
+import { convertToVND } from "utils/utils";
 import { enqueueSnackbar } from "notistack";
 import CustomDropDown from "./CustomDropDown";
 
@@ -65,6 +66,10 @@ function ModalAddMenu({setIsModalAddMenu , orderId ,setLoading , listThucDon , s
         }])
     }
 
+    
+    
+
+
     return ( 
 
         <ModalStyle>
@@ -90,7 +95,7 @@ function ModalAddMenu({setIsModalAddMenu , orderId ,setLoading , listThucDon , s
                             <ul>
                                
                             {
-                                data?.map((item, idx)=>{
+                               data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
                                             <MenuItem
@@ -106,30 +111,35 @@ function ModalAddMenu({setIsModalAddMenu , orderId ,setLoading , listThucDon , s
                             </ul>
                         </div>
                         <div className="modal-col-30">
-                            <h5>Món ăn đã đặt</h5>
+                            <div className="flex-d">
+                                <h5>Món ăn đã đặt</h5>
+                                <strong>{dataUse?.length}</strong>
+                            </div>
                             <ul>
                             {
                                     dataUse ? dataUse.map((item,index)=>{
                                         return (
-                                            <li key={index}>
-                                               <div>
-                                                    <span>Tên món:</span>
-                                                    {item.MaThucDon.TenMon}
+                                            <li key={index} className="item">
+                                                <div className="box-content">
+                                                    <div className="img-menu">
+                                                        <img src={item.MaThucDon.HinhAnh} style={{width: 100, height: 100}}/>
+                                                    </div>
+                                                    <div className="box-menu">
+                                                        <div className="name-menu">
+                                                            {item.MaThucDon.TenMon}
+                                                        </div>
+                                                        <div>
+                                                            {convertToVND(item.MaThucDon.GiaMon)}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <span>Giá món:</span>
-                                                    {item.MaThucDon.GiaMon}
-                                                </div>
-                                                <div>
-                                                    <img src={item.MaThucDon.HinhAnh} style={{width: 100, height: 100}}/>
-                                                    
-                                                </div>
-                                                <div>
-                                                    <span>Số lượng:</span>
-                                                    {item.SoLuong}
-                                                    
-                                                </div>
+                                               
+                    
                                                 <div className="btn-group">
+                                                    <div>
+                                                        <span>Số lượng:</span>
+                                                        {" "}{item.SoLuong}
+                                                    </div>
                                                     <button className="btn-order cancel"
                                                         onClick={()=>{
                                                             setDataUse(dataUse?.filter((itm)=>
@@ -145,19 +155,25 @@ function ModalAddMenu({setIsModalAddMenu , orderId ,setLoading , listThucDon , s
                                 }
                                 
                             </ul>
+                            <button className="btn-order info bottom-position"
+                                onClick={handleSave}
+                            >Lưu</button>
                         </div>
 
 
-                    </div>
-                    <div className="modal-add-footer">
-                        <button className="btn-order info"
-                            onClick={handleSave}
-                        >Lưu</button>
                     </div>
                 </div>
             </div>
         </ModalStyle>
     );
+}
+
+const autoScroll = ()=>{
+    
+    const ul = document.querySelector('.modal-col-30 ul')
+    ul.scrollTop = ul.scrollHeight;
+
+
 }
 
 function MenuItem({item, handleAdd}) {
@@ -170,23 +186,28 @@ function MenuItem({item, handleAdd}) {
     return (
       <div>
         <div className="item">
-            <div>
-                <span>Tên món:</span>
-                {item.TenMon}
+            <div className="box-content">
+                <div className="img-menu">
+                    <img src={item.HinhAnh} style={{width: 100, height: 100}}/>
+                </div>
+                <div className="box-menu">
+                    <div className="name-menu">
+                        {item.TenMon}
+                    </div>
+                    <div>
+                        {convertToVND(item.GiaMon)}
+                    </div>
+                </div>
             </div>
-            <div>
-                <span>Giá món:</span>
-                {item.GiaMon}
-            </div>
-            <div>
-                <img src={item.HinhAnh} style={{width: 100, height: 100}}/>
-                
-            </div>
+
             <div className="btn-group">
-                <input type="number"  min={1} defaultValue={1} value={quantity} onChange={handleQuantityChange} />
+                <input type="number" min={1} defaultValue={1} value={quantity} onChange={handleQuantityChange} />
                 <button className="btn-order handle"
-                        onClick={()=>{
-                            handleAdd(item, quantity)}}
+                        onClick={async()=>{
+                            await handleAdd(item, quantity)
+                            autoScroll()
+
+                        }}
                                                 >Thêm</button>
             </div>
             <div className="clear"></div>
@@ -257,6 +278,7 @@ const ModalStyle = styled.div`
                     width: 100%;
                     align-items: center;
                     justify-content: space-between;
+                    margin-bottom: 10px;
 
                     .dropdown-menu{
                         width: 300px;
@@ -285,8 +307,40 @@ const ModalStyle = styled.div`
                         .item{
                             width: 100%;
                             background-color: #f3f3f3;
-                            border-radius : 5px;
-                            padding : 5px;
+                            border-radius : 10px;
+                            padding : 10px;
+
+
+                            .box-content{
+                                display : flex;
+                                
+
+                                .box-menu{
+                                    flex : 1;
+                                    padding-left : 10px;
+
+                                    .name-menu{
+                                        text-overflow: ellipsis;
+                                        overflow: hidden;
+                                        display: -webkit-box;
+                                        -webkit-line-clamp: 3; 
+                                        -webkit-box-orient: vertical;
+                                        line-height: 20px;
+                                        margin-bottom: 5px;
+                                    }
+
+                                }
+                                .img-menu{
+                                    
+
+                                    img{
+                                        border-radius : 5px;
+                                        object-fit : contain;
+                                    }
+                                }
+                            }
+
+                            
                         }
                     }
                 }
@@ -295,21 +349,74 @@ const ModalStyle = styled.div`
                 width: 30%;
                 min-width: 30%;
                 height: 100%;
-                overflow-y : auto;
+                position: relative;
 
-                ::-webkit-scrollbar {
-                    display: none;
+
+                .flex-d{
+                    display: flex;
+                    align-items:center;
+                    justify-content: space-between;
                 }
+
                 ul{
                     list-style-type: none;
                     padding : 0;
+                    height : 85%;
+                    overflow-y : auto;
+                    scroll-behavior: smooth;
 
-                    li{
-                        background-color: #f3f3f3;
-                        border-radius : 5px;
-                        padding : 5px;
-                        margin-bottom: 10px;
+                    ::-webkit-scrollbar {
+                        display: none;
                     }
+                    li{
+                        margin-bottom: 10px;
+                        display: block;
+
+
+                        &.item{
+                            width: 100%;
+                            background-color: #f3f3f3;
+                            border-radius : 10px;
+                            padding : 10px;
+
+
+                            .box-content{
+                                display : flex;
+                                
+
+                                .box-menu{
+                                    flex : 1;
+                                    padding-left : 10px;
+
+                                    .name-menu{
+                                        text-overflow: ellipsis;
+                                        overflow: hidden;
+                                        display: -webkit-box;
+                                        -webkit-line-clamp: 3; 
+                                        -webkit-box-orient: vertical;
+                                        line-height: 20px;
+                                        margin-bottom: 5px;
+                                    }
+
+                                }
+                                .img-menu{
+                                    
+
+                                    img{
+                                        border-radius : 5px;
+                                        object-fit : contain;
+                                    }
+                                }
+                            }
+
+                            
+                        }
+                    }
+                }
+                .bottom-position{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
                 }
             }
         }
@@ -318,8 +425,17 @@ const ModalStyle = styled.div`
         }
         .btn-group{
             float: right;
-    
+            justify-content: flex-end;
+
+            input{
+                width: 50px;
+                border-radius: 10px;
+                border: 1px solid;
+            }
             
+            .btn-order{
+
+            }
         }
         .clear{
             clear: both;

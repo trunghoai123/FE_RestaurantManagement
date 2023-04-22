@@ -55,7 +55,13 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
             variant: "success",
         });
     }
-
+    const autoScroll = ()=>{
+    
+        const ul = document.querySelector('.modal-col-30 ul')
+        ul.scrollTop = ul.scrollHeight;
+    
+    
+    }
     return ( 
         <ModalStyle>
             <div className="modal-add-over">
@@ -69,7 +75,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                             <h5>{`Danh sách phòng hợp lệ`}</h5>
                             <ul>
                                 {
-                                data?.map((item, idx)=>{
+                                data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
                                             <div className="item">
@@ -87,12 +93,15 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                                 </div>
                                                 <div className="btn-group">
                                                     <button className="btn-order handle"
-                                                    onClick={()=>{
+                                                    onClick={async()=>{
                                                         if(!dataUse?.some((itm)=>
                                                             item.MaPhong == itm.MaPhong
 
                                                         ))
-                                                        setDataUse([...dataUse, item])
+                                                        await setDataUse([...dataUse, item])
+
+                                                        autoScroll()
+
                                                     }}
                                                     >Gán</button>
                                                 </div>
@@ -137,15 +146,14 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                 }
                                 
                             </ul>
+                            <button className="btn-order info bottom-position"
+                            onClick={handleSave}
+                        >Lưu</button>
                         </div>
 
 
                     </div>
-                    <div className="modal-add-footer">
-                        <button className="btn-order info"
-                            onClick={handleSave}
-                        >Lưu</button>
-                    </div>
+                  
                 </div>
             </div>
         </ModalStyle>
@@ -235,14 +243,26 @@ const ModalStyle = styled.div`
                 width: 30%;
                 min-width: 30%;
                 height: 100%;
-                overflow-y : auto;
+                position: relative;
 
-                ::-webkit-scrollbar {
-                    display: none;
+
+                .flex-d{
+                    display: flex;
+                    align-items:center;
+                    justify-content: space-between;
                 }
+               
                 ul{
                     list-style-type: none;
                     padding : 0;
+                    overflow-y : auto;
+                    height : 85%;
+                    scroll-behavior: smooth;
+
+
+                    ::-webkit-scrollbar {
+                        display: none;
+                    }
 
                     li{
                         background-color: #f3f3f3;
@@ -250,6 +270,11 @@ const ModalStyle = styled.div`
                         padding : 5px;
                         margin-bottom: 10px;
                     }
+                }
+                .bottom-position{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
                 }
             }
         }

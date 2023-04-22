@@ -38,7 +38,13 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
         });
        
     }
-
+    const autoScroll = ()=>{
+    
+        const ul = document.querySelector('.modal-col-30 ul')
+        ul.scrollTop = ul.scrollHeight;
+    
+    
+    }
     return ( 
         <ModalStyle>
             <div className="modal-add-over">
@@ -52,13 +58,13 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
                             <h5>{`Danh sách bàn hợp lệ`}</h5>
                             <ul>
                                 {
-                                data?.map((item, idx)=>{
+                               data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
                                             <div className="item">
                                                 <div>
                                                     <span>Mã bàn:</span>
-                                                    {item.MaBan}
+                                                    <span>{item.MaBan}</span>
                                                 </div>
                                                 <div>
                                                     <span>Số thứ tự bàn:</span>
@@ -70,12 +76,14 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
                                                 </div>
                                                 <div className="btn-group">
                                                     <button className="btn-order handle"
-                                                    onClick={()=>{
+                                                    onClick={ async()=>{
                                                         if(!dataUse?.some((itm)=>
                                                             item.MaBan == itm.MaBan
 
                                                         ))
-                                                        setDataUse([...dataUse, item])
+                                                        await setDataUse([...dataUse, item])
+
+                                                        autoScroll()
                                                     }}
                                                     >Gán</button>
                                                 </div>
@@ -89,6 +97,7 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
                                 
                                 
                             </ul>
+                            
                         </div>
                         <div className="modal-col-30">
                             <h5>{`Danh sách bàn đã gán`}</h5>
@@ -120,15 +129,14 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
                                 }
                                 
                             </ul>
+                            <button className="btn-order info bottom-position"
+                                onClick={handleSave}
+                            >Lưu</button>
                         </div>
 
 
                     </div>
-                    <div className="modal-add-footer">
-                        <button className="btn-order info"
-                            onClick={handleSave}
-                        >Lưu</button>
-                    </div>
+                    
                 </div>
             </div>
         </ModalStyle>
@@ -201,9 +209,9 @@ const ModalStyle = styled.div`
 
                     li{
                         padding: 0 5px;
-                        width: 50%;
-                        min-width:50%;
-                        max-width:50%;
+                        width: 33.3333%;
+                        min-width:33.3333%;
+                        max-width:33.3333%;
                         margin-bottom: 10px;
                         .item{
                             width: 100%;
@@ -218,14 +226,26 @@ const ModalStyle = styled.div`
                 width: 30%;
                 min-width: 30%;
                 height: 100%;
-                overflow-y : auto;
+                position: relative;
 
-                ::-webkit-scrollbar {
-                    display: none;
+
+                .flex-d{
+                    display: flex;
+                    align-items:center;
+                    justify-content: space-between;
                 }
+               
                 ul{
                     list-style-type: none;
                     padding : 0;
+                    overflow-y : auto;
+                    height : 85%;
+                    scroll-behavior: smooth;
+
+
+                    ::-webkit-scrollbar {
+                        display: none;
+                    }
 
                     li{
                         background-color: #f3f3f3;
@@ -234,15 +254,19 @@ const ModalStyle = styled.div`
                         margin-bottom: 10px;
                     }
                 }
+                .bottom-position{
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                }
             }
+            
         }
         .modal-add-footer{
             text-align : right;
         }
         .btn-group{
             float: right;
-    
-            
         }
         .clear{
             clear: both;
