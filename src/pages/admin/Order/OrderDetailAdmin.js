@@ -117,7 +117,7 @@ function OrderDetailAdmin(props) {
             <div className="deposit"></div>
           <div className="right-btn">
             <button className="btn-order handle" onClick={handleOrderReceive}>
-              Xác nhận đơn hàng đã được nhận
+              Chuyển đơn đặt thành hóa đơn
             </button>
             <button className="btn-order handle" onClick={handleOrderNoReceive}>
               Khánh hàng không đến
@@ -273,11 +273,11 @@ function OrderDetailAdmin(props) {
                 let id = orderDetail?.MaPhieuDat?._id;
                 let result = await changeStatus(id, status);
                 if (result.success) {
-                getOrderDetail(orderId);
-                setLoading(false);
-                enqueueSnackbar("Xác nhận khách hàng nhận đơn thành công", {
-                    variant: "success",
-                });
+                  getOrderDetail(orderId);
+                  setLoading(false);
+                  enqueueSnackbar("Đơn đặt đã chuyển thành hóa đơn thành công", {
+                      variant: "success",
+                  });
                 } else {
                 setLoading(false);
                 enqueueSnackbar("Xác nhận khách hàng nhận đơn thất bại", {
