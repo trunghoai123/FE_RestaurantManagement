@@ -9,7 +9,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./pages/customer/HomePage";
 import Introduce from "./pages/customer/Introduce";
 import Service from "./pages/customer/Service";
-import Booking from "./pages/customer/Booking";
 import Dishes from "./pages/customer/Dishes";
 import AppAdmin from "./pages/admin/AppAdmin";
 import AreaAdmin from "pages/admin/Area/AreaAdmin";
@@ -33,6 +32,9 @@ import Profile from "pages/customer/Profile";
 import AreaSearch from "pages/admin/Area/AreaSearch";
 import RoomSearch from "pages/admin/Room/RoomSearch";
 import TableSearch from "pages/admin/Table/TableSearch";
+import Area from "pages/customer/Area";
+import Room from "pages/customer/Room";
+import DishSearch from "pages/admin/Dish/DishSearch";
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -65,9 +67,14 @@ const router = createBrowserRouter([
         element: <Dishes></Dishes>,
       },
       {
-        path: "booking",
-        element: <Booking></Booking>,
+        path: "area",
+        element: <Area></Area>,
       },
+      {
+        path: "room",
+        element: <Room></Room>,
+      },
+
       {
         path: "introduce",
         element: <Introduce></Introduce>,
@@ -125,8 +132,8 @@ const router = createBrowserRouter([
         element: <OrderAdmin></OrderAdmin>,
       },
       {
-        path: "dish/update",
-        element: <DishAdmin></DishAdmin>,
+        path: "dish/search",
+        element: <DishSearch></DishSearch>,
       },
       {
         path: "order/:orderId",

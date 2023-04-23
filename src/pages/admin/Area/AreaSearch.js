@@ -39,6 +39,8 @@ const AreaSearchStyles = styled.div`
             min-width: 120px;
           }
           .filter__value__input {
+            min-width: 180px;
+            width: 180px;
           }
         }
       }

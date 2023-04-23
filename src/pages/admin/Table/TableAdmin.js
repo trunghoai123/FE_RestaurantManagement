@@ -187,7 +187,7 @@ const TableAdmin = (props) => {
                     onClick={() => handleOpenUpdate(table?._id)}
                   >
                     <div>
-                      <span className="text">Cập Nhật</span>
+                      <span className="text">Sửa</span>
                       <i className="icon__item fa-solid fa-pen-to-square"></i>
                     </div>
                   </Button>

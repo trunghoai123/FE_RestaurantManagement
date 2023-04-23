@@ -421,7 +421,7 @@ const RoomSearch = (props) => {
                     onClick={() => handleOpenUpdate(room?._id)}
                   >
                     <div>
-                      <span className="text">Cập Nhật</span>
+                      <span className="text">Sửa</span>
                       <i className="icon__item fa-solid fa-pen-to-square"></i>
                     </div>
                   </Button>

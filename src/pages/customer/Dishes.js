@@ -23,6 +23,7 @@ import { convertToVND } from "utils/utils";
 import DishViewDetails from "components/Dish/DishViewDetails";
 import Button from "components/Button/Button";
 import { confirmAlert } from "react-confirm-alert";
+import { enqueueSnackbar } from "notistack";
 const DishesStyles = styled.div`
   padding-top: 54px;
   .top__actions {
@@ -359,12 +360,20 @@ const Dishes = (props) => {
 
   const handleApplyAmount = (amount, dish) => {
     dispatch(addToCartWidthAmount({ amount, dish }));
+    enqueueSnackbar("Đã thêm món", {
+      variant: "success",
+    });
     setIsViewingDish(false);
   };
 
   const handleAddToCart = (e, id) => {
     e.preventDefault();
-    dispatch(addToCartById(id)).then((data) => {});
+    dispatch(addToCartById(id)).then((data) => {
+      enqueueSnackbar("Đã thêm món", {
+        variant: "success",
+        preventDuplicate: "true",
+      });
+    });
     if (isViewingDish) {
       setIsViewingDish(null);
     }
@@ -427,11 +436,12 @@ const Dishes = (props) => {
           },
           {
             label: "Đặt bàn",
-            // color: colors.orange_1,
             onClick: () => handleShowModal(),
           },
         ],
       });
+    } else {
+      handleShowModal();
     }
   };
 

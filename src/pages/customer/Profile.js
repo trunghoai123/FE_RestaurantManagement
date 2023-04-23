@@ -268,6 +268,7 @@ const Profile = (props) => {
             setValue("email", customer.Email || "");
             setValue("fullname", customer.TenKhachHang || "");
             setImageSelecting(customer.HinhAnh);
+            setIsLoadedImage(customer.HinhAnh && true);
           }
         }
       } catch (error) {
@@ -294,7 +295,6 @@ const Profile = (props) => {
         GioiTinh: values.sex,
         HinhAnh: imageSelecting,
       };
-      console.log(updatedCustomer);
       try {
         const addAreaRs = await updateCustomer(updatedCustomer);
         if (addAreaRs.data._id) {
