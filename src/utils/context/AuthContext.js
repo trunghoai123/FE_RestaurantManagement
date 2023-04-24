@@ -10,6 +10,10 @@ const AuthContext = createContext();
 
 const AuthProvider = (props) => {
   const [user, setUser] = useState(null);
+  
+
+
+
   const handleSetUser = (account) => {
     localStorage.removeItem("Restaurant-Account");
     localStorage.setItem("Restaurant-Account", JSON.stringify(account));

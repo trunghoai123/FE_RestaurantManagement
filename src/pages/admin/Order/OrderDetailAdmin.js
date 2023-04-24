@@ -2,13 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { changeStatus, getOrderDetailByOrder, updateOrder } from "utils/api";
+import { changeStatus, getOrderDetailByOrder, updateOrder,addInvoice,getEmployeeByUserId ,
+  updateManyRoom, updateManyTable} from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
+import { confirmAlert } from "react-confirm-alert";
 import ModalAddMenu from "./components/ModalAddMenu";
 import { enqueueSnackbar } from "notistack";
 import { convertDate } from "./OrderAdmin";
+import { convertToVND } from "utils/utils";
+import { useAuthContext } from "utils/context/AuthContext";
+
 
 function OrderDetailAdmin(props) {
   const [orderDetail, setOrderDetail] = useState({});
@@ -20,6 +25,26 @@ function OrderDetailAdmin(props) {
   const [listThucDon, setListThucDon] = useState([]);
   const [listBan, setListBan] = useState([]);
   const [listPhong, setListPhong] = useState([]);
+  const { user } = useAuthContext();
+  const [idEm, setIdEm] = useState("")
+
+  useEffect(()=>{
+    getEmployee(user._id)
+  },[])
+
+
+  const getEmployee = async (id) => {
+    setLoading(true);
+    let result = await getEmployeeByUserId(id);
+    if (result && result.data) {
+      setIdEm(result.data._id);
+      setLoading(false);
+    } else {
+      setIdEm("");
+      setLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     const arrLocation = window.location.href.split("/");
@@ -43,55 +68,96 @@ function OrderDetailAdmin(props) {
     }
   };
 
+  const totalDeposit = ()=>{
+    let dish = totalPrice()*30/100;
+    let room = 0;
+    if(orderDetail?.MaPhieuDat?.LoaiPhieuDat == 1){
+        room = 50000*listPhong.length
+    }
+    if(orderDetail?.MaPhieuDat?.LoaiPhieuDat == 2){
+        room = 100000*listPhong.length
+    }
+
+    return convertToVND(dish + room)
+  }
+
   const renderButton = () => {
     switch (orderDetail?.MaPhieuDat?.TrangThai) {
       case 0:
         return (
-          <>
+            <>
+            <div className="deposit"></div>
+          <div className="right-btn">
             <button className="btn-order handle" onClick={handleOrderConfirm}>
               Xác nhận đơn
             </button>
             <button className="btn-order cancel" onClick={handleOrderCancel}>
               Hủy đơn
             </button>
+          </div>
           </>
         );
         break;
       case 1:
         return (
-          <>
-            <button className="btn-order handle" onClick={handleOrder}>
+            <>
+            {renderDeposit()}
+            <div className="right-btn">
+            <button className="btn-order handle" onClick={handleOrderDeposit}>
               Xác nhận đã đặt cọc
             </button>
             <button className="btn-order cancel" onClick={handleOrderCancel}>
               Hủy đơn
             </button>
+          </div>
           </>
         );
         break;
       case 2:
         return (
-          <>
-            <button className="btn-order success" onClick={handleOrder}>
-              Xác nhận đơn hàng đã được nhận
+            <>
+            {renderDeposit()}
+          <div className="right-btn">
+            <button className="btn-order handle" onClick={handleOrderReceive}>
+              Chuyển đơn đặt thành hóa đơn
+            </button>
+            <button className="btn-order handle" onClick={handleOrderNoReceive}>
+              Khánh hàng không đến
             </button>
             <button className="btn-order cancel" onClick={handleOrderCancel}>
               Hủy đơn
             </button>
+          </div>
           </>
         );
         break;
       case 3:
         return (
-          <>
-            <button className="btn-order success">Thành công</button>
+            <>
+            {renderDeposit()}
+          <div className="right-btn">
+            <span className="btn-order success">Thành công</span>
+          </div>
           </>
         );
         break;
       case 4:
         return (
-          <>
-            <button className="btn-order fail">Đơn hàng bị hủy</button>
+            <>
+            <div className="deposit"></div>
+          <div className="right-btn">
+            <span className="btn-order fail">Đơn hàng bị hủy</span>
+          </div>
+          </>
+        );
+        break;
+    case 5:
+        return (
+            <>
+            <div className="deposit"></div>
+          <div className="right-btn">
+            <button className="btn-order fail">Khách hàng không nhận đơn</button>
+          </div>
           </>
         );
         break;
@@ -100,92 +166,286 @@ function OrderDetailAdmin(props) {
     }
   };
 
+
+  const renderDeposit = () =>{
+    return (
+      <div className="deposit">
+                <div>Khánh hàng phải đặt cọc:</div>
+                <div className="w60pc-depo">
+                    <span>30% tổng giá trị món ăn</span>
+                    {convertToVND(totalPrice()*30/100)}
+                </div>
+                {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 1 ?
+                <div className="w60pc-depo">
+                    <span>50.000đ mỗi phòng</span>
+                    {convertToVND(50000*listPhong.length)}
+                </div>: ""}
+                {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 2 ? 
+                <div className="w60pc-depo">
+                    <span>100.000đ mỗi phòng</span>
+                    {convertToVND(100000*listPhong.length)}
+                </div>: ""}
+                <div className="w60pc-depo">
+                    <span>Tổng cộng:</span>
+                    <strong>{totalDeposit()}</strong>
+                </div>
+            </div>
+    )
+  }
+
   const totalPrice = () => {
     return listThucDon?.reduce((total, menu) => total + menu?.MaThucDon?.GiaMon * menu?.SoLuong, 0);
   };
 
+  const handleOrderDeposit = async() =>{
+    confirmAlert({
+        title: "Xác nhận",
+        message: `Xác nhận đã nhận ${totalDeposit()} tiền đặt cọc?`,
+        buttons: [
+          {
+            label: "Có",
+            onClick: async() => {
+                setLoading(true);
+                let id = orderDetail?.MaPhieuDat?._id;
+                let status = 2;
+                let result = await changeStatus(id, status);
+                if (result.success) {
+                getOrderDetail(orderId);
+                setLoading(false);
+                enqueueSnackbar("Xác nhận đặt cọc thành công", {
+                    variant: "success",
+                });
+                } else {
+                setLoading(false);
+                enqueueSnackbar("Xác nhận đặt cọc thất bại", {
+                    variant: "error",
+                });
+                }
+            },
+          },
+          {
+            label: "Không",
+            onClick: () => {},
+          },
+        ],
+      });
+  }
+
+
+
   const handleOrderConfirm = async () => {
-    if (
-      orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 &&
-      listBan.length < orderDetail?.MaPhieuDat?.SoLuongBanOrPhong
-    ) {
-      enqueueSnackbar("Cần cập nhật bàn cho đơn hàng đủ với số lượng", {
-        variant: "warning",
+    confirmAlert({
+        title: "Xác nhận",
+        message: "Bạn có chắc chắn chuyển đơn hàng sang trạng thái chờ đặt cọc ?",
+        buttons: [
+          {
+            label: "Có",
+            onClick: async() => {
+                if (
+                    orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 &&
+                    listBan.length < orderDetail?.MaPhieuDat?.SoLuongBanOrPhong
+                  ) {
+                    enqueueSnackbar("Cần cập nhật bàn cho đơn hàng đủ với số lượng", {
+                      variant: "warning",
+                    });
+                  } else if (
+                    orderDetail?.MaPhieuDat?.LoaiPhieuDat != 0 &&
+                    listPhong.length < orderDetail?.MaPhieuDat?.SoLuongBanOrPhong
+                  ) {
+                    enqueueSnackbar("Cần cập nhật phòng cho đơn hàng đủ với số lượng", {
+                      variant: "warning",
+                    });
+                  } else {
+                    setLoading(true);
+                    let status = 1;
+                    let id = orderDetail?.MaPhieuDat?._id;
+                    let result = await updateOrder({
+                      id,
+                      TrangThai: status,
+                      ListThucDon: listThucDon,
+                      ListBan: listBan,
+                      ListPhong: listPhong,
+                    });
+                    if (result.success) {
+                      getOrderDetail(orderId);
+                      setLoading(false);
+                      enqueueSnackbar("Xác nhận đơn đặt thành công", {
+                        variant: "success",
+                      });
+                    } else {
+                      setLoading(false);
+                      enqueueSnackbar("Xác nhận đơn đặt thất bại", {
+                        variant: "error",
+                      });
+                    }
+                  }
+            },
+          },
+          {
+            label: "Không",
+            onClick: () => {},
+          },
+        ],
       });
-    } else if (
-      orderDetail?.MaPhieuDat?.LoaiPhieuDat != 0 &&
-      listPhong.length < orderDetail?.MaPhieuDat?.SoLuongBanOrPhong
-    ) {
-      enqueueSnackbar("Cần cập nhật phòng cho đơn hàng đủ với số lượng", {
-        variant: "warning",
-      });
-    } else {
-      setLoading(true);
-      let status = 1;
-      let id = orderDetail?.MaPhieuDat?._id;
-      let result = await updateOrder({
-        id,
-        TrangThai: status,
-        ListThucDon: listThucDon,
-        ListBan: listBan,
-        ListPhong: listPhong,
-      });
-      if (result.success) {
-        getOrderDetail(orderId);
-        setLoading(false);
-        enqueueSnackbar("Xác nhận đơn đặt thành công", {
-          variant: "success",
-        });
-      } else {
-        setLoading(false);
-        enqueueSnackbar("Xác nhận đơn đặt thất bại", {
-          variant: "error",
-        });
-      }
-    }
   };
 
-  const handleOrder = async () => {
-    setLoading(true);
-    let status = -1;
-    let id = orderDetail?.MaPhieuDat?._id;
-    if (orderDetail?.MaPhieuDat?.TrangThai == 1) status = 2;
-    if (orderDetail?.MaPhieuDat?.TrangThai == 2) status = 3;
-    let result = await changeStatus(id, status);
-    if (result.success) {
-      getOrderDetail(orderId);
-      setLoading(false);
-      enqueueSnackbar("Thay đổi trạng thái đơn hàng thành công", {
-        variant: "success",
+  const handleOrderReceive = async () => {
+    confirmAlert({
+        title: "Xác nhận",
+        message: "Xác nhận khách hàng đã đến nhận đơn?",
+        buttons: [
+          {
+            label: "Có",
+            onClick:    async () => {
+                setLoading(true);
+                let status = 3;
+                let id = orderDetail?.MaPhieuDat?._id;
+                let result = await changeStatus(id, status);
+                if (result.success) {
+
+                  let invoice = {
+                    MaPhieuDat: orderDetail?.MaPhieuDat?._id,
+                    MaNhanVien: idEm , 
+                    MaKhachHang : orderDetail?.MaPhieuDat?.MaKhachHang,
+                     HoTen: orderDetail?.MaPhieuDat?.HoTen ,
+                      SoDienThoai: orderDetail?.MaPhieuDat?.SoDienThoai, 
+                      LoaiHoaDon: orderDetail?.MaPhieuDat?.LoaiPhieuDat , 
+                      TrangThai: 0,
+                      ThoiGianBatDau: new Date(),
+                       ListThucDon: listThucDon,
+                       ListPhong: listPhong,
+                       ListBan : listBan,
+                  }
+                  let rs = await addInvoice(invoice)
+                  if(rs.success) {
+                    let reslt
+                    let ids
+                    if(orderDetail?.MaPhieuDat?.LoaiPhieuDat === 0){
+                      ids = listBan.map(obj => obj._id);
+                      reslt = await updateManyTable({ ids , TrangThai: 1})
+                    }else{
+                      ids = listPhong.map(obj => obj._id);
+                      reslt = await updateManyRoom({ ids , TrangThai: 1})
+                    }
+
+                    if(reslt.success){
+                      getOrderDetail(orderId);
+                      setLoading(false);
+                      enqueueSnackbar("Đơn đặt đã chuyển thành hóa đơn thành công", {
+                          variant: "success",
+                      });
+                    }
+                    else{
+                      getOrderDetail(orderId);
+                      setLoading(false);
+                      enqueueSnackbar("Chuyển trạng thái thất bại", {
+                        variant: "error",
+                    });
+                    }
+
+
+
+                    
+                  }
+                  else {
+                    setLoading(false);
+                    enqueueSnackbar("Tạo hóa đơn thất bại", {
+                        variant: "error",
+                    });
+                    }
+
+
+
+                  
+                } else {
+                setLoading(false);
+                enqueueSnackbar("Xác nhận khách hàng nhận đơn thất bại", {
+                    variant: "error",
+                });
+                }
+            },
+          },
+          {
+            label: "Không",
+            onClick: () => {},
+          },
+        ],
       });
-    } else {
-      setLoading(false);
-      enqueueSnackbar("Thay đổi trạng thái đơn hàng thất bại", {
-        variant: "error",
-      });
-    }
   };
+
+
+  const handleOrderNoReceive = async () => {
+    confirmAlert({
+        title: "Xác nhận",
+        message: "Xác nhận khách hàng không đến nhận đơn?",
+        buttons: [
+          {
+            label: "Có",
+            onClick:    async () => {
+                setLoading(true);
+                let status = 5;
+                let id = orderDetail?.MaPhieuDat?._id;
+                let result = await changeStatus(id, status);
+                if (result.success) {
+                getOrderDetail(orderId);
+                setLoading(false);
+                enqueueSnackbar("Xác nhận khách hàng không nhận đơn thành công", {
+                    variant: "success",
+                });
+                } else {
+                setLoading(false);
+                enqueueSnackbar("Xác nhận khách hàng không nhận đơn thất bại", {
+                    variant: "error",
+                });
+                }
+            },
+          },
+          {
+            label: "Không",
+            onClick: () => {},
+          },
+        ],
+      });
+  };
+
+
+
+
   const handleOrderCancel = async () => {
     // eslint-disable-next-line no-restricted-globals
-    const request = confirm("Bạn có chắc chắn muốn hủy đơn ?");
-    if (request) {
-      setLoading(true);
-      let status = 4;
-      let id = orderDetail?.MaPhieuDat?._id;
-      let result = await changeStatus(id, status);
-      if (result.success) {
-        getOrderDetail(orderId);
-        setLoading(false);
-        enqueueSnackbar("Hủy đơn hàng thành công", {
-          variant: "success",
-        });
-      } else {
-        setLoading(false);
-        enqueueSnackbar("Hủy đơn hàng thất bại", {
-          variant: "error",
-        });
-      }
-    }
+
+    confirmAlert({
+        title: "Xác nhận",
+        message: "Bạn có chắc chắn muốn hủy đơn ?",
+        buttons: [
+          {
+            label: "Có",
+            onClick: async() => {
+                setLoading(true);
+                let status = 4;
+                let id = orderDetail?.MaPhieuDat?._id;
+                let result = await changeStatus(id, status);
+                if (result.success) {
+                    getOrderDetail(orderId);
+                    setLoading(false);
+                    enqueueSnackbar("Hủy đơn hàng thành công", {
+                    variant: "success",
+                    });
+                } else {
+                    setLoading(false);
+                    enqueueSnackbar("Hủy đơn hàng thất bại", {
+                    variant: "error",
+                    });
+                }
+            },
+          },
+          {
+            label: "Không",
+            onClick: () => {},
+          },
+        ],
+      });
+   
   };
 
   return (
@@ -200,30 +460,38 @@ function OrderDetailAdmin(props) {
           <div className="col">
             <div className="item">
               <div className="title">Thông tin khánh hàng</div>
-              <p className="">Họ tên: {orderDetail?.MaPhieuDat?.HoTen}</p>
-              <p className="">Số điện thoại: {orderDetail?.MaPhieuDat?.SoDienThoai}</p>
-              <p className="">Email: {orderDetail?.MaPhieuDat?.Email}</p>
+              <p className="desc"><span className="w160px">Họ tên khách hàng:</span> 
+              <strong>{orderDetail?.MaPhieuDat?.HoTen}</strong></p>
+              <p className="desc"><span className="w160px">Số điện thoại:</span> 
+              <strong>{orderDetail?.MaPhieuDat?.SoDienThoai}</strong></p>
+              <p className="desc"><span className="w160px">Email:</span>
+               <strong>{orderDetail?.MaPhieuDat?.Email}</strong></p>
             </div>
           </div>
           <div className="col">
             <div className="item">
               <div className="title">Thông tin đơn đặt</div>
-              <p className="">Thời gian đặt: {convertDate(orderDetail?.MaPhieuDat?.createdAt)}</p>
-              <p className="">
-                Thời gian nhận {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}:{" "}
-                {convertDate(orderDetail?.MaPhieuDat?.ThoiGianBatDau)}
+              <p className="desc"><span className="w220px">Thời gian đặt: </span>
+              <strong>{convertDate(orderDetail?.MaPhieuDat?.createdAt)}</strong></p>
+              <p className="desc">
+              <span className="w220px">Thời gian nhận {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}:</span>
+                <strong>{convertDate(orderDetail?.MaPhieuDat?.ThoiGianBatDau)}</strong>
               </p>
 
-              <p className="">
-                Số {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}:{" "}
-                {orderDetail?.MaPhieuDat?.SoLuongBanOrPhong}
+              <p className="desc">
+              <span className="w220px">Số {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}:</span>
+              <strong>{orderDetail?.MaPhieuDat?.SoLuongBanOrPhong}</strong>
+                
               </p>
-              <p className="">
-                Số lượng người trên mỗi{" "}
-                {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}:{" "}
-                {orderDetail?.MaPhieuDat?.SoLuongNguoiTrenBanOrPhong}
+              <p className="desc">
+              <span className="w220px">Số lượng người trên mỗi{" "}
+                {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 0 ? "bàn" : "phòng"}:</span>
+                <strong>{orderDetail?.MaPhieuDat?.SoLuongNguoiTrenBanOrPhong}</strong>
+                
               </p>
-              <p className="">Ghi chú: {orderDetail?.MaPhieuDat?.GhiChu}</p>
+              <p className="desc"><span className="w220px">Ghi chú:</span>
+              <strong>{orderDetail?.MaPhieuDat?.GhiChu}</strong>
+              </p>
             </div>
           </div>
           <div className="col">
@@ -307,15 +575,15 @@ function OrderDetailAdmin(props) {
                     return (
                       <li key={index}>
                         <span className="name-col">{menu.MaThucDon.TenMon}</span>
-                        <span className="">{menu.MaThucDon.GiaMon}đ</span>
+                        <span className="">{convertToVND(menu.MaThucDon.GiaMon)}</span>
                         <span className="right stock-col">{menu.SoLuong}</span>
-                        <span className="right">{menu.MaThucDon.GiaMon * menu.SoLuong}đ</span>
+                        <span className="right">{convertToVND(menu.MaThucDon.GiaMon * menu.SoLuong)}</span>
                       </li>
                     );
                   })}
                   <li className="total-row">
                     <span className="total">Tổng tiền</span>
-                    <span className="total w-75pc right">{totalPrice()}đ</span>
+                    <span className="total w-75pc right">{convertToVND(totalPrice())}</span>
                   </li>
                 </ul>
               ) : (
@@ -409,6 +677,20 @@ const OrderDetailAdminStyle = styled.div`
             font-size: 15px;
             color: rgb(220, 180, 110, 1);
           }
+          .desc{
+            font-size: 15px;
+            margin: 5px 0;
+
+          }
+
+          .w160px{
+            width: 165px;
+            display: inline-block;
+          }
+          .w220px{
+            width: 220px;
+            display: inline-block;
+          }
 
           .list-menu {
             width: 100%;
@@ -455,7 +737,31 @@ const OrderDetailAdminStyle = styled.div`
     }
   }
   .btn-group {
-    float: right;
+    width: 100%;
+    display: flex;
+    align-items:center;
+    justify-content: space-between;
+
+    .right-btn{
+       float: right;
+    }
+
+    .deposit{
+        float: left;
+
+
+        width: 50%;
+
+        .w60pc-depo{
+            width: 100%;
+            span{
+                width: 60%;
+                display: inline-block;
+
+            }
+        }
+    }
+    
   }
   .btn-order {
     border: none;
@@ -474,12 +780,18 @@ const OrderDetailAdminStyle = styled.div`
     }
     &.success {
       background-color: #28a745;
+      :hover{
+        opacity: 1;
+      }
     }
     &.cancel {
       background-color: #dc3545;
     }
     &.fail {
       background-color: #6c757d;
+      :hover{
+        opacity: 1;
+      }
     }
     &.info {
       background-color: #17a2b8;

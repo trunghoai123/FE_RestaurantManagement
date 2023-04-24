@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { updateOrder , getMenuByAll } from "utils/api";
+import { updateInvoice , getMenuByAll } from "utils/api";
 import { convertToVND } from "utils/utils";
 import { enqueueSnackbar } from "notistack";
 import CustomDropDown from "./CustomDropDown";
@@ -10,7 +10,7 @@ import CustomDropDown from "./CustomDropDown";
 const AllMenu = 'ALL_MENU'
 
 
-function ModalAddMenu({setIsModalAddMenu , orderId ,setLoading , listThucDon , setListThucDon }) {
+function ModalAddMenu({setIsModalAddMenu ,getInvoice, invoiceId ,setLoading , listThucDon , setListThucDon , isSave}) {
     const [data, setData] = useState([])
     const [dataUse , setDataUse] =useState([])
     const [selectedItem,setSelectedItem] = useState("")
@@ -46,13 +46,30 @@ function ModalAddMenu({setIsModalAddMenu , orderId ,setLoading , listThucDon , s
 
 
     const handleSave= async ()=>{
-       
-        setIsModalAddMenu(false)
-        setListThucDon(dataUse)
-        enqueueSnackbar("Cập nhật món ăn cho đơn đặt thành công", {
-            variant: "success",
-            });
+        if(isSave){
+            let result = await updateInvoice({id:invoiceId, ListThucDon: dataUse });
+            if (result.success) {
+                enqueueSnackbar("Cập nhật món ăn cho hóa đơn thành công", {
+                    variant: "success",
+                    });
+                getInvoice(invoiceId)
+                setIsModalAddMenu(false)
+            }else{
+                enqueueSnackbar("Cập nhật món ăn cho hóa đơn thất bại", {
+                    variant: "error",
+                    });
+            }
+        }else{
+            setIsModalAddMenu(false)
+            setListThucDon(dataUse)
+            enqueueSnackbar("Cập nhật món ăn cho đơn đặt thành công", {
+                variant: "success",
+                });
+        }
+        
       
+
+        
     }
 
 

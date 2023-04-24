@@ -1,14 +1,14 @@
 import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { updateOrder , getRoomMatchTimeAndSeat , getTypeOfRoomById } from "utils/api";
+import { updateInvoice , getRoomMatchTimeAndSeat , getTypeOfRoomById } from "utils/api";
 import { enqueueSnackbar } from "notistack";
 
 const MaLoaiPhongThuong = 1;
 const MaLoaiPhongVIP = 2;
 
-function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
-    soNguoi , thoiGianBatDau , soPhong , listPhong , setListPhong}) {
+function ModalAddRoom({setIsModalAddRoom, loaiHoaDon , isSave,invoiceId,getInvoice , setLoading,
+    soNguoi , thoiGianBatDau  , listPhong , setListPhong}) {
     const [data, setData] = useState([])
     const [dataUse , setDataUse] =useState([])
     const [maLoaiPhong, setMaLoaiPhong] =useState("")
@@ -24,7 +24,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
 
     const getMaLoaiPhong = async ()=>{
         setLoading(true)
-        let result = await getTypeOfRoomById(loaiPhieuDat == 1 ? MaLoaiPhongThuong : MaLoaiPhongVIP)
+        let result = await getTypeOfRoomById(loaiHoaDon == 1 ? MaLoaiPhongThuong : MaLoaiPhongVIP)
         if(result && result.data){
             setLoading(false)
             setMaLoaiPhong(result.data._id)
@@ -37,7 +37,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
     }
     const getData = async ()=>{
         setLoading(true)
-        let result = await getRoomMatchTimeAndSeat({ SoNguoi : soNguoi , ThoiGianBatDau : thoiGianBatDau , LoaiPhieuDat : loaiPhieuDat, MaLoaiPhong : maLoaiPhong })
+        let result = await getRoomMatchTimeAndSeat({ SoNguoi : soNguoi , ThoiGianBatDau : thoiGianBatDau , LoaiPhieuDat : loaiHoaDon, MaLoaiPhong : maLoaiPhong })
         if(result && result.data){
             setLoading(false)
             setData(result.data)
@@ -49,11 +49,26 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
         }
     }
     const handleSave= async ()=>{
+        if(isSave){
+            let result = await updateInvoice({id:invoiceId, ListPhong: dataUse });
+            if (result.success) {
+                enqueueSnackbar("Cập nhật phòng cho hóa đơn thành công", {
+                    variant: "success",
+                    });
+                getInvoice(invoiceId)
+                setIsModalAddRoom(false)
+            }else{
+                enqueueSnackbar("Cập nhật phòng cho hóa đơn thất bại", {
+                    variant: "error",
+                    });
+            }
+        }else{
         setIsModalAddRoom(false)
         setListPhong(dataUse)
-        enqueueSnackbar("Cập nhật phòng cho đơn đặt thành công", {
+        enqueueSnackbar("Cập nhật phòng cho hóa đơn thành công", {
             variant: "success",
         });
+    }
     }
     const autoScroll = ()=>{
     
@@ -78,7 +93,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                 data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
-                                            <div className="item">
+                                            <div className={`item ${item.TrangThai == 1 ? "active": ""}`}>
                                                 <div>
                                                     <span>Mã phòng:</span>
                                                     {item.MaPhong}
@@ -92,7 +107,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                                     {item.SoChoNgoiToiDa}
                                                 </div>
                                                 <div className="btn-group">
-                                                    <button className="btn-order handle"
+                                                    <button disabled={item.TrangThai === 0 ? "" : "disabled"} className="btn-order handle"
                                                     onClick={async()=>{
                                                         if(!dataUse?.some((itm)=>
                                                             item.MaPhong == itm.MaPhong
@@ -235,6 +250,9 @@ const ModalStyle = styled.div`
                             background-color: #f3f3f3;
                             border-radius : 5px;
                             padding : 5px;
+                            &.active{
+                                border: 5px solid #dcb46e;
+                            }
                         }
                     }
                 }
@@ -282,7 +300,7 @@ const ModalStyle = styled.div`
             text-align : right;
         }
         .btn-group{
-            float: right;
+            justify-content: flex-end
     
             
         }
@@ -298,6 +316,11 @@ const ModalStyle = styled.div`
             border-radius: 10px;
             margin: 0 5px;
             margin-left: 10px;
+
+            :disabled{
+                opacity: 0.2 !important;
+                cursor: no-drop;
+            }
             :hover {
               opacity: 0.8;
             }
