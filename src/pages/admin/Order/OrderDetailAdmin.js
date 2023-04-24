@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { changeStatus, getOrderDetailByOrder, updateOrder } from "utils/api";
+import { changeStatus, getOrderDetailByOrder, updateOrder,addInvoice,getEmployeeByUserId ,
+  updateManyRoom, updateManyTable} from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
@@ -11,6 +12,7 @@ import ModalAddMenu from "./components/ModalAddMenu";
 import { enqueueSnackbar } from "notistack";
 import { convertDate } from "./OrderAdmin";
 import { convertToVND } from "utils/utils";
+import { useAuthContext } from "utils/context/AuthContext";
 
 
 function OrderDetailAdmin(props) {
@@ -23,6 +25,26 @@ function OrderDetailAdmin(props) {
   const [listThucDon, setListThucDon] = useState([]);
   const [listBan, setListBan] = useState([]);
   const [listPhong, setListPhong] = useState([]);
+  const { user } = useAuthContext();
+  const [idEm, setIdEm] = useState("")
+
+  useEffect(()=>{
+    getEmployee(user._id)
+  },[])
+
+
+  const getEmployee = async (id) => {
+    setLoading(true);
+    let result = await getEmployeeByUserId(id);
+    if (result && result.data) {
+      setIdEm(result.data._id);
+      setLoading(false);
+    } else {
+      setIdEm("");
+      setLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     const arrLocation = window.location.href.split("/");
@@ -79,27 +101,7 @@ function OrderDetailAdmin(props) {
       case 1:
         return (
             <>
-            <div className="deposit">
-                <div>Khánh hàng phải đặt cọc:</div>
-                <div className="w60pc-depo">
-                    <span>30% tổng giá trị món ăn</span>
-                    {convertToVND(totalPrice()*30/100)}
-                </div>
-                {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 1 ?
-                <div className="w60pc-depo">
-                    <span>50.000đ mỗi phòng</span>
-                    {convertToVND(50000*listPhong.length)}
-                </div>: ""}
-                {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 2 ? 
-                <div className="w60pc-depo">
-                    <span>100.000đ mỗi phòng</span>
-                    {convertToVND(100000*listPhong.length)}
-                </div>: ""}
-                <div className="w60pc-depo">
-                    <span>Tổng cộng:</span>
-                    <strong>{totalDeposit()}</strong>
-                </div>
-            </div>
+            {renderDeposit()}
             <div className="right-btn">
             <button className="btn-order handle" onClick={handleOrderDeposit}>
               Xác nhận đã đặt cọc
@@ -114,7 +116,7 @@ function OrderDetailAdmin(props) {
       case 2:
         return (
             <>
-            <div className="deposit"></div>
+            {renderDeposit()}
           <div className="right-btn">
             <button className="btn-order handle" onClick={handleOrderReceive}>
               Chuyển đơn đặt thành hóa đơn
@@ -132,7 +134,7 @@ function OrderDetailAdmin(props) {
       case 3:
         return (
             <>
-            <div className="deposit"></div>
+            {renderDeposit()}
           <div className="right-btn">
             <span className="btn-order success">Thành công</span>
           </div>
@@ -163,6 +165,33 @@ function OrderDetailAdmin(props) {
         break;
     }
   };
+
+
+  const renderDeposit = () =>{
+    return (
+      <div className="deposit">
+                <div>Khánh hàng phải đặt cọc:</div>
+                <div className="w60pc-depo">
+                    <span>30% tổng giá trị món ăn</span>
+                    {convertToVND(totalPrice()*30/100)}
+                </div>
+                {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 1 ?
+                <div className="w60pc-depo">
+                    <span>50.000đ mỗi phòng</span>
+                    {convertToVND(50000*listPhong.length)}
+                </div>: ""}
+                {orderDetail?.MaPhieuDat?.LoaiPhieuDat == 2 ? 
+                <div className="w60pc-depo">
+                    <span>100.000đ mỗi phòng</span>
+                    {convertToVND(100000*listPhong.length)}
+                </div>: ""}
+                <div className="w60pc-depo">
+                    <span>Tổng cộng:</span>
+                    <strong>{totalDeposit()}</strong>
+                </div>
+            </div>
+    )
+  }
 
   const totalPrice = () => {
     return listThucDon?.reduce((total, menu) => total + menu?.MaThucDon?.GiaMon * menu?.SoLuong, 0);
@@ -273,11 +302,61 @@ function OrderDetailAdmin(props) {
                 let id = orderDetail?.MaPhieuDat?._id;
                 let result = await changeStatus(id, status);
                 if (result.success) {
-                  getOrderDetail(orderId);
-                  setLoading(false);
-                  enqueueSnackbar("Đơn đặt đã chuyển thành hóa đơn thành công", {
-                      variant: "success",
-                  });
+
+                  let invoice = {
+                    MaPhieuDat: orderDetail?.MaPhieuDat?._id,
+                    MaNhanVien: idEm , 
+                    MaKhachHang : orderDetail?.MaPhieuDat?.MaKhachHang,
+                     HoTen: orderDetail?.MaPhieuDat?.HoTen ,
+                      SoDienThoai: orderDetail?.MaPhieuDat?.SoDienThoai, 
+                      LoaiHoaDon: orderDetail?.MaPhieuDat?.LoaiPhieuDat , 
+                      TrangThai: 0,
+                      ThoiGianBatDau: new Date(),
+                       ListThucDon: listThucDon,
+                       ListPhong: listPhong,
+                       ListBan : listBan,
+                  }
+                  let rs = await addInvoice(invoice)
+                  if(rs.success) {
+                    let reslt
+                    let ids
+                    if(orderDetail?.MaPhieuDat?.LoaiPhieuDat === 0){
+                      ids = listBan.map(obj => obj._id);
+                      reslt = await updateManyTable({ ids , TrangThai: 1})
+                    }else{
+                      ids = listPhong.map(obj => obj._id);
+                      reslt = await updateManyRoom({ ids , TrangThai: 1})
+                    }
+
+                    if(reslt.success){
+                      getOrderDetail(orderId);
+                      setLoading(false);
+                      enqueueSnackbar("Đơn đặt đã chuyển thành hóa đơn thành công", {
+                          variant: "success",
+                      });
+                    }
+                    else{
+                      getOrderDetail(orderId);
+                      setLoading(false);
+                      enqueueSnackbar("Chuyển trạng thái thất bại", {
+                        variant: "error",
+                    });
+                    }
+
+
+
+                    
+                  }
+                  else {
+                    setLoading(false);
+                    enqueueSnackbar("Tạo hóa đơn thất bại", {
+                        variant: "error",
+                    });
+                    }
+
+
+
+                  
                 } else {
                 setLoading(false);
                 enqueueSnackbar("Xác nhận khách hàng nhận đơn thất bại", {

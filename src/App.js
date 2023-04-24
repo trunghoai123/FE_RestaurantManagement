@@ -33,6 +33,10 @@ import Profile from "pages/customer/Profile";
 import AreaSearch from "pages/admin/Area/AreaSearch";
 import RoomSearch from "pages/admin/Room/RoomSearch";
 import TableSearch from "pages/admin/Table/TableSearch";
+import AddInvoiceAdmin from "pages/admin/Invoice/AddInvoiceAdmin";
+import InvoiceAdmin from "pages/admin/Invoice/InvoiceAdmin";
+import InvoiceDetailAdmin from "pages/admin/Invoice/InvoiceDetailAdmin";
+
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -131,6 +135,18 @@ const router = createBrowserRouter([
       {
         path: "order/:orderId",
         element: <OrderDetailAdmin></OrderDetailAdmin>,
+      },
+      {
+        path: "invoice/add",
+        element: <AddInvoiceAdmin></AddInvoiceAdmin>,
+      },
+      {
+        path: "invoice/:invoiceId",
+        element: <InvoiceDetailAdmin></InvoiceDetailAdmin>,
+      },
+      {
+        path: "invoice/update",
+        element: <InvoiceAdmin></InvoiceAdmin>,
       },
     ],
   },

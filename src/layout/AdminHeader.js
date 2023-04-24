@@ -217,8 +217,13 @@ const adminNavbarItems = [
       },
       {
         id: 2,
+        title: "Tạo hóa đơn",
+        to: "invoice/add",
+      },
+      {
+        id: 3,
         title: "Cập nhật",
-        to: "area/update",
+        to: "invoice/update",
       },
     ],
   },
