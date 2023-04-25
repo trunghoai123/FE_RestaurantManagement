@@ -78,10 +78,11 @@ const AdminHeaderStyles = styled.div`
       position: absolute;
       left: 0px;
       height: 100vh;
-      width: 200px;
+      width: 220px;
       transition: all ease 300ms;
+      /* overflow-y: auto; */
       &.hidden {
-        left: -200px;
+        left: -220px;
       }
       .icon__toggle__container {
         position: absolute;
@@ -98,6 +99,26 @@ const AdminHeaderStyles = styled.div`
         background-color: ${(props) => colors.gold_1};
         :hover {
           background-color: ${(props) => colors.gold_1_blur};
+        }
+      }
+      .nav__list__container {
+        height: 100%;
+        width: 100%;
+        overflow: auto;
+
+        ::-webkit-scrollbar {
+          width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+          background: lightgrey;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+          border-radius: 10px;
+          background: #888;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #555;
         }
       }
     }
@@ -196,7 +217,7 @@ const adminNavbarItems = [
       },
       {
         id: 2,
-        title: "Tạo đơn đặt",
+        title: "Tạo phiếu đặt",
         to: "order/add",
       },
       {
@@ -224,6 +245,11 @@ const adminNavbarItems = [
         id: 3,
         title: "Cập nhật",
         to: "invoice/update",
+      },
+      {
+        id: 4,
+        title: "Thống kê doanh thu",
+        to: "invoice/statistic",
       },
     ],
   },
@@ -279,9 +305,11 @@ const AdminHeader = (props) => {
               <i className="fa-solid fa-list-ul"></i>
             )}
           </div>
-          {adminNavbarItems.map((navItem) => {
-            return <NavbarItem key={navItem?.id} navItem={navItem}></NavbarItem>;
-          })}
+          <div className="nav__list__container">
+            {adminNavbarItems.map((navItem) => {
+              return <NavbarItem key={navItem?.id} navItem={navItem}></NavbarItem>;
+            })}
+          </div>
           {/* <div className="link__container menu__list">
             <span className="navlink" to={"/admin/area"}>
               Khu vực

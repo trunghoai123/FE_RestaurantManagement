@@ -38,6 +38,7 @@ import DishSearch from "pages/admin/Dish/DishSearch";
 import AddInvoiceAdmin from "pages/admin/Invoice/AddInvoiceAdmin";
 import InvoiceAdmin from "pages/admin/Invoice/InvoiceAdmin";
 import InvoiceDetailAdmin from "pages/admin/Invoice/InvoiceDetailAdmin";
+import InvoiceStatistic from "pages/admin/Invoice/InvoiceStatistic";
 
 const App = (props) => {
   return (
@@ -140,12 +141,20 @@ const router = createBrowserRouter([
         element: <DishSearch></DishSearch>,
       },
       {
+        path: "dish/update",
+        element: <DishAdmin></DishAdmin>,
+      },
+      {
         path: "order/:orderId",
         element: <OrderDetailAdmin></OrderDetailAdmin>,
       },
       {
         path: "invoice/add",
         element: <AddInvoiceAdmin></AddInvoiceAdmin>,
+      },
+      {
+        path: "invoice/statistic",
+        element: <InvoiceStatistic></InvoiceStatistic>,
       },
       {
         path: "invoice/:invoiceId",
