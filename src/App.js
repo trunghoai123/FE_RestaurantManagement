@@ -40,6 +40,9 @@ import InvoiceAdmin from "pages/admin/Invoice/InvoiceAdmin";
 import InvoiceDetailAdmin from "pages/admin/Invoice/InvoiceDetailAdmin";
 import InvoiceStatistic from "pages/admin/Invoice/InvoiceStatistic";
 import InvoiceSearch from "pages/admin/Invoice/InvoiceSearch";
+import AddOrUpdatePost from "pages/admin/Post/AddOrUpdatePost";
+import Post from "pages/admin/Post/Post";
+import TypePost from "pages/admin/Post/TypePost";
 
 const App = (props) => {
   return (
@@ -169,6 +172,18 @@ const router = createBrowserRouter([
         path: "invoice/update",
         element: <InvoiceAdmin></InvoiceAdmin>,
       },
+      {
+        path: "post/manage-post",
+        element: <Post></Post>,
+      },
+      {
+        path: "post/manage-type-post",
+        element: <TypePost></TypePost>,
+      },{
+        path: "post/:id",
+        element: <AddOrUpdatePost></AddOrUpdatePost>,
+      },
+      
     ],
   },
 ]);
