@@ -365,6 +365,7 @@ export const addOrder = async ({
   SoLuongBanOrPhong,
   ThoiGianBatDau,
   MaKhachHang,
+  MaNhanVien,
   ListThucDon,
   ListPhong,
   ListBan,
@@ -388,6 +389,7 @@ export const addOrder = async ({
       Email,
       SoDienThoai,
       GhiChu,
+      MaNhanVien
     })
     .then((res) => {
       return res.data;
