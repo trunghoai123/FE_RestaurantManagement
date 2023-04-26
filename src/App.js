@@ -9,7 +9,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import HomePage from "./pages/customer/HomePage";
 import Introduce from "./pages/customer/Introduce";
 import Service from "./pages/customer/Service";
-import Booking from "./pages/customer/Booking";
 import Dishes from "./pages/customer/Dishes";
 import AppAdmin from "./pages/admin/AppAdmin";
 import AreaAdmin from "pages/admin/Area/AreaAdmin";
@@ -33,6 +32,15 @@ import Profile from "pages/customer/Profile";
 import AreaSearch from "pages/admin/Area/AreaSearch";
 import RoomSearch from "pages/admin/Room/RoomSearch";
 import TableSearch from "pages/admin/Table/TableSearch";
+import Area from "pages/customer/Area";
+import Room from "pages/customer/Room";
+import DishSearch from "pages/admin/Dish/DishSearch";
+import AddInvoiceAdmin from "pages/admin/Invoice/AddInvoiceAdmin";
+import InvoiceAdmin from "pages/admin/Invoice/InvoiceAdmin";
+import InvoiceDetailAdmin from "pages/admin/Invoice/InvoiceDetailAdmin";
+import InvoiceStatistic from "pages/admin/Invoice/InvoiceStatistic";
+import InvoiceSearch from "pages/admin/Invoice/InvoiceSearch";
+
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -65,9 +73,14 @@ const router = createBrowserRouter([
         element: <Dishes></Dishes>,
       },
       {
-        path: "booking",
-        element: <Booking></Booking>,
+        path: "area",
+        element: <Area></Area>,
       },
+      {
+        path: "room",
+        element: <Room></Room>,
+      },
+
       {
         path: "introduce",
         element: <Introduce></Introduce>,
@@ -125,12 +138,36 @@ const router = createBrowserRouter([
         element: <OrderAdmin></OrderAdmin>,
       },
       {
+        path: "dish/search",
+        element: <DishSearch></DishSearch>,
+      },
+      {
         path: "dish/update",
         element: <DishAdmin></DishAdmin>,
       },
       {
         path: "order/:orderId",
         element: <OrderDetailAdmin></OrderDetailAdmin>,
+      },
+      {
+        path: "invoice/add",
+        element: <AddInvoiceAdmin></AddInvoiceAdmin>,
+      },
+      {
+        path: "invoice/statistic",
+        element: <InvoiceStatistic></InvoiceStatistic>,
+      },
+      {
+        path: "invoice/search",
+        element: <InvoiceSearch></InvoiceSearch>,
+      },
+      {
+        path: "invoice/:invoiceId",
+        element: <InvoiceDetailAdmin></InvoiceDetailAdmin>,
+      },
+      {
+        path: "invoice/update",
+        element: <InvoiceAdmin></InvoiceAdmin>,
       },
     ],
   },

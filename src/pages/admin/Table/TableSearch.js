@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import styled from "styled-components";
-import Search from "components/Search";
-import DropdownManage from "components/Dopdown/ButtonDropDown";
 import { colors } from "variables";
 import Button from "components/Button/Button";
-import axiosClient from "utils/axios";
 import {
-  deleteRoomById,
   deleteTableById,
   getAllArea,
   getAllRoom,
@@ -449,7 +444,7 @@ const TableSearch = (props) => {
                     onClick={() => handleOpenUpdate(table?._id)}
                   >
                     <div>
-                      <span className="text">Cập Nhật</span>
+                      <span className="text">Sửa</span>
                       <i className="icon__item fa-solid fa-pen-to-square"></i>
                     </div>
                   </Button>

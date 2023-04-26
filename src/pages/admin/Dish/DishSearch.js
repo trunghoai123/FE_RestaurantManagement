@@ -6,20 +6,55 @@ import { colors } from "variables";
 import DropdownManage from "components/Dopdown/ButtonDropDown";
 import Search from "components/Search";
 import axiosClient from "utils/axios";
-import { deleteDishById, deleteRoomById, getAllDish, getAllRoom } from "utils/api";
+import {
+  deleteDishById,
+  deleteRoomById,
+  getAllDish,
+  getAllRoom,
+  getAllTypeOfDish,
+  getMenuByAll,
+} from "utils/api";
 import RoomUpdateForm from "components/Room/RoomUpdateForm";
 import { confirmAlert } from "react-confirm-alert";
 import { enqueueSnackbar } from "notistack";
 import DishUpdateForm from "components/Dish/DishUpdateForm";
 import { convertToVND } from "utils/utils";
+import SelectBox from "SelectBox/SelectBox";
+import Input from "components/Input/Input";
+import { useForm } from "react-hook-form";
 
-const DishAdminStyles = styled.div`
+const DishSearchStyles = styled.div`
   padding-top: 54px;
   .top__actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0px 20px;
+    .filter__container {
+      padding-bottom: 30px;
+      .filter__row {
+        display: flex;
+        .filter__value {
+          display: flex;
+          column-gap: 20px;
+          margin-top: 12px;
+          align-items: center;
+          &.button__container {
+            margin-left: auto;
+          }
+          .filter__value__label {
+            text-align: right;
+            display: block;
+            width: 120px;
+            min-width: 120px;
+          }
+          .filter__value__input {
+            min-width: 180px;
+            width: 180px;
+          }
+        }
+      }
+    }
   }
   .main__table {
     .table__head--container {
@@ -70,24 +105,78 @@ const DishAdminStyles = styled.div`
   }
 `;
 
-const DishAdmin = (props) => {
-  const [dishs, setRoms] = useState();
+const DishSearch = (props) => {
+  const [dishes, setDishes] = useState();
+  const [dishTypes, setDishTypes] = useState();
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [mode, setMode] = useState({ mode: 0, id: null });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    getValues,
+    setValue,
+    formState: { errors, isValid, isLoading, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      price: 0,
+      type: 0,
+    },
+  });
+  const fetchDishes = async () => {
+    try {
+      let result;
+      if (!getValues("name") && !getValues("price") && !getValues("type")) {
+        result = await getAllDish();
+      } else {
+        const filter = {
+          TenMon: getValues("name"),
+          GiaMon: getValues("price"),
+          MaLoai: Number(getValues("type")) === 0 ? null : getValues("type"),
+        };
+        console.log(filter);
+        result = await getMenuByAll(filter);
+        // {TenMon,GiaMon , DonViTinh , MoTa , MaLoai }
+      }
+      if (result?.data) {
+        setDishes(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  };
+
   useEffect(() => {
-    const fetchRooms = async () => {
+    fetchDishes();
+  }, [mode]);
+  useEffect(() => {
+    const fetchDisheType = async () => {
       try {
-        const result = await getAllDish();
+        const result = await getAllTypeOfDish();
         if (result?.data) {
-          setRoms(result.data);
+          setDishTypes(result.data);
         }
       } catch (error) {
         console.log(error);
         return;
       }
     };
-    fetchRooms();
-  }, [mode]);
+    fetchDisheType();
+  }, []);
+
+  const submitSearch = () => {
+    fetchDishes();
+  };
+
+  const handleClearFilter = () => {
+    // {TenMon,GiaMon , DonViTinh , MoTa , MaLoai }
+    setValue("id", "");
+    setValue("price", 0);
+    setValue("type", 0);
+    fetchDishes();
+  };
   const handleOpenUpdate = (id) => {
     if (id) {
       setMode({ id, mode: 1 });
@@ -138,20 +227,108 @@ const DishAdmin = (props) => {
     });
   };
   return (
-    <DishAdminStyles>
+    <DishSearchStyles>
       <div className="top__actions">
-        <Search placeHolder="Tìm Kiếm"></Search>
-        <DropdownManage borderRadius="6px">
-          <li>
-            <div
-              onClick={() => handleOpenUpdate(null)}
-              className="dropdown-item dropdown__item"
-              href="/"
-            >
-              Thêm Món
+        <form className="filter__container" onSubmit={handleSubmit(submitSearch)}>
+          <div className="filter__row">
+            <div className="filter__value">
+              <label className="filter__value__label">Tên món</label>
+              <Input
+                className="filter__value__input"
+                placeHolder="Mã"
+                name="name"
+                {...register("name")}
+              ></Input>
             </div>
-          </li>
-        </DropdownManage>
+
+            <div className="filter__value">
+              <label className="filter__value__label">Giá từ</label>
+              <Input
+                min="0"
+                max="9999999"
+                type="number"
+                className="filter__value__input"
+                name="price"
+                {...register("price")}
+              ></Input>
+            </div>
+            <div className="filter__value">
+              <label className="filter__value__label">Loại món</label>
+              <SelectBox
+                padding="6px 12px"
+                className="filter__value__input"
+                name="type"
+                {...register("type")}
+              >
+                <option className="option" value="0">
+                  Tất cả
+                </option>
+                {dishTypes?.length &&
+                  dishTypes.map((type) => {
+                    return (
+                      <option key={type?._id} className="option" value={type?._id}>
+                        {type?.TenLoai}
+                      </option>
+                    );
+                  })}
+              </SelectBox>
+            </div>
+          </div>
+          <div className="filter__row">
+            {/* <div className="filter__value">
+              <label className="filter__value__label">Loại phòng</label>
+              <SelectBox
+                padding="6px 12px"
+                className="filter__value__input"
+                name="type"
+                {...register("type")}
+              >
+                <option className="option" value={0}>
+                  Tất cả
+                </option>
+
+                <option className="option">a</option>
+              </SelectBox>
+            </div>
+            <div className="filter__value">
+              <label className="filter__value__label">Khu vực</label>
+              <SelectBox
+                padding="6px 12px"
+                className="filter__value__input"
+                name="area"
+                {...register("area")}
+              >
+                <option value={0} className="option">
+                  Tất cả
+                </option>
+                <option className="option">b</option>
+              </SelectBox>
+            </div> */}
+            <div className="filter__value button__container">
+              <Button
+                bgColor={colors.orange_1}
+                bgHover={colors.orange_1_hover}
+                borderRadius="5px"
+                padding="4px 20px"
+                width="100px"
+                type="button"
+                onClick={handleClearFilter}
+              >
+                <div>Xóa</div>
+              </Button>
+              <Button
+                type="submit"
+                bgColor={colors.green_1}
+                bgHover={colors.green_1_hover}
+                borderRadius="5px"
+                padding="4px 20px"
+                width="100px"
+              >
+                <div>Tìm</div>
+              </Button>
+            </div>
+          </div>
+        </form>
       </div>
       <table className="main__table table table-striped">
         <thead className="table__head--container">
@@ -159,9 +336,6 @@ const DishAdmin = (props) => {
             <th className="table__head item__id" scope="col">
               Mã
             </th>
-            {/* <th className="table__head" scope="col">
-              Tên món
-            </th> */}
             <th className="table__head" scope="col">
               Tên Món
             </th>
@@ -180,7 +354,7 @@ const DishAdmin = (props) => {
           </tr>
         </thead>
         <tbody className="table__body">
-          {dishs?.map((dish) => {
+          {dishes?.map((dish) => {
             return (
               <tr className="table__row" key={dish?._id}>
                 <td className="table__data item__id">{dish?._id}</td>
@@ -246,10 +420,10 @@ const DishAdmin = (props) => {
           handleCloseForm={handleCloseUpdateForm}
         ></DishUpdateForm>
       )}
-    </DishAdminStyles>
+    </DishSearchStyles>
   );
 };
 
-DishAdmin.propTypes = {};
+DishSearch.propTypes = {};
 
-export default DishAdmin;
+export default DishSearch;

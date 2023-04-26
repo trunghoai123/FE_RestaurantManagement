@@ -101,6 +101,8 @@ const HomePageStyles = styled.div`
           .left__intro {
           }
           .left__button {
+            text-decoration: none;
+            display: inline-block;
             border-radius: 4px;
             border: none;
             color: white;
@@ -178,7 +180,9 @@ const HomePage = (props) => {
               <div className="left__intro">
                 Khám phá ngay những sảnh tiệc sang trọng và lịch lãm tại Evergreen Garden
               </div>
-              <button className="left__button">Khám phá</button>
+              <Link to={"/room"} className="left__button">
+                Khám phá
+              </Link>
             </div>
             <div className="main__right">
               Evergreen Garden mang trên mình một lối kiến trúc hoàng gia sang trọng, mỗi góc tại

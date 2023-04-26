@@ -1,43 +1,24 @@
 import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { updateOrder , getRoomMatchTimeAndSeat , getTypeOfRoomById } from "utils/api";
+import { updateInvoice , getTableMatchTimeAndSeat } from "utils/api";
 import { enqueueSnackbar } from "notistack";
 
-const MaLoaiPhongThuong = 1;
-const MaLoaiPhongVIP = 2;
 
-function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
-    soNguoi , thoiGianBatDau , soPhong , listPhong , setListPhong}) {
+function ModalAddTable({setIsModalAddTable, loaiHoaDon , setLoading,
+    soNguoi , thoiGianBatDau , listBan , setListBan , isSave, invoiceId ,getInvoice}) {
     const [data, setData] = useState([])
     const [dataUse , setDataUse] =useState([])
-    const [maLoaiPhong, setMaLoaiPhong] =useState("")
 
     useEffect(() => {
-        getMaLoaiPhong()
-        setDataUse(listPhong)
-        
-    },[])
-    useEffect(()=>{
+        setDataUse(listBan)
         getData()
-    },[maLoaiPhong])
+    },[])
 
-    const getMaLoaiPhong = async ()=>{
-        setLoading(true)
-        let result = await getTypeOfRoomById(loaiPhieuDat == 1 ? MaLoaiPhongThuong : MaLoaiPhongVIP)
-        if(result && result.data){
-            setLoading(false)
-            setMaLoaiPhong(result.data._id)
-        }
-        else{
-            setLoading(false)
-            setMaLoaiPhong("")
 
-        }
-    }
     const getData = async ()=>{
         setLoading(true)
-        let result = await getRoomMatchTimeAndSeat({ SoNguoi : soNguoi , ThoiGianBatDau : thoiGianBatDau , LoaiPhieuDat : loaiPhieuDat, MaLoaiPhong : maLoaiPhong })
+        let result = await getTableMatchTimeAndSeat({ SoNguoi : soNguoi , ThoiGianBatDau : thoiGianBatDau , LoaiPhieuDat : loaiHoaDon })
         if(result && result.data){
             setLoading(false)
             setData(result.data)
@@ -49,11 +30,27 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
         }
     }
     const handleSave= async ()=>{
-        setIsModalAddRoom(false)
-        setListPhong(dataUse)
-        enqueueSnackbar("Cập nhật phòng cho đơn đặt thành công", {
+        if(isSave){
+            let result = await updateInvoice({id:invoiceId, ListBan: dataUse });
+            if (result.success) {
+                enqueueSnackbar("Cập nhật bàn cho hóa đơn thành công", {
+                    variant: "success",
+                    });
+                getInvoice(invoiceId)
+                setIsModalAddTable(false)
+            }else{
+                enqueueSnackbar("Cập nhật bàn cho hóa đơn thất bại", {
+                    variant: "error",
+                    });
+            }
+        }else{
+        setIsModalAddTable(false)
+        setListBan(dataUse)
+        enqueueSnackbar("Cập nhật bàn cho hóa đơn thành công", {
             variant: "success",
         });
+    }
+       
     }
     const autoScroll = ()=>{
     
@@ -67,41 +64,40 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
             <div className="modal-add-over">
                 <div className="modal-add">
                     <div className="modal-add-header">
-                        <h2>Thêm phòng</h2>
-                        <div className="close" onClick={()=>setIsModalAddRoom(false)}>&times;</div>
+                        <h2>Thêm bàn</h2>
+                        <div className="close" onClick={()=>setIsModalAddTable(false)}>&times;</div>
                     </div>
                     <div className="modal-add-body">
                         <div className="modal-col-70">
-                            <h5>{`Danh sách phòng hợp lệ`}</h5>
+                            <h5>{`Danh sách bàn hợp lệ`}</h5>
                             <ul>
                                 {
-                                data && data?.map((item, idx)=>{
+                               data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
-                                            <div className="item">
+                                            <div className={`item ${item.TrangThai == 1 ? "active": ""}`}>
                                                 <div>
-                                                    <span>Mã phòng:</span>
-                                                    {item.MaPhong}
+                                                    <span>Mã bàn:</span>
+                                                    <span>{item.MaBan}</span>
                                                 </div>
                                                 <div>
-                                                    <span>Tên phòng:</span>
-                                                    {item.TenPhong}
+                                                    <span>Số thứ tự bàn:</span>
+                                                    {item.SoThuTuBan}
                                                 </div>
                                                 <div>
                                                     <span>Số chỗ ngồi:</span>
-                                                    {item.SoChoNgoiToiDa}
+                                                    {item.SoChoNgoi}
                                                 </div>
                                                 <div className="btn-group">
-                                                    <button className="btn-order handle"
-                                                    onClick={async()=>{
+                                                    <button disabled={item.TrangThai === 0 ? "" : "disabled"} className="btn-order handle"
+                                                    onClick={ async()=>{
                                                         if(!dataUse?.some((itm)=>
-                                                            item.MaPhong == itm.MaPhong
+                                                            item.MaBan == itm.MaBan
 
                                                         ))
                                                         await setDataUse([...dataUse, item])
 
                                                         autoScroll()
-
                                                     }}
                                                     >Gán</button>
                                                 </div>
@@ -115,26 +111,27 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                 
                                 
                             </ul>
+                            
                         </div>
                         <div className="modal-col-30">
-                            <h5>{`Danh sách phòng đã gán`}</h5>
+                            <h5>{`Danh sách bàn đã gán`}</h5>
                             <ul>
                                 {
                                     dataUse ? dataUse.map((item,index)=>{
                                         return (
                                             <li key={index}>
-                                                <div><span>Mã phòng:</span>
-                                                    {item.MaPhong}
+                                                <div><span>Mã bàn:</span>
+                                                    {item.MaBan}
                                                 </div>
-                                                <div><span>Tên phòng:</span>
-                                                {item.TenPhong}</div>
+                                                <div><span>Số thứ tự bàn:</span>
+                                                {item.SoThuTuBan}</div>
                                                 <div><span>Số chỗ ngồi:</span>
-                                                {item.SoChoNgoiToiDa}</div>
+                                                {item.SoChoNgoi}</div>
                                                 <div className="btn-group">
                                                     <button className="btn-order cancel"
                                                         onClick={()=>{
                                                             setDataUse(dataUse?.filter((itm)=>
-                                                            item.MaPhong != itm.MaPhong
+                                                            item.MaBan != itm.MaBan
                                                         ))
                                                         }}
                                                     >Gỡ</button>
@@ -142,18 +139,18 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                                 <div className="clear"></div>
                                             </li>
                                         )
-                                    }) : "Chưa gán phòng"
+                                    }) : "Chưa gán bàn"
                                 }
                                 
                             </ul>
                             <button className="btn-order info bottom-position"
-                            onClick={handleSave}
-                        >Lưu</button>
+                                onClick={handleSave}
+                            >Lưu</button>
                         </div>
 
 
                     </div>
-                  
+                    
                 </div>
             </div>
         </ModalStyle>
@@ -226,15 +223,19 @@ const ModalStyle = styled.div`
 
                     li{
                         padding: 0 5px;
-                        width: 50%;
-                        min-width:50%;
-                        max-width:50%;
+                        width: 33.3333%;
+                        min-width:33.3333%;
+                        max-width:33.3333%;
                         margin-bottom: 10px;
                         .item{
                             width: 100%;
                             background-color: #f3f3f3;
                             border-radius : 5px;
                             padding : 5px;
+
+                            &.active{
+                                border: 5px solid #dcb46e;
+                            }
                         }
                     }
                 }
@@ -277,14 +278,13 @@ const ModalStyle = styled.div`
                     right: 0;
                 }
             }
+            
         }
         .modal-add-footer{
             text-align : right;
         }
         .btn-group{
             float: right;
-    
-            
         }
         .clear{
             clear: both;
@@ -298,6 +298,11 @@ const ModalStyle = styled.div`
             border-radius: 10px;
             margin: 0 5px;
             margin-left: 10px;
+
+            :disabled{
+                opacity: 0.2 !important;
+                cursor: no-drop;
+            }
             :hover {
               opacity: 0.8;
             }
@@ -324,4 +329,4 @@ const ModalStyle = styled.div`
 
 `
 
-export default ModalAddRoom;
+export default ModalAddTable;

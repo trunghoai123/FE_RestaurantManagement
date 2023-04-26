@@ -171,12 +171,12 @@ const Header = (props) => {
           </NavLink>
         </div>
         <div className="link__container">
-          <NavLink className="navlink" to={""}>
+          <NavLink className="navlink" to={"room"}>
             Phòng
           </NavLink>
         </div>
         <div className="link__container">
-          <NavLink className="navlink" to={"/orders"}>
+          <NavLink className="navlink" to={"orders"}>
             Phiếu Đặt
           </NavLink>
         </div>

@@ -2,32 +2,26 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { getOrderByAll } from "utils/api";
+import { getInvoiceByAll } from "utils/api";
 import Loading from "components/Loading/Loading";
 
-export const TAB_ORDER_STATUS = [
-  {status: 0, value:"Chờ xác nhận"},
-  {status: 1, value:"Chờ đặt cọc"},
-  {status: 2, value:"Chờ nhận đơn"},
-  {status: 3, value:"Thành công"},
-  {status: 4, value:"Đã hủy"},
-  {status: 5, value:"Không nhận đơn"},
+export const TAB_INVOICE_STATUS = [
+  {status: 0, value:"Chờ thanh toán"},
+  {status: 1, value:"Đã thanh toán"},
+  {status: 2, value:"Đã hủy"},
 
 ]
-export const ARR_ORDER_STATUS = [
-  "Chờ xác nhận",
-  "Chờ đặt cọc",
-  "Chờ nhận đơn",
-  "Thành công",
-  "Đã hủy",
-  "Không nhận đơn"
+export const ARR_INVOICE_STATUS = [
+  "Chờ thanh toán",
+  "Đã thanh toán",
+  "Đã hủy"
 ]
 
 
-export const TAB_ORDER_TYPE = [
-  { type: 0, value: "Đơn đặt bàn" },
-  { type: 1, value: "Đơn đặt phòng thường" },
-  { type: 2, value: "Đơn đặt phòng VIP" },
+export const TAB_INVOICE_TYPE = [
+  { type: 0, value: "Bàn" },
+  { type: 1, value: "Phòng thường" },
+  { type: 2, value: "Phòng VIP" },
 ];
 
 export const convertDate = (mongoDate) => {
@@ -40,17 +34,21 @@ export const convertDate = (mongoDate) => {
   return `${hour} giờ ${minute} phút ${day}-${month}-${year}`;
 }
 
-const ALL_ORDER = -1;
+const ALL_INVOICE = -1;
 
-const OrderAdmin = (props) => {
+const InvoiceAdmin = (props) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedTab, setSelectedTab] = useState(ALL_ORDER);
+  const [selectedTab, setSelectedTab] = useState(ALL_INVOICE);
   const [selectedType, setSelectedType] = useState(-1);
   const navigate = useNavigate();
+
+
+  console.log(data)
+
   useEffect(() => {
     setSelectedType(0);
-    setSelectedTab(ALL_ORDER);
+    setSelectedTab(ALL_INVOICE);
   }, []);
 
   useEffect(() => {
@@ -61,13 +59,13 @@ const OrderAdmin = (props) => {
     getData(selectedTab, selectedType);
   }, [selectedType]);
 
-  const getData = async (TrangThai, LoaiPhieuDat) => {
+  const getData = async (TrangThai, LoaiHoaDon) => {
     setLoading(true);
     let result = null;
-    if (TrangThai == ALL_ORDER) {
-      result = await getOrderByAll({ LoaiPhieuDat });
+    if (TrangThai == ALL_INVOICE) {
+      result = await getInvoiceByAll({ LoaiHoaDon });
     } else {
-      result = await getOrderByAll({ LoaiPhieuDat, TrangThai });
+      result = await getInvoiceByAll({ LoaiHoaDon, TrangThai });
     }
     if (result && result.data) {
       setData(result.data);
@@ -79,7 +77,7 @@ const OrderAdmin = (props) => {
   };
 
   function renderTabType() {
-    return TAB_ORDER_TYPE.map((item, index) => {
+    return TAB_INVOICE_TYPE.map((item, index) => {
       return (
         <div
           key={index}
@@ -94,7 +92,7 @@ const OrderAdmin = (props) => {
     });
   }
   function renderTabStatus() {
-    return TAB_ORDER_STATUS.map((item, index) => {
+    return TAB_INVOICE_STATUS.map((item, index) => {
       return (
         <div
           key={index}
@@ -114,10 +112,9 @@ const OrderAdmin = (props) => {
       <tr>
         <th>STT</th>
         <th>Khách hàng</th>
-        <th>Thời gian đặt đơn</th>
-        <th>Thời gian nhận đơn</th>
-        <th>Ghi chú</th>
-        <th>Số lượng</th>
+        <th>Người tạo đơn</th>
+        <th>Thời gian đến</th>
+        <th>Danh sách {selectedType == 0 ? "bàn" : "phòng" }</th>
         <th>Trạng thái</th>
         <th>Hành động</th>
       </tr>
@@ -129,30 +126,34 @@ const OrderAdmin = (props) => {
         return (
           <tr key={idx}>
             <td className="w-50 text-center">{idx + 1}</td>
-            <td className="w-250">
+            <td className="w-150">
               <div>
                 <strong>{item.HoTen}</strong>
               </div>
               <div>{item.SoDienThoai}</div>
-              <div>{item.Email}</div>
             </td>
-            <td className="w-120 text-center">{convertDate(item.createdAt)}</td>
-            <td className="w-120 text-center">{convertDate(item.ThoiGianBatDau)}</td>
-            <td>{item.GhiChu}</td>
+            <td className="w-150">{item.MaNhanVien?.TenNhanVien}</td>
+            <td className="w-85 text-center">{convertDate(item.ThoiGianBatDau)}</td>
             <td className="w-150">
-              <div>
-                {`${selectedType == 0 ? "Số bàn" : "Số phòng"}: ${
-                  item.SoLuongBanOrPhong ? item.SoLuongBanOrPhong : 0
-                }`}{" "}
-              </div>
-              <div>{`${selectedType == 0 ? "Số người/bàn" : "Số người/phòng"}: ${
-                item.SoLuongNguoiTrenBanOrPhong ? item.SoLuongNguoiTrenBanOrPhong : 0
-              }`}</div>
+                {selectedType == 0 ? item.ListBan && item.ListBan.length > 0 && item.ListBan.map((itm,idn)=>{
+                  return (<div key={idn}>
+                    Mã bàn: {itm.MaBan}
+                  </div>)
+                  
+                }) : 
+                item.ListPhong && item.ListPhong.length > 0 && item.ListPhong.map((itm,idn)=>{
+                  return (<div key={idn}>
+                    Mã phòng{selectedType == 2 && " VIP"}: {itm.MaPhong}
+                  </div>)
+                })
+                }
+               
+             
             </td>
-            <td className="w-150 text-center"><strong>{ARR_ORDER_STATUS[item.TrangThai]}</strong></td>
+            <td className="w-150 text-center"><strong>{ARR_INVOICE_STATUS[item.TrangThai]}</strong></td>
             <td className="w-150 text-center">
               <button className="btn-order detail" onClick={()=>{
-                navigate(`/admin/order/${item._id}`)
+                navigate(`/admin/invoice/${item._id}`)
               }}>Chi Tiết</button>
             </td>
           </tr>
@@ -164,15 +165,15 @@ const OrderAdmin = (props) => {
   };
 
   return (
-    <OrderAdminStyles>
+    <InvoiceAdminStyles>
       {loading && <Loading />}
-      <div className="title">Quản lý phiếu đặt</div>
+      <div className="title">Quản lý hóa đơn</div>
       <div className="list_tab">{renderTabType()}</div>
       <div className="list_tab status">
         <div
-          className={`tab_item ${selectedTab == ALL_ORDER ? "active" : ""}`}
+          className={`tab_item ${selectedTab == ALL_INVOICE ? "active" : ""}`}
           onClick={() => {
-            setSelectedTab(ALL_ORDER);
+            setSelectedTab(ALL_INVOICE);
           }}
         >
           Tất cả
@@ -185,14 +186,15 @@ const OrderAdmin = (props) => {
           <tbody>{renderBody()}</tbody>
         </table>
       </div>
-    </OrderAdminStyles>
+    </InvoiceAdminStyles>
   );
 };
 
-const OrderAdminStyles = styled.div`
+const InvoiceAdminStyles = styled.div`
   padding: 64px 10px 10px;
   background-color: #f3f3f3;
   min-height: 90vh;
+  box-sizing: border-box;
   .title {
     font-size: 20px;
     font-weight: bold;
@@ -205,9 +207,9 @@ const OrderAdminStyles = styled.div`
       width: 100%;
 
       tr {
-        .w-120 {
-          max-width: 120px;
-          width: 120px;
+        .w-85 {
+          max-width: 85px;
+          width: 85px;
         }
         .w-50 {
           max-width: 50px;
@@ -301,6 +303,6 @@ const OrderAdminStyles = styled.div`
   }
 `;
 
-OrderAdmin.propTypes = {};
+InvoiceAdmin.propTypes = {};
 
-export default OrderAdmin;
+export default InvoiceAdmin;

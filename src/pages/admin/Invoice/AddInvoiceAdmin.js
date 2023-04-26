@@ -2,21 +2,22 @@ import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import {addOrder} from "utils/api";
+import {addInvoice,getEmployeeByUserId , updateManyTable, updateManyRoom} from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
 import ModalAddMenu from "./components/ModalAddMenu";
 import { enqueueSnackbar } from "notistack";
-import {convertDate} from "./OrderAdmin"
+import {convertDate} from "../Order/OrderAdmin"
+import { useAuthContext } from "utils/context/AuthContext";
 
-const LOAIPHIEUDAT = {
+const LOAIHOADON = {
     BAN: 0,
     PHONGTHUONG: 1,
     PHONGVIP: 2
 }
 
-function AddOrderAdmin() {
+function AddInvoiceAdmin() {
     const [loading , setLoading] = useState(false)
     const [isModalAddMenu , setIsModalAddMenu] = useState(false)
     const [isModalAddTable , setIsModalAddTable] = useState(false)
@@ -25,23 +26,32 @@ function AddOrderAdmin() {
     const [listBan, setListBan] = useState([])
     const [listPhongThuong, setListPhongThuong] = useState([])
     const [listPhongVIP, setListPhongVIP] = useState([])
-    const [loaiPhieuDat, setLoaiPhieuDat] = useState(LOAIPHIEUDAT.BAN)
+    const [loaiHoaDon, setLoaiHoaDon] = useState(LOAIHOADON.BAN)
     const [thoiGianBatDau , setThoiGianBatDau] = useState(new Date())
     const [hoTen, setHoTen] = useState("")
     const [msgHT, setMsgHT] = useState("")
-    const [msgEmail, setMsgEmail] = useState("")
-    const [msgNum, setMsgNum] = useState("")
-    const [msgNumPeo, setMsgNumPeo] = useState("")
-    const [msgDate, setMsgDate] = useState("")
     const [msgSDT, setMsgSDT] = useState("")
-    const [email, setEmail] = useState("")
     const [soDienThoai, setSoDienThoai] = useState("")
-    const [ghiChu, setGhiChu] = useState("")
-    const [soLuongNguoiTrenBanOrPhong, setSoLuongNguoiTrenBanOrPhong] = useState(0)
-    const [soLuongBanOrPhong, setSoLuongBanOrPhong] = useState(0)
     const TrangThai = 0;
-    
-    console.log(thoiGianBatDau)
+    const { user } = useAuthContext();
+    const [idEm, setIdEm] = useState("")
+
+  useEffect(()=>{
+    getEmployee(user._id)
+  },[])
+
+
+  const getEmployee = async (id) => {
+    setLoading(true);
+    let result = await getEmployeeByUserId(id);
+    if (result && result.data) {
+      setIdEm(result.data._id);
+      setLoading(false);
+    } else {
+      setIdEm("");
+      setLoading(false);
+    }
+  };
 
 
 
@@ -54,57 +64,42 @@ function AddOrderAdmin() {
 
     const isValid = () =>{
         let check = true;
-        if(!hoTen){
-            setMsgHT("Họ tên không được để trống")
-            check =  false
-        }else{
-            setMsgHT("")
-        }
-        if(!email){
-            setMsgEmail("Email không được để trống")
-            check =  false
-        }else{
-            setMsgEmail("")
-        }
-        if(!soDienThoai){
-            setMsgSDT("Số điện thoại không được để trống")
-            check =  false
-        }else{
-            setMsgSDT("")
-        }
-        if(!soLuongBanOrPhong){
-            setMsgNum("Chưa chọn số lượng")
-            check =  false
-        }else{
-            setMsgNum("")
-        }
-        if(!soLuongNguoiTrenBanOrPhong){
-            setMsgNumPeo("Chưa chọn số lượng")
-            check =  false
-        }else{
-            setMsgNumPeo("")
-        }
-        if(thoiGianBatDau){
-            let now = new Date()
-            let time = new Date(thoiGianBatDau)
-            if(time.getTime() <= now.getTime()){
-                setMsgDate("Chọn ngày ở tương lai")
-                check =  false
-            }
-            else{
-                setMsgDate("")
-            }
-        }else{
-            setMsgDate("Chưa chọn ngày đặt")
-            check =  false
-
-        }
-        // if(!soLuongBanOrPhong < listBan?.length){
-        //     enqueueSnackbar("", {
-        //         variant: "warning",
-        //       });
+        // if(!hoTen){
+        //     setMsgHT("Họ tên không được để trống")
         //     check =  false
+        // }else{
+        //     setMsgHT("")
         // }
+        // if(!soDienThoai){
+        //     setMsgSDT("Số điện thoại không được để trống")
+        //     check =  false
+        // }else{
+        //     setMsgSDT("")
+        // }
+        if(loaiHoaDon === 0 && listBan?.length === 0){
+            enqueueSnackbar("Chưa chọn bàn", {
+                variant: "warning",
+              });
+            check =  false
+        }
+        if(loaiHoaDon === 1 && listPhongThuong?.length === 0){
+            enqueueSnackbar("Chưa chọn phòng", {
+                variant: "warning",
+              });
+            check =  false
+        }
+        if(loaiHoaDon === 2 && listPhongVIP?.length === 0){
+            enqueueSnackbar("Chưa chọn phòng", {
+                variant: "warning",
+              });
+            check =  false
+        }
+        if(listThucDon?.length === 0){
+            enqueueSnackbar("Chưa chọn món ăn", {
+                variant: "warning",
+              });
+            check =  false
+        }
 
 
         return check;
@@ -113,30 +108,54 @@ function AddOrderAdmin() {
     const handleAddOrder = async() => {
         if(isValid()) {
             const data = {
-                LoaiPhieuDat: loaiPhieuDat,
+                LoaiHoaDon: loaiHoaDon,
                 TrangThai,
-                SoLuongNguoiTrenBanOrPhong: soLuongNguoiTrenBanOrPhong,
-                SoLuongBanOrPhong : soLuongBanOrPhong,
                 ThoiGianBatDau: thoiGianBatDau,
                 MaKhachHang: null,
                 ListThucDon: listThucDon,
-                ListPhong: loaiPhieuDat == 0 ? [] : loaiPhieuDat == 1 ? listPhongThuong : listPhongVIP,
-                ListBan: loaiPhieuDat == 0 ? listBan : [] ,
+                ListPhong: loaiHoaDon == 0 ? [] : loaiHoaDon == 1 ? listPhongThuong : listPhongVIP,
+                ListBan: loaiHoaDon == 0 ? listBan : [] ,
                 HoTen : hoTen,
-                Email : email ? email: "",
                 SoDienThoai: soDienThoai,
-                GhiChu: ghiChu ? ghiChu: "",
+                MaPhieuDat: null,
+                MaNhanVien: idEm , 
             
             }
             setLoading(true)
-            let result = await addOrder(data)
+            let result = await addInvoice(data)
             if(result.success){
-                enqueueSnackbar("Tạo đơn đặt thành công", {
-                    variant: "success",
-                  });
+
+
+                let reslt
+                let ids
+                if(loaiHoaDon === 0){
+                    ids = listBan.map(obj => obj._id);
+                    reslt = await updateManyTable({ ids , TrangThai: 1})
+                }else if(loaiHoaDon === 1){
+                    ids = listPhongThuong.map(obj => obj._id);
+                    reslt = await updateManyRoom({ ids , TrangThai: 1})
+                }
+                else{
+                    ids = listPhongVIP.map(obj => obj._id);
+                    reslt = await updateManyRoom({ ids , TrangThai: 1})
+                }
+
+                if(reslt.success){
+                    enqueueSnackbar("Tạo hóa đơn thành công", {
+                        variant: "success",
+                    });
+                }
+                else{
+                    enqueueSnackbar("Chuyển trạng thái thất bại", {
+                        variant: "error",
+                    });
+                }
+
+
+                
                 setLoading(false)
             }else{
-                enqueueSnackbar("Tạo đơn đặt thất bại", {
+                enqueueSnackbar("Tạo hóa đơn thất bại", {
                     variant: "error",
                   });
                 setLoading(false)
@@ -145,25 +164,14 @@ function AddOrderAdmin() {
     }
 
     const handleOpenModal = () => {
-        if(soLuongNguoiTrenBanOrPhong && thoiGianBatDau && soLuongBanOrPhong){
-            loaiPhieuDat == 0 ? 
-            setIsModalAddTable(true) : setIsModalAddRoom(true)
+        if(loaiHoaDon === 0){
+            setIsModalAddTable(true)  
         }
-        if(!soLuongBanOrPhong ){
-            enqueueSnackbar(`Vui lòng chọn số lượng`, {
-                variant: "warning",
-            });
+        else{
+            setIsModalAddRoom(true)
         }
-        if(!soLuongNguoiTrenBanOrPhong ){
-            enqueueSnackbar(`Vui lòng chọn số người`, {
-                variant: "warning",
-            });
-        }
-        if(!thoiGianBatDau ){
-            enqueueSnackbar(`Vui lòng chọn ngày`, {
-                variant: "warning",
-            });
-        }
+   
+
       
     }
 
@@ -202,114 +210,37 @@ function AddOrderAdmin() {
                                 {msgSDT && <span className="error">{msgSDT}</span>}
 
                             </div>
-                            <div className="row-item"> 
-                                <span className="label">
-                                    Nhập email:
-                                </span>
-                                <input type="email" placeholder="vd: abc123@gmail.com"
-                                onChange={(e)=>{
-                                    setEmail(e.target.value)
-                                }}/>
-                                {msgEmail && <span className="error">{msgEmail}</span>}
-
-                            </div>
+                            
                         </div>
                     </div>
                     <div className="col">
                         <div className="item">
-                            <div className="title">Thông tin đơn đặt</div>
+                            <div className="title">Thông tin hóa đơn</div>
                             <div className="row-item">
                                 <span className="label">
-                                Loại đơn đặt:
+                                Loại hóa đơn:
                                 </span>
-                                <button className={`btn-order type ${loaiPhieuDat == 0 ? 'active' : "choose"}`}
+                                <button className={`btn-order type ${loaiHoaDon == 0 ? 'active' : "choose"}`}
                                     onClick={()=>{
-                                        setLoaiPhieuDat(0)
+                                        setLoaiHoaDon(0)
                                     }}
                                 >Đơn đặt bàn</button>
-                                <button className={`btn-order type ${loaiPhieuDat == 1 ? 'active' : "choose"}`}
+                                <button className={`btn-order type ${loaiHoaDon == 1 ? 'active' : "choose"}`}
                                 onClick={()=>{
-                                    setLoaiPhieuDat(1)
+                                    setLoaiHoaDon(1)
                                 }}>Đơn đặt phòng thường</button>
-                                <button className={`btn-order type ${loaiPhieuDat == 2 ? 'active' : "choose"}`}
+                                <button className={`btn-order type ${loaiHoaDon == 2 ? 'active' : "choose"}`}
                                 onClick={()=>{
-                                    setLoaiPhieuDat(2)
+                                    setLoaiHoaDon(2)
                                 }}>Đơn đặt phòng VIP</button>
                             </div>
-
-                                <div className="row-item order pb5">
-                                    <span className="label">
-                                    Số {loaiPhieuDat ==0 ? 'bàn':'phòng'}: 
-                                    </span>
-                                    <input className="time-format  date" type="number" min={1} placeholder={`Số ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`} onChange={(e)=>{
-                                        setSoLuongBanOrPhong(e.target.value)
-                                    }}/>
-                                    {msgNum && <span className="error right">{msgNum}</span>}
-                                </div>
-                                <div className="row-item order pb5"> 
-                                    <span className="label">
-                                    Số người trên mỗi {loaiPhieuDat ==0 ? 'bàn':'phòng'}: 
-                                    </span>  
-                                    <input className="time-format  date" type="number" min={2} placeholder={`Số người trên mỗi ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`}
-                                        onChange={(e)=>{
-                                            setSoLuongNguoiTrenBanOrPhong(e.target.value)
-                                        }}
-                                    />
-                                    {msgNumPeo && <span className="error right">{msgNumPeo}</span>}
-
-                                </div>
-                                <div className="row-item order">
-                                    <span className="label">
-                                        Thời gian đặt: 
-                                    </span>
-                                    <input type="date" className="time-format date" onChange={(e)=>{
-                                            setThoiGianBatDau(e.target.value)
-                                            setListBan([])
-                                            setListPhongThuong([])
-                                            setListPhongVIP([])
-                                        }}/>
-                                   
-                                   <input type="number" onChange={(e)=>{
-                                            let date = new Date(thoiGianBatDau)
-                                            date.setHours(e.target.value)
-                                            setThoiGianBatDau(date)
-
-                                        }} className="time-format mr-time" min={0} defaultValue={7} max={23} step={1} />
-                                    <span >
-                                        giờ 
-                                    </span>
-
-                                    <input type="number" onChange={(e)=>{
-                                            let date = new Date(thoiGianBatDau)
-                                            date.setMinutes(e.target.value)
-                                            setThoiGianBatDau(date)
-                                        }} className="time-format mr-time" min={0} defaultValue={0} max={45} step={15} />
-                                    <span className="">
-                                        phút 
-                                    </span>
-
-                                    {msgDate && <span className="error left">{msgDate}</span>}
-
-                                </div>
-                            <div className="row-item order">
-                                <span className="label">
-                                    Ghi chú:
-                                </span> 
-                                <textarea placeholder="Nhập ghi chú" 
-                                    onChange={(e)=>{
-                                        setGhiChu(e.target.value)
-                                    }}
-                                />
-                            </div>
-                            
-
                         </div>
                     </div>
                     <div className="col">
                         <div className="item">
-                            <div className="title">Đơn đặt {loaiPhieuDat ==0 ? 'bàn':'phòng'}</div>
+                            <div className="title">Đơn đặt {loaiHoaDon ==0 ? 'bàn':'phòng'}</div>
                             
-                            {loaiPhieuDat == 0 ? 
+                            {loaiHoaDon == 0 ? 
                             
                             (listBan?.length>0 ? 
                             <ul className="list-menu">
@@ -333,7 +264,7 @@ function AddOrderAdmin() {
                         
                         
                         :
-                        loaiPhieuDat == 1 ? 
+                        loaiHoaDon == 1 ? 
                         (listPhongThuong?.length>0 ? 
                             <ul className="list-menu">
                                 <li>
@@ -426,24 +357,28 @@ function AddOrderAdmin() {
                 setLoading = {setLoading}
                 listThucDon = {listThucDon}
                 setListThucDon={setListThucDon}
+                isSave = {false}
                 />}
             {isModalAddTable && <ModalAddTable
                 setIsModalAddTable={setIsModalAddTable}
-                loaiPhieuDat = {loaiPhieuDat}
+                loaiHoaDon = {loaiHoaDon}
                 setLoading = {setLoading}
-                soNguoi = {soLuongNguoiTrenBanOrPhong}
+                soNguoi = {0}
                 thoiGianBatDau = {thoiGianBatDau}
                 listBan = {listBan}
                 setListBan={setListBan}
+                isSave = {false}
+
              />}
              {isModalAddRoom && <ModalAddRoom
                 setIsModalAddRoom={setIsModalAddRoom}
-                loaiPhieuDat = {loaiPhieuDat}
+                loaiHoaDon = {loaiHoaDon}
                 setLoading = {setLoading}
-                soNguoi = {soLuongNguoiTrenBanOrPhong}
+                soNguoi = {0}
                 thoiGianBatDau = {thoiGianBatDau}
-                listPhong = {loaiPhieuDat == 1 ? listPhongThuong : listPhongVIP}
-                setListPhong={loaiPhieuDat == 1 ? setListPhongThuong : setListPhongVIP}
+                listPhong = {loaiHoaDon == 1 ? listPhongThuong : listPhongVIP}
+                setListPhong={loaiHoaDon == 1 ? setListPhongThuong : setListPhongVIP}
+                isSave = {false}
              />}
         </OrderAdminStyle>
     );
@@ -704,4 +639,4 @@ const OrderAdminStyle = styled.div`
         }
       }
 `
-export default AddOrderAdmin;
+export default AddInvoiceAdmin;

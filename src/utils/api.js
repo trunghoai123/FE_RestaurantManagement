@@ -35,6 +35,11 @@ export const getAllTable = async () => {
     return res.data;
   });
 };
+export const getAllInvoice = async () => {
+  return axiosClient.get(`invoice/getAllInvoice`).then((res) => {
+    return res.data;
+  });
+};
 
 export const addNewArea = async (area) => {
   return axiosClient.post(`area/addArea`, area).then((res) => {
@@ -213,6 +218,12 @@ export const getAllTypeOfRoom = async () => {
   });
 };
 
+export const getInvoiceByDate = async (data) => {
+  return axiosClient.post(`invoice/getInvoiceFromDateToDate`, data).then((res) => {
+    return res.data;
+  });
+};
+
 export const getMenuByAll = async (filter) => {
   return axiosClient.post(`menu/getMenuByAll`, filter).then((res) => {
     return res.data;
@@ -381,4 +392,119 @@ export const addOrder = async ({
     .then((res) => {
       return res.data;
     });
+};
+
+export const addInvoice = async ({
+  MaPhieuDat,
+  MaNhanVien,
+  MaKhachHang,
+  HoTen,
+  SoDienThoai,
+  LoaiHoaDon,
+  TrangThai,
+  ThoiGianBatDau,
+  ListThucDon,
+  ListPhong,
+  ListBan,
+}) => {
+  return axiosClient
+    .post(`invoice/addInvoice`, {
+      MaPhieuDat,
+      MaNhanVien,
+      MaKhachHang,
+      HoTen,
+      SoDienThoai,
+      LoaiHoaDon,
+      TrangThai,
+      ThoiGianBatDau,
+      ListThucDon,
+      ListPhong,
+      ListBan,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+
+export const getInvoiceByAll = async ({
+  MaPhieuDat,
+  MaNhanVien,
+  MaKhachHang,
+  HoTen,
+  SoDienThoai,
+  LoaiHoaDon,
+  TrangThai,
+  ThoiGianBatDau,
+}) => {
+  return axiosClient
+    .post(`invoice/getInvoiceByAll`, {
+      MaPhieuDat,
+      MaNhanVien,
+      MaKhachHang,
+      HoTen,
+      SoDienThoai,
+      LoaiHoaDon,
+      TrangThai,
+      ThoiGianBatDau,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+
+export const getEmployeeByUserId = async (id) => {
+  return axiosClient.post(`employee/getEmployeeByUserId`, { MaTaiKhoan: id }).then((res) => {
+    return res.data;
+  });
+};
+
+export const getInvoiceById = async (id) => {
+  return axiosClient.post(`invoice/getInvoiceById`, { id }).then((res) => {
+    return res.data;
+  });
+};
+
+export const updateInvoice = async ({
+  id,
+  MaPhieuDat,
+  MaNhanVien,
+  MaKhachHang,
+  HoTen,
+  SoDienThoai,
+  LoaiHoaDon,
+  TrangThai,
+  ThoiGianBatDau,
+  ListThucDon,
+  ListPhong,
+  ListBan,
+}) => {
+  return axiosClient
+    .post(`invoice/updateInvoice`, {
+      id,
+      MaPhieuDat,
+      MaNhanVien,
+      MaKhachHang,
+      HoTen,
+      SoDienThoai,
+      LoaiHoaDon,
+      TrangThai,
+      ThoiGianBatDau,
+      ListThucDon,
+      ListPhong,
+      ListBan,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+
+export const updateManyRoom = async ({ ids, TrangThai }) => {
+  return axiosClient.post(`room/updateManyRoom`, { ids, TrangThai }).then((res) => {
+    return res.data;
+  });
+};
+export const updateManyTable = async ({ ids, TrangThai }) => {
+  return axiosClient.post(`table/updateManyTable`, { ids, TrangThai }).then((res) => {
+    return res.data;
+  });
 };
