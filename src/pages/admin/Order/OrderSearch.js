@@ -8,7 +8,7 @@ import DropdownManage from "components/Dopdown/ButtonDropDown";
 import axiosClient from "utils/axios";
 import AreaUpdateForm from "components/Area/AreaUpdateForm";
 import { confirmAlert } from "react-confirm-alert";
-import { deleteAreaById, getAllArea, getAreaByAll, getInvoiceByDate } from "utils/api";
+import { getAllInvoice, getInvoiceByAll, getInvoiceByDate } from "utils/api";
 import { enqueueSnackbar } from "notistack";
 import Input from "components/Input/Input";
 import * as yup from "yup";
@@ -16,12 +16,9 @@ import { useForm } from "react-hook-form";
 import SelectBox from "SelectBox/SelectBox";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { convertToVND, renderDate } from "utils/utils";
-const InvoiceStatisticStyles = styled.div`
+import { useNavigate } from "react-router-dom";
+const OrderSearchStyles = styled.div`
   padding-top: 54px;
-  .sum__money {
-    text-align: right;
-    padding: 4px 12px;
-  }
   .top__actions {
     display: flex;
     align-items: center;
@@ -107,14 +104,15 @@ const InvoiceStatisticStyles = styled.div`
     }
   }
 `;
-const schema = yup
-  .object({
-    dateFrom: yup.string("Hãy xem lại ngày").required("Hãy chọn ngày"),
-    dateTo: yup.string("hãy xem lại ngày").required("Hãy chọn ngày"),
-    bookingType: yup.string("hãy xem lại hình thức đặt").required("Hãy chọn hình thức đặt"),
-  })
-  .required();
-const InvoiceStatistic = (props) => {
+// const schema = yup
+//   .object({
+//     dateFrom: yup.string("Hãy xem lại ngày").required("Hãy chọn ngày"),
+//     dateTo: yup.string("hãy xem lại ngày").required("Hãy chọn ngày"),
+//     bookingType: yup.string("hãy xem lại hình thức đặt").required("Hãy chọn hình thức đặt"),
+//   })
+//   .required();
+const OrderSearch = (props) => {
+  const navigate = useNavigate();
   const [invoices, setInvoices] = useState();
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [sumStatistics, setSumStatistics] = useState(0);
@@ -128,42 +126,85 @@ const InvoiceStatistic = (props) => {
     formState: { errors, isValid, isLoading, isSubmitting },
   } = useForm({
     defaultValues: {
-      dateFrom: "",
-      dateTo: "",
-      bookingType: 0,
+      orderId: "",
+      staffId: "",
+      clientId: "",
+      fullname: "",
+      bookingType: -1,
+      phone: "",
+      status: -1,
+      startTime: "",
+      //   MaPhieuDat,
+      //   MaNhanVien,
+      //   MaKhachHang,
+      //   HoTen,
+      //   SoDienThoai,
+      //   LoaiHoaDon,
+      //   TrangThai,
+      //   ThoiGianBatDau,
     },
-    resolver: yupResolver(schema),
+    // resolver: yupResolver(schema),
   });
-  // useEffect(() => {
-  //   fetchInvoices();
-  // }, [mode]);
-  // const fetchInvoices = async () => {
-  //   try {
-  //     let result;
-  //     const data = {
-  //       ThoiGianBatDau: null,
-  //       ThoiGianKetThuc: null,
-  //       LoaiHoaDon: null,
-  //     };
-  //     // {ThoiGianBatDau , ThoiGianKetThuc, LoaiHoaDon}
-  //     result = await getInvoiceByDate(data);
-  //     // if (result?.data) {
-  //     //   console.log(result.data);
-  //     //   setInvoices(result.data);
-  //     // }
-  //   } catch (error) {
-  //     console.log(error);
-  //     return;
-  //   }
-  // };
-
-  const handleOpenUpdate = (id) => {
-    if (id) {
-      setMode({ id, mode: 1 });
-    } else {
-      setMode({ id: null, mode: 2 });
+  useEffect(() => {
+    fetchInvoices();
+  }, [mode]);
+  const handleViewDetail = (id) => {
+    navigate(`/admin/invoice/${id}`);
+  };
+  const fetchInvoices = async () => {
+    try {
+      let result;
+      if (
+        !getValues("orderId") &&
+        !getValues("staffId") &&
+        !getValues("clientId") &&
+        !getValues("fullname") &&
+        !getValues("phone") &&
+        !getValues("status") &&
+        !getValues("bookingType") &&
+        !getValues("startTime")
+      ) {
+        const data = {
+          MaPhieuDat: null,
+          MaNhanVien: null,
+          MaKhachHang: null,
+          HoTen: null,
+          SoDienThoai: null,
+          LoaiHoaDon: null,
+          TrangThai: null,
+          ThoiGianBatDau: null,
+        };
+        result = await getInvoiceByAll(data);
+      } else {
+        const data = {
+          MaPhieuDat: getValues("orderId").trim(),
+          MaNhanVien: getValues("staffId").trim(),
+          MaKhachHang: getValues("clientId").trim(),
+          HoTen: getValues("fullname").trim(),
+          SoDienThoai: getValues("phone").trim(),
+          LoaiHoaDon:
+            Number(getValues("bookingType")) === -1 ? null : Number(getValues("bookingType")),
+          TrangThai: Number(getValues("status")) === -1 ? null : Number(getValues("status")),
+          ThoiGianBatDau: getValues("startTime"),
+        };
+        result = await getInvoiceByAll(data);
+      }
+      // MaPhieuDat,
+      // MaNhanVien,
+      // MaKhachHang,
+      // HoTen,
+      // SoDienThoai,
+      // LoaiHoaDon,
+      // TrangThai,
+      // ThoiGianBatDau,
+      if (result?.data) {
+        console.log(result.data);
+        setInvoices(result.data);
+      }
+    } catch (error) {
+      console.log(error);
+      return;
     }
-    setOpenUpdateForm(true);
   };
 
   const handleCloseUpdateForm = () => {
@@ -171,72 +212,20 @@ const InvoiceStatistic = (props) => {
     setOpenUpdateForm(false);
   };
 
-  const handleDelete = (id) => {
-    const deleteArea = async (id) => {
-      try {
-        await deleteAreaById({ id });
-        setMode({ ...mode });
-        enqueueSnackbar("Đã xóa khu vực", {
-          variant: "success",
-        });
-      } catch (error) {
-        console.log(error);
-        enqueueSnackbar("Lỗi!. Không thể xóa khu vực", {
-          variant: "error",
-        });
-      }
-    };
-    confirmAlert({
-      title: "Xác nhận",
-      message: "Bạn có muốn xóa khu vực đã chọn không",
-      buttons: [
-        {
-          label: "Có",
-          onClick: () => deleteArea(id),
-        },
-        {
-          label: "Không",
-          onClick: () => {},
-        },
-      ],
-    });
+  const submitSearch = async () => {
+    fetchInvoices();
   };
 
-  const submitSearch = async (values) => {
-    const { dateFrom, dateTo, bookingType } = values;
-    try {
-      let result;
-      // {ThoiGianBatDau , ThoiGianKetThuc, LoaiHoaDon}
-      const data = {
-        ThoiGianBatDau: dateFrom,
-        ThoiGianKetThuc: dateTo,
-        LoaiHoaDon: Number(bookingType),
-      };
-      result = await getInvoiceByDate(data);
-      if (result?.data) {
-        console.log(result.data);
-        setInvoices(result.data);
-        calculateSumStatics(result.data);
-      }
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  };
   const handleClearFilter = () => {
-    setValue("dateFrom", "");
-    setValue("dateTo", "");
+    setValue("staffId", "");
+    setValue("orderId", "");
+    setValue("clientId", "");
+    setValue("fullname", "");
     setValue("bookingType", -1);
-    // fetchInvoices();
-  };
-
-  const calculateSumStatics = (invoices) => {
-    let sum = 0;
-    invoices.forEach((invoice) => {
-      const { LoaiHoaDon, ListThucDon, ListBan, ListPhong } = invoice;
-      sum += calculateMoney(LoaiHoaDon, ListThucDon, ListBan, ListPhong);
-    });
-    setSumStatistics(sum);
+    setValue("phone", "");
+    setValue("status", -1);
+    setValue("startTime", "");
+    fetchInvoices();
   };
 
   const calculateMoney = (bookingType, dishes, tables, rooms) => {
@@ -258,7 +247,7 @@ const InvoiceStatistic = (props) => {
   };
 
   return (
-    <InvoiceStatisticStyles>
+    <OrderSearchStyles>
       <div className="top__actions">
         <form className="filter__container" onSubmit={handleSubmit(submitSearch)}>
           <div className="filter__row">
@@ -267,27 +256,72 @@ const InvoiceStatistic = (props) => {
                 <label className="filter__value__label">Mã</label>
                 <Input
                   className="filter__value__input"
-                  placeHolder="Từ ngày"
-                  type="date"
-                  name="dateFrom"
-                  {...register("dateFrom")}
+                  placeHolder="Mã hóa đơn"
+                  name="orderId"
+                  {...register("orderId")}
                 ></Input>
               </div>
-              {errors?.dateFrom && (
-                <div className="error__message">{errors?.dateFrom?.message}</div>
+              {errors?.orderId && <div className="error__message">{errors?.orderId?.message}</div>}
+            </div>
+            <div className="filter__value">
+              <div className="value__content">
+                <label className="filter__value__label">Mã nhân viên</label>
+                <Input
+                  className="filter__value__input"
+                  name="staffId"
+                  {...register("staffId")}
+                ></Input>
+              </div>
+              {errors?.staffId && <div className="error__message">{errors?.staffId?.message}</div>}
+            </div>
+            <div className="filter__value">
+              <div className="value__content">
+                <label className="filter__value__label">Mã khách hàng</label>
+                <Input
+                  className="filter__value__input"
+                  name="fullname"
+                  {...register("clientId")}
+                ></Input>
+              </div>
+              {errors?.clientId && (
+                <div className="error__message">{errors?.clientId?.message}</div>
+              )}
+            </div>
+          </div>
+          <div className="filter__row">
+            <div className="filter__value">
+              <div className="value__content">
+                <label className="filter__value__label">Họ tên KH</label>
+                <Input
+                  className="filter__value__input"
+                  name="fullname"
+                  {...register("fullname")}
+                ></Input>
+              </div>
+              {errors?.fullname && (
+                <div className="error__message">{errors?.fullname?.message}</div>
               )}
             </div>
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Đến ngày</label>
+                <label className="filter__value__label">Số điện thoại</label>
+                <Input className="filter__value__input" name="phone" {...register("phone")}></Input>
+              </div>
+              {errors?.phone && <div className="error__message">{errors?.phone?.message}</div>}
+            </div>
+            <div className="filter__value">
+              <div className="value__content">
+                <label className="filter__value__label">T/g bắt đầu</label>
                 <Input
-                  className="filter__value__input"
                   type="date"
-                  name="dateTo"
-                  {...register("dateTo")}
+                  className="filter__value__input"
+                  name="startTime"
+                  {...register("startTime")}
                 ></Input>
               </div>
-              {errors?.dateTo && <div className="error__message">{errors?.dateTo?.message}</div>}
+              {errors?.startTime && (
+                <div className="error__message">{errors?.startTime?.message}</div>
+              )}
             </div>
           </div>
           <div className="filter__row">
@@ -318,6 +352,31 @@ const InvoiceStatistic = (props) => {
                 <div className="error__message">{errors?.bookingType?.message}</div>
               )}
             </div>
+            <div className="filter__value">
+              <div className="value__content">
+                <label className="filter__value__label">Trạng thái</label>
+                <SelectBox
+                  padding="6px 12px"
+                  className="filter__value__input"
+                  name="status"
+                  {...register("status")}
+                >
+                  <option className="option" value={-1}>
+                    Tất cả
+                  </option>
+                  <option className="option" value={0}>
+                    Đang tạo
+                  </option>
+                  <option className="option" value={1}>
+                    Đã tạo
+                  </option>
+                  <option className="option" value={2}>
+                    Đã hủy
+                  </option>
+                </SelectBox>
+              </div>
+              {errors?.status && <div className="error__message">{errors?.status?.message}</div>}
+            </div>
             <div className="filter__value button__container">
               <div className="value__content">
                 <Button
@@ -346,7 +405,6 @@ const InvoiceStatistic = (props) => {
           </div>
         </form>
       </div>
-      <div className="sum__money">Tổng tiền: {convertToVND(sumStatistics)}</div>
       <table className="main__table table table-striped">
         <thead className="table__head--container">
           <tr className="table__row">
@@ -363,7 +421,10 @@ const InvoiceStatistic = (props) => {
               Loại hóa đơn
             </th>
             <th className="table__head" scope="col">
-              Thời gian lập
+              Thời gian bắt đầu
+            </th>
+            <th className="table__head" scope="col">
+              Trạng thái
             </th>
             <th className="table__head" scope="col">
               Tổng tiền
@@ -387,7 +448,15 @@ const InvoiceStatistic = (props) => {
                     ? "Đặt phòng thường"
                     : "Đặt phòng VIP"}
                 </td>
-                <td className="table__data">{renderDate(invoice?.createdAt)}</td>
+                <td className="table__data">{renderDate(invoice?.ThoiGianBatDau)}</td>
+                <td className="table__data">
+                  {" "}
+                  {invoice?.TrangThai === 0
+                    ? "Đang tạo"
+                    : invoice?.LoaiHoaDon === 1
+                    ? "Đã tạo"
+                    : "Đã hủy"}
+                </td>
                 <td className="table__data">
                   {convertToVND(
                     calculateMoney(
@@ -398,22 +467,22 @@ const InvoiceStatistic = (props) => {
                     )
                   )}
                 </td>
-                {/* <td className="table__data">
+                <td className="table__data">
                   <Button
                     // to={`/admin/area/update/${area?._id}`}
                     borderRadius="8px"
                     padding="4px 8px"
-                    onClick={() => handleOpenUpdate(area?._id)}
+                    onClick={() => handleViewDetail(invoice?._id)}
                     className="button button__update"
-                    bgHover={colors.orange_1_hover}
-                    bgColor={colors.orange_1}
+                    bgHover={colors.green_1}
+                    bgColor={colors.green_1_hover}
                   >
                     <div>
-                      <span className="text">Sửa</span>
-                      <i className="icon__item fa-solid fa-pen-to-square"></i>
+                      <span className="text">Chi tiết</span>
+                      <i className="icon__item fa-solid fa-eye"></i>
                     </div>
                   </Button>
-                  <Button
+                  {/* <Button
                     borderRadius="8px"
                     padding="4px 8px"
                     className="button button__remove"
@@ -425,8 +494,8 @@ const InvoiceStatistic = (props) => {
                       <span className="text">Xóa</span>
                       <i className="icon__item fa-solid fa-trash-can"></i>
                     </div>
-                  </Button>
-                </td> */}
+                  </Button> */}
+                </td>
               </tr>
             );
           })}
@@ -442,10 +511,10 @@ const InvoiceStatistic = (props) => {
           handleCloseForm={handleCloseUpdateForm}
         ></AreaUpdateForm>
       )}
-    </InvoiceStatisticStyles>
+    </OrderSearchStyles>
   );
 };
 
-InvoiceStatistic.propTypes = {};
+OrderSearch.propTypes = {};
 
-export default InvoiceStatistic;
+export default OrderSearch;

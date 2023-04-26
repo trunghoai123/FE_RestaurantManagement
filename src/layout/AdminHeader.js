@@ -234,7 +234,7 @@ const adminNavbarItems = [
       {
         id: 1,
         title: "Tìm kiếm",
-        to: "area/search",
+        to: "invoice/search",
       },
       {
         id: 2,

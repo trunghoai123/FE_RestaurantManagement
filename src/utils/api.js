@@ -35,6 +35,11 @@ export const getAllTable = async () => {
     return res.data;
   });
 };
+export const getAllInvoice = async () => {
+  return axiosClient.get(`invoice/getAllInvoice`).then((res) => {
+    return res.data;
+  });
+};
 
 export const addNewArea = async (area) => {
   return axiosClient.post(`area/addArea`, area).then((res) => {
