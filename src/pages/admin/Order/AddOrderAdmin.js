@@ -2,13 +2,14 @@ import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import {addOrder} from "utils/api";
+import {addOrder, getEmployeeByUserId} from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
 import ModalAddMenu from "./components/ModalAddMenu";
 import { enqueueSnackbar } from "notistack";
 import {convertDate} from "./OrderAdmin"
+import { useAuthContext } from "utils/context/AuthContext";
 
 const LOAIPHIEUDAT = {
     BAN: 0,
@@ -40,8 +41,26 @@ function AddOrderAdmin() {
     const [soLuongNguoiTrenBanOrPhong, setSoLuongNguoiTrenBanOrPhong] = useState(0)
     const [soLuongBanOrPhong, setSoLuongBanOrPhong] = useState(0)
     const TrangThai = 0;
-    
-    console.log(thoiGianBatDau)
+    const { user } = useAuthContext();
+    const [idEm, setIdEm] = useState("")
+
+  useEffect(()=>{
+    getEmployee(user._id)
+  },[])
+
+
+  const getEmployee = async (id) => {
+    setLoading(true);
+    let result = await getEmployeeByUserId(id);
+    if (result && result.data) {
+      setIdEm(result.data._id);
+      setLoading(false);
+    } else {
+      setIdEm("");
+      setLoading(false);
+    }
+  };
+
 
 
 
@@ -126,7 +145,7 @@ function AddOrderAdmin() {
                 Email : email ? email: "",
                 SoDienThoai: soDienThoai,
                 GhiChu: ghiChu ? ghiChu: "",
-            
+                MaNhanVien: idEm , 
             }
             setLoading(true)
             let result = await addOrder(data)
