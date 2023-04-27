@@ -323,7 +323,7 @@ const OrderSearch = (props) => {
             </div>
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">T/g bắt đầu</label>
+                <label className="filter__value__label">Ngày nhận</label>
                 <Input
                   type="date"
                   className="filter__value__input"
@@ -430,7 +430,7 @@ const OrderSearch = (props) => {
               Tên khách hàng
             </th>
             <th className="table__head" scope="col">
-              Thời gian bắt đầu
+              Thời gian nhận
             </th>
             <th className="table__head" scope="col">
               Loại phiếu đặt
