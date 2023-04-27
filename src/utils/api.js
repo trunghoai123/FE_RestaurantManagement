@@ -2,25 +2,33 @@ import axios from "axios";
 import axiosClient from "./axios";
 
 export const uploadImage = (base64) => {
-  return axiosClient.post("image/sendImageAndGetLink", { image: base64 }).then((res) => {
+  return axiosClient.post("image/sendImageAndGetLink", {
+    image: base64
+  }).then((res) => {
     return res.data;
   });
 };
 
 export const getAreaByAreaId = async (MaKhuVuc) => {
-  return axiosClient.post(`area/getAreaByAreaId`, { MaKhuVuc }).then((res) => {
+  return axiosClient.post(`area/getAreaByAreaId`, {
+    MaKhuVuc
+  }).then((res) => {
     return res.data;
   });
 };
 
 export const getRoomByAreaId = async (MaKhuVuc) => {
-  return axiosClient.post(`room/getRoomByAreaId`, { MaKhuVuc }).then((res) => {
+  return axiosClient.post(`room/getRoomByAreaId`, {
+    MaKhuVuc
+  }).then((res) => {
     return res.data;
   });
 };
 
 export const getRoomByRoomId = async (MaPhong) => {
-  return axiosClient.post(`room/getRoomByRoomId`, { MaPhong }).then((res) => {
+  return axiosClient.post(`room/getRoomByRoomId`, {
+    MaPhong
+  }).then((res) => {
     return res.data;
   });
 };
@@ -120,20 +128,26 @@ export const getTableById = async (id) => {
 
 export const getUserByAccessToken = async (AccessToken) => {
   return axiosClient
-    .post(`account/getAccountCustomerByAccessToken`, { AccessToken })
+    .post(`account/getAccountCustomerByAccessToken`, {
+      AccessToken
+    })
     .then((res) => {
       return res.data;
     });
 };
 
 export const getTableByTableId = async (MaBan) => {
-  return axiosClient.post(`table/getTableByTableId`, { MaBan }).then((res) => {
+  return axiosClient.post(`table/getTableByTableId`, {
+    MaBan
+  }).then((res) => {
     return res.data;
   });
 };
 
 export const getTableByRoomId = async (MaPhong) => {
-  return axiosClient.post(`table/getTableByRoomId`, { MaPhong }).then((res) => {
+  return axiosClient.post(`table/getTableByRoomId`, {
+    MaPhong
+  }).then((res) => {
     return res.data;
   });
 };
@@ -169,19 +183,25 @@ export const getAllRoom = async () => {
 };
 
 export const getCustomerByUserId = async (id) => {
-  return axiosClient.post(`customer/getCustomerByUserId`, { MaTaiKhoan: id }).then((res) => {
+  return axiosClient.post(`customer/getCustomerByUserId`, {
+    MaTaiKhoan: id
+  }).then((res) => {
     return res.data;
   });
 };
 
 export const getOrderByUser = async (id) => {
-  return axiosClient.post(`order/getOrderByUser`, { MaKhachHang: id }).then((res) => {
+  return axiosClient.post(`order/getOrderByUser`, {
+    MaKhachHang: id
+  }).then((res) => {
     return res.data;
   });
 };
 
 export const getOrderDetailByOrder = async (id) => {
-  return axiosClient.post(`order/getOrderDetailByOrder`, { MaPhieuDat: id }).then((res) => {
+  return axiosClient.post(`order/getOrderDetailByOrder`, {
+    MaPhieuDat: id
+  }).then((res) => {
     return res.data;
   });
 };
@@ -193,7 +213,9 @@ export const getOneMenu = async (id) => {
 };
 
 export const getOrderById = async (id) => {
-  return axiosClient.post(`order/getOrderById`, { id }).then((res) => {
+  return axiosClient.post(`order/getOrderById`, {
+    id
+  }).then((res) => {
     return res.data;
   });
 };
@@ -288,7 +310,10 @@ export const getOrderByAll = async ({
 };
 
 export const changeStatus = async (id, TrangThai) => {
-  return axiosClient.post(`order/changeStatus`, { id, TrangThai }).then((res) => {
+  return axiosClient.post(`order/changeStatus`, {
+    id,
+    TrangThai
+  }).then((res) => {
     return res.data;
   });
 };
@@ -331,9 +356,17 @@ export const updateOrder = async ({
     });
 };
 
-export const getTableMatchTimeAndSeat = async ({ SoNguoi, ThoiGianBatDau, LoaiPhieuDat }) => {
+export const getTableMatchTimeAndSeat = async ({
+  SoNguoi,
+  ThoiGianBatDau,
+  LoaiPhieuDat
+}) => {
   return axiosClient
-    .post(`table/getTableMatchTimeAndSeat`, { SoNguoi, ThoiGianBatDau, LoaiPhieuDat })
+    .post(`table/getTableMatchTimeAndSeat`, {
+      SoNguoi,
+      ThoiGianBatDau,
+      LoaiPhieuDat
+    })
     .then((res) => {
       return res.data;
     });
@@ -346,14 +379,21 @@ export const getRoomMatchTimeAndSeat = async ({
   MaLoaiPhong,
 }) => {
   return axiosClient
-    .post(`room/getRoomMatchTimeAndSeat`, { SoNguoi, ThoiGianBatDau, LoaiPhieuDat, MaLoaiPhong })
+    .post(`room/getRoomMatchTimeAndSeat`, {
+      SoNguoi,
+      ThoiGianBatDau,
+      LoaiPhieuDat,
+      MaLoaiPhong
+    })
     .then((res) => {
       return res.data;
     });
 };
 
 export const getTypeOfRoomById = async (MaLoai) => {
-  return axiosClient.post(`typeOfRoom/getTypeOfRoomById`, { MaLoai }).then((res) => {
+  return axiosClient.post(`typeOfRoom/getTypeOfRoomById`, {
+    MaLoai
+  }).then((res) => {
     return res.data;
   });
 };
@@ -455,13 +495,17 @@ export const getInvoiceByAll = async ({
 };
 
 export const getEmployeeByUserId = async (id) => {
-  return axiosClient.post(`employee/getEmployeeByUserId`, { MaTaiKhoan: id }).then((res) => {
+  return axiosClient.post(`employee/getEmployeeByUserId`, {
+    MaTaiKhoan: id
+  }).then((res) => {
     return res.data;
   });
 };
 
 export const getInvoiceById = async (id) => {
-  return axiosClient.post(`invoice/getInvoiceById`, { id }).then((res) => {
+  return axiosClient.post(`invoice/getInvoiceById`, {
+    id
+  }).then((res) => {
     return res.data;
   });
 };
@@ -500,13 +544,149 @@ export const updateInvoice = async ({
     });
 };
 
-export const updateManyRoom = async ({ ids, TrangThai }) => {
-  return axiosClient.post(`room/updateManyRoom`, { ids, TrangThai }).then((res) => {
+export const updateManyRoom = async ({
+  ids,
+  TrangThai
+}) => {
+  return axiosClient.post(`room/updateManyRoom`, {
+    ids,
+    TrangThai
+  }).then((res) => {
     return res.data;
   });
 };
-export const updateManyTable = async ({ ids, TrangThai }) => {
-  return axiosClient.post(`table/updateManyTable`, { ids, TrangThai }).then((res) => {
+export const updateManyTable = async ({
+  ids,
+  TrangThai
+}) => {
+  return axiosClient.post(`table/updateManyTable`, {
+    ids,
+    TrangThai
+  }).then((res) => {
+    return res.data;
+  });
+};
+export const addPost = async ({
+  TieuDe,
+  NoiDung,
+  AnhNen,
+  MaNhanVien,
+  MaLoai,
+  NoiBat,
+  ThuTuBaiViet,
+  HienThi
+}) => {
+  return axiosClient.post(`post/addPost`, {
+    TieuDe,
+    NoiDung,
+    AnhNen,
+    MaNhanVien,
+    MaLoai,
+    NoiBat,
+    ThuTuBaiViet,
+    HienThi
+  }).then((res) => {
+    return res.data;
+  });
+};
+export const updatePost = async ({
+  id,
+  TieuDe,
+  NoiDung,
+  AnhNen,
+  HienThi,
+  MaLoai,
+  NoiBat,
+  ThuTuBaiViet
+}) => {
+  return axiosClient.post(`post/updatePost`, {
+    id,
+    TieuDe,
+    NoiDung,
+    AnhNen,
+    HienThi,
+    MaLoai,
+    NoiBat,
+    ThuTuBaiViet
+}).then((res) => {
+    return res.data;
+  });
+};
+export const deletePost = async ({
+  id
+}) => {
+  return axiosClient.post(`post/deletePost`, {
+    id
+}).then((res) => {
+    return res.data;
+  });
+};
+export const getAllPost = async ({HienThi}) => {
+  return axiosClient.post(`post/getAllPost`, {
+    HienThi
+}).then((res) => {
+    return res.data;
+  });
+};
+export const getPostById = async ({
+  id
+}) => {
+  return axiosClient.post(`post/getPostById`, {
+    id
+}).then((res) => {
+    return res.data;
+  });
+};
+export const getPostByTypeId = async ({
+  MaLoai,HienThi
+}) => {
+  return axiosClient.post(`post/getPostByTypeId`, {
+    MaLoai,HienThi
+}).then((res) => {
+    return res.data;
+  });
+};
+
+export const addTypePost = async ({
+  TenLoai
+}) => {
+  return axiosClient.post(`post/addTypePost`, {
+    TenLoai
+  }).then((res) => {
+    return res.data;
+  });
+};
+export const updateTypePost = async ({
+  id,
+    TenLoai
+}) => {
+  return axiosClient.post(`post/updateTypePost`, {
+    id,
+    TenLoai
+}).then((res) => {
+    return res.data;
+  });
+};
+export const deleteTypePost = async ({
+  id
+}) => {
+  return axiosClient.post(`post/deleteTypePost`, {
+    id
+}).then((res) => {
+    return res.data;
+  });
+};
+export const getAllTypePost = async () => {
+  return axiosClient.post(`post/getAllTypePost`).then((res) => {
+    return res.data;
+  });
+};
+export const getTypePostById = async ({
+  id
+}) => {
+  return axiosClient.post(`post/getTypePostById`, {
+    id
+}).then((res) => {
     return res.data;
   });
 };
