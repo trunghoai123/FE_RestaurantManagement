@@ -8,7 +8,6 @@ import DropdownManage from "components/Dopdown/ButtonDropDown";
 import axiosClient from "utils/axios";
 import AreaUpdateForm from "components/Area/AreaUpdateForm";
 import { confirmAlert } from "react-confirm-alert";
-import { getAllInvoice, getInvoiceByAll, getInvoiceByDate } from "utils/api";
 import { enqueueSnackbar } from "notistack";
 import Input from "components/Input/Input";
 import * as yup from "yup";
@@ -17,6 +16,7 @@ import SelectBox from "SelectBox/SelectBox";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { convertToVND, renderDate } from "utils/utils";
 import { useNavigate } from "react-router-dom";
+import { getOrderByAll } from "utils/api";
 const OrderSearchStyles = styled.div`
   padding-top: 54px;
   .top__actions {
@@ -113,7 +113,7 @@ const OrderSearchStyles = styled.div`
 //   .required();
 const OrderSearch = (props) => {
   const navigate = useNavigate();
-  const [invoices, setInvoices] = useState();
+  const [orders, setOrders] = useState();
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [sumStatistics, setSumStatistics] = useState(0);
   const [mode, setMode] = useState({ mode: 0, id: null }); // 0: noneOfBoth, 1: update. 2: add
@@ -126,80 +126,102 @@ const OrderSearch = (props) => {
     formState: { errors, isValid, isLoading, isSubmitting },
   } = useForm({
     defaultValues: {
-      orderId: "",
-      staffId: "",
       clientId: "",
-      fullname: "",
-      bookingType: -1,
       phone: "",
-      status: -1,
+      fullname: "",
+      email: "",
+      status: "",
+      bookingType: -1,
       startTime: "",
-      //   MaPhieuDat,
-      //   MaNhanVien,
-      //   MaKhachHang,
-      //   HoTen,
-      //   SoDienThoai,
-      //   LoaiHoaDon,
-      //   TrangThai,
-      //   ThoiGianBatDau,
+      // startTime: "",
+
+      // LoaiPhieuDat,
+      // TrangThai,
+      // HoTen,
+      // Email,
+      // SoDienThoai,
+      // MaNhanVien,
+      // MaKhachHang,
+      // ThoiGianBatDau,
+      // SoLuongNguoiTrenBanOrPhong,
+      // SoLuongBanOrPhong,
+      // GhiChu,
     },
     // resolver: yupResolver(schema),
   });
   useEffect(() => {
-    fetchInvoices();
+    fetchOrders();
   }, [mode]);
   const handleViewDetail = (id) => {
-    navigate(`/admin/invoice/${id}`);
+    navigate(`/admin/order/${id}`);
   };
-  const fetchInvoices = async () => {
+  const fetchOrders = async () => {
     try {
       let result;
       if (
-        !getValues("orderId") &&
-        !getValues("staffId") &&
         !getValues("clientId") &&
-        !getValues("fullname") &&
         !getValues("phone") &&
         !getValues("status") &&
+        !getValues("fullname") &&
         !getValues("bookingType") &&
-        !getValues("startTime")
+        !getValues("startTime") &&
+        !getValues("email")
+        // !getValues("startTime")
       ) {
         const data = {
-          MaPhieuDat: null,
-          MaNhanVien: null,
           MaKhachHang: null,
-          HoTen: null,
-          SoDienThoai: null,
-          LoaiHoaDon: null,
+          LoaiPhieuDat: null,
           TrangThai: null,
+          SoLuongNguoiTrenBanOrPhong: null,
+          SoLuongBanOrPhong: null,
           ThoiGianBatDau: null,
+          GhiChu: null,
+          HoTen: null,
+          Email: null,
+          SoDienThoai: null,
+          MaNhanVien: null,
         };
-        result = await getInvoiceByAll(data);
+        result = await getOrderByAll(data);
       } else {
         const data = {
-          MaPhieuDat: getValues("orderId").trim(),
-          MaNhanVien: getValues("staffId").trim(),
-          MaKhachHang: getValues("clientId").trim(),
-          HoTen: getValues("fullname").trim(),
-          SoDienThoai: getValues("phone").trim(),
-          LoaiHoaDon:
+          MaKhachHang: getValues("clientId"),
+          LoaiPhieuDat:
             Number(getValues("bookingType")) === -1 ? null : Number(getValues("bookingType")),
           TrangThai: Number(getValues("status")) === -1 ? null : Number(getValues("status")),
+          SoLuongNguoiTrenBanOrPhong: null,
+          SoLuongBanOrPhong: null,
           ThoiGianBatDau: getValues("startTime"),
+          GhiChu: null,
+          HoTen: getValues("fullname"),
+          Email: getValues("email"),
+          SoDienThoai: getValues("phone"),
+          MaNhanVien: null,
+          // MaPhieuDat: getValues("clientId").trim(),
+          // MaNhanVien: getValues("staffId").trim(),
+          // MaKhachHang: getValues("clientId").trim(),
+          // HoTen: getValues("fullname").trim(),
+          // SoDienThoai: getValues("phone").trim(),
+          // LoaiHoaDon:
+          //   Number(getValues("bookingType")) === -1 ? null : Number(getValues("bookingType")),
+          // TrangThai: Number(getValues("status")) === -1 ? null : Number(getValues("status")),
+          // ThoiGianBatDau: getValues("startTime"),
         };
-        result = await getInvoiceByAll(data);
+        result = await getOrderByAll(data);
       }
-      // MaPhieuDat,
-      // MaNhanVien,
       // MaKhachHang,
-      // HoTen,
-      // SoDienThoai,
-      // LoaiHoaDon,
+      // LoaiPhieuDat,
       // TrangThai,
+      // SoLuongNguoiTrenBanOrPhong,
+      // SoLuongBanOrPhong,
       // ThoiGianBatDau,
+      // GhiChu,
+      // HoTen,
+      // Email,
+      // SoDienThoai,
+      // MaNhanVien,
       if (result?.data) {
         console.log(result.data);
-        setInvoices(result.data);
+        setOrders(result.data);
       }
     } catch (error) {
       console.log(error);
@@ -213,19 +235,25 @@ const OrderSearch = (props) => {
   };
 
   const submitSearch = async () => {
-    fetchInvoices();
+    fetchOrders();
   };
 
   const handleClearFilter = () => {
-    setValue("staffId", "");
-    setValue("orderId", "");
     setValue("clientId", "");
-    setValue("fullname", "");
-    setValue("bookingType", -1);
     setValue("phone", "");
     setValue("status", -1);
+    setValue("fullname", "");
+    setValue("bookingType", -1);
     setValue("startTime", "");
-    fetchInvoices();
+    setValue("email", "");
+    // setValue("orderId", "");
+    // setValue("clientId", "");
+    // setValue("fullname", "");
+    // setValue("bookingType", -1);
+    // setValue("phone", "");
+    // setValue("status", -1);
+    // setValue("startTime", "");
+    fetchOrders();
   };
 
   const calculateMoney = (bookingType, dishes, tables, rooms) => {
@@ -253,33 +281,10 @@ const OrderSearch = (props) => {
           <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Mã</label>
+                <label className="filter__value__label">Mã người đặt</label>
                 <Input
                   className="filter__value__input"
-                  placeHolder="Mã hóa đơn"
-                  name="orderId"
-                  {...register("orderId")}
-                ></Input>
-              </div>
-              {errors?.orderId && <div className="error__message">{errors?.orderId?.message}</div>}
-            </div>
-            <div className="filter__value">
-              <div className="value__content">
-                <label className="filter__value__label">Mã nhân viên</label>
-                <Input
-                  className="filter__value__input"
-                  name="staffId"
-                  {...register("staffId")}
-                ></Input>
-              </div>
-              {errors?.staffId && <div className="error__message">{errors?.staffId?.message}</div>}
-            </div>
-            <div className="filter__value">
-              <div className="value__content">
-                <label className="filter__value__label">Mã khách hàng</label>
-                <Input
-                  className="filter__value__input"
-                  name="fullname"
+                  name="clientId"
                   {...register("clientId")}
                 ></Input>
               </div>
@@ -287,11 +292,16 @@ const OrderSearch = (props) => {
                 <div className="error__message">{errors?.clientId?.message}</div>
               )}
             </div>
-          </div>
-          <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Họ tên KH</label>
+                <label className="filter__value__label">SĐT Khách hàng</label>
+                <Input className="filter__value__input" name="phone" {...register("phone")}></Input>
+              </div>
+              {errors?.phone && <div className="error__message">{errors?.phone?.message}</div>}
+            </div>
+            <div className="filter__value">
+              <div className="value__content">
+                <label className="filter__value__label">Tên khách hàng</label>
                 <Input
                   className="filter__value__input"
                   name="fullname"
@@ -302,12 +312,14 @@ const OrderSearch = (props) => {
                 <div className="error__message">{errors?.fullname?.message}</div>
               )}
             </div>
+          </div>
+          <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Số điện thoại</label>
-                <Input className="filter__value__input" name="phone" {...register("phone")}></Input>
+                <label className="filter__value__label">Email</label>
+                <Input className="filter__value__input" name="email" {...register("email")}></Input>
               </div>
-              {errors?.phone && <div className="error__message">{errors?.phone?.message}</div>}
+              {errors?.email && <div className="error__message">{errors?.email?.message}</div>}
             </div>
             <div className="filter__value">
               <div className="value__content">
@@ -323,11 +335,9 @@ const OrderSearch = (props) => {
                 <div className="error__message">{errors?.startTime?.message}</div>
               )}
             </div>
-          </div>
-          <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Loại hóa đơn</label>
+                <label className="filter__value__label">Loại phiếu đặt</label>
                 <SelectBox
                   padding="6px 12px"
                   className="filter__value__input"
@@ -352,6 +362,8 @@ const OrderSearch = (props) => {
                 <div className="error__message">{errors?.bookingType?.message}</div>
               )}
             </div>
+          </div>
+          <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
                 <label className="filter__value__label">Trạng thái</label>
@@ -409,19 +421,19 @@ const OrderSearch = (props) => {
         <thead className="table__head--container">
           <tr className="table__row">
             <th className="table__head item__id" scope="col">
-              Mã hóa đơn
+              Mã phiếu đặt
             </th>
-            <th className="table__head" scope="col">
-              Tên nhân viên
-            </th>
+            {/* <th className="table__head" scope="col">
+              Tên người đặt
+            </th> */}
             <th className="table__head" scope="col">
               Tên khách hàng
             </th>
             <th className="table__head" scope="col">
-              Loại hóa đơn
+              Thời gian bắt đầu
             </th>
             <th className="table__head" scope="col">
-              Thời gian bắt đầu
+              Loại phiếu đặt
             </th>
             <th className="table__head" scope="col">
               Trạng thái
@@ -433,37 +445,35 @@ const OrderSearch = (props) => {
         </thead>
 
         <tbody className="table__body">
-          {invoices?.map((invoice) => {
+          {orders?.map((order) => {
             return (
-              <tr className="table__row" key={invoice?._id}>
-                <td title={invoice?._id} className="table__data item__id">
-                  {invoice?._id}
+              <tr className="table__row" key={order?._id}>
+                <td title={order?._id} className="table__data item__id">
+                  {order?._id}
                 </td>
-                <td className="table__data">{invoice?.MaNhanVien?.TenNhanVien}</td>
-                <td className="table__data">{invoice?.HoTen || "Khách vãng lai"}</td>
+                <td className="table__data">{order?.HoTen || "Khách vãng lai"}</td>
+                <td className="table__data">{renderDate(order?.ThoiGianBatDau)}</td>
                 <td className="table__data">
-                  {invoice?.LoaiHoaDon === 0
+                  {order?.LoaiPhieuDat === 0
                     ? "Đặt bàn"
-                    : invoice?.LoaiHoaDon === 1
+                    : order?.LoaiPhieuDat === 1
                     ? "Đặt phòng thường"
                     : "Đặt phòng VIP"}
                 </td>
-                <td className="table__data">{renderDate(invoice?.ThoiGianBatDau)}</td>
                 <td className="table__data">
-                  {" "}
-                  {invoice?.TrangThai === 0
+                  {order?.TrangThai === 0
                     ? "Đang tạo"
-                    : invoice?.LoaiHoaDon === 1
+                    : order?.LoaiHoaDon === 1
                     ? "Đã tạo"
                     : "Đã hủy"}
                 </td>
                 <td className="table__data">
                   {convertToVND(
                     calculateMoney(
-                      invoice.LoaiHoaDon,
-                      invoice.ListThucDon,
-                      invoice.ListBan,
-                      invoice.ListPhong
+                      order.LoaiHoaDon,
+                      order.ListThucDon,
+                      order.ListBan,
+                      order.ListPhong
                     )
                   )}
                 </td>
@@ -472,7 +482,7 @@ const OrderSearch = (props) => {
                     // to={`/admin/area/update/${area?._id}`}
                     borderRadius="8px"
                     padding="4px 8px"
-                    onClick={() => handleViewDetail(invoice?._id)}
+                    onClick={() => handleViewDetail(order?._id)}
                     className="button button__update"
                     bgHover={colors.green_1}
                     bgColor={colors.green_1_hover}
@@ -501,7 +511,7 @@ const OrderSearch = (props) => {
           })}
         </tbody>
       </table>
-      {!invoices?.length && (
+      {!orders?.length && (
         <div style={{ textAlign: "center", marginBottom: "400px" }}>Không có hóa đơn nào</div>
       )}
       {openUpdateForm && (
