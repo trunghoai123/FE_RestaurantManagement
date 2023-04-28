@@ -410,7 +410,7 @@ const OrderSearch = (props) => {
                   padding="4px 20px"
                   width="120px"
                 >
-                  <div>Thống kê</div>
+                  <div>Tìm</div>
                 </Button>
               </div>
             </div>
