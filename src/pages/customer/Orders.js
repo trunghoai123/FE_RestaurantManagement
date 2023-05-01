@@ -15,6 +15,7 @@ import { useAuthContext } from "utils/context/AuthContext";
 import { getDishById } from "store/dish/dishSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import ViewOrderDetailForm from "components/Order/ViewOrderDetailForm";
+import { renderDate } from "utils/utils";
 const OrdersStyles = styled.div`
   padding-top: 54px;
   .main__orders {
@@ -163,13 +164,12 @@ const Orders = (props) => {
       }
     };
     getCustomer();
-  }, [user, orderState]);
+  }, [user, orderState, viewOrderDetail]);
   const calculateTotalPrice = async (orderId) => {
     let dishes = [];
     let total = 0;
     try {
       const order = await getOrderDetailByOrder(orderId);
-      console.log(order);
       const orderDetail = order.data[0];
       dishes = orderDetail.ListThucDon;
     } catch (error) {
@@ -193,7 +193,7 @@ const Orders = (props) => {
   const handleCloseForm = () => {
     setViewOrderDetail(false);
   };
-  const handleViewOrderDetail = (id) => {
+  const handleViewOrderDetail = (id, order) => {
     setViewingOrder(id);
     setViewOrderDetail(true);
   };
@@ -281,20 +281,8 @@ const Orders = (props) => {
                         <td className="table__data item__id">
                           {order?._id.substring(0, 6) + "..."}
                         </td>
-                        <td className="table__data">
-                          {new Date(order?.createdAt).getHours() +
-                            ":" +
-                            new Date(order?.createdAt).getMinutes() +
-                            " - " +
-                            new Date(order?.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="table__data">
-                          {new Date(order?.ThoiGianBatDau).getHours() +
-                            ":" +
-                            new Date(order?.ThoiGianBatDau).getMinutes() +
-                            " - " +
-                            new Date(order?.ThoiGianBatDau).toLocaleDateString()}
-                        </td>
+                        <td className="table__data">{renderDate(order?.createdAt)}</td>
+                        <td className="table__data">{renderDate(order?.ThoiGianBatDau)}</td>
                         <td className="table__data">
                           {order?.LoaiPhieuDat === 0
                             ? "Đặt bàn"
@@ -315,6 +303,7 @@ const Orders = (props) => {
                               <i className="icon__item fa fa-eye" aria-hidden="true"></i>
                             </div>
                           </Button>
+
                           {/* <Button
                             className="button button__remove"
                             bgHover={colors.red_1_hover}
@@ -325,12 +314,13 @@ const Orders = (props) => {
                               <i className="icon__item fa-solid fa-trash-can"></i>
                             </div>
                           </Button> */}
-                          <Button className="button button__payment" disabled>
+
+                          {/* <Button className="button button__payment" disabled>
                             <div>
                               <span className="text">Thanh toán cọc</span>
                               <i className="icon__item fa-regular fa-credit-card"></i>
                             </div>
-                          </Button>
+                          </Button> */}
                         </td>
                       </tr>
                     );

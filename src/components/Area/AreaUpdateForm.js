@@ -198,14 +198,24 @@ const AreaUpdateFormStyles = styled.div`
 const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const schema = yup
     .object({
-      id: yup.string("hãy xem lại mã").test({
-        name: "check-id",
+      id: yup.string("hãy xem lại số lượng chỗ ngồi").test({
+        name: "check-size",
         skipAbsent: true,
         test(value, ctx) {
           if (mode.mode === 2) {
             if (value.trim() === "") {
               return ctx.createError({ message: "hãy nhập mã" });
             }
+          }
+          return true;
+        },
+      }),
+      maxSize: yup.string("hãy xem lại mã").test({
+        name: "check-id",
+        skipAbsent: true,
+        test(value, ctx) {
+          if (Number(value) < 50 || Number(value) > 1000) {
+            return ctx.createError({ message: "Số lượng không được nhỏ hơn 50 và lớn hơn 1000" });
           }
           return true;
         },
@@ -224,8 +234,7 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      // email: "hoaitrung@gmail.com",
-      // password: "123123123",
+      maxSize: 50,
     },
     resolver: yupResolver(schema),
   });
@@ -237,12 +246,13 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
         try {
           const data = await getAreaById(mode.id);
           const area = data.data;
-          setCurrentArea(area);
           if (area) {
+            setCurrentArea(area);
             setValue("id", area.MaKhuVuc);
             setValue("name", area.TenKhuVuc);
             setValue("description", area.MoTa);
             setValue("detail", area.ViTriCuThe);
+            setValue("maxSize", area.SoNguoiToiDa);
             setImageSelecting(area.HinhAnh);
             setIsLoadedImage(true);
           } else {
@@ -269,9 +279,8 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
           HinhAnh: imageSelecting,
           MoTa: values.description.trim(),
           ViTriCuThe: values.detail.trim(),
-          SoNguoiToiDa: currentArea?.SoNguoiToiDa,
+          SoNguoiToiDa: Number(values.maxSize),
         };
-        console.log(updatedArea);
         try {
           const addAreaRs = await updateArea(updatedArea);
           if (addAreaRs.data._id) {
@@ -286,12 +295,6 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             variant: "error",
           });
         }
-        // id,
-        // TenKhuVuc,
-        // HinhAnh,
-        // MoTa,
-        // ViTriCuThe,
-        // SoNguoiToiDa,
       } else {
         const checkAreaId = async () => {
           try {
@@ -350,7 +353,6 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       setImageSelecting(null);
     }
   };
-  const { user, updateAuthUser } = useAuthContext();
   return (
     <AreaUpdateFormStyles>
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
@@ -447,6 +449,31 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                 </div>
                 <div className="value__container">
                   <div className="label__container">
+                    <label className="label" htmlFor="data">
+                      Số người tối đa
+                    </label>
+                  </div>
+                  <div className="input__container">
+                    <Input
+                      autoComplete="off"
+                      type="number"
+                      min="50"
+                      max="1000"
+                      className="input"
+                      id="maxSize"
+                      {...register("maxSize")}
+                    />
+                  </div>
+                  {errors?.maxSize && (
+                    <div className="error__container">
+                      <div className="error__message">{errors?.maxSize?.message}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="row__container">
+                <div className="value__container">
+                  <div className="label__container">
                     <label className="label" htmlFor="time">
                       Vị trí cụ thế
                     </label>
@@ -466,8 +493,6 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </div>
                   )}
                 </div>
-              </div>
-              <div className="row__container">
                 <div className="value__container">
                   <div className="label__container">
                     <label className="label" htmlFor="time">
@@ -489,7 +514,6 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                     </div>
                   )}
                 </div>
-                <div className="value__container"></div>
               </div>
             </div>
           </div>

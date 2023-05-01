@@ -17,7 +17,7 @@ const TableAdminStyles = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0px 20px;
+    padding: 10px 20px;
   }
   .main__table {
     .table__head--container {
@@ -128,10 +128,20 @@ const TableAdmin = (props) => {
       ],
     });
   };
+
   return (
     <TableAdminStyles>
       <div className="top__actions">
-        <Search placeHolder="Tìm Kiếm"></Search>
+        <Button
+          borderRadius="5px"
+          bgColor={colors.blue_1}
+          bgHover={colors.blue_1}
+          padding="4px 10px"
+          to="/admin/table/search"
+        >
+          Tìm kiếm
+        </Button>
+        {/* <Search placeHolder="Tìm Kiếm"></Search> */}
         <DropdownManage borderRadius="6px">
           <li>
             <div

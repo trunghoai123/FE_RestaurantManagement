@@ -17,6 +17,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { convertToVND, renderDate } from "utils/utils";
 import { useNavigate } from "react-router-dom";
 import { getOrderByAll } from "utils/api";
+
 const OrderSearchStyles = styled.div`
   padding-top: 54px;
   .top__actions {
@@ -130,7 +131,7 @@ const OrderSearch = (props) => {
       phone: "",
       fullname: "",
       email: "",
-      status: "",
+      status: -1,
       bookingType: -1,
       startTime: "",
       // startTime: "",
@@ -220,7 +221,6 @@ const OrderSearch = (props) => {
       // SoDienThoai,
       // MaNhanVien,
       if (result?.data) {
-        console.log(result.data);
         setOrders(result.data);
       }
     } catch (error) {
@@ -438,9 +438,6 @@ const OrderSearch = (props) => {
             <th className="table__head" scope="col">
               Trạng thái
             </th>
-            <th className="table__head" scope="col">
-              Tổng tiền
-            </th>
           </tr>
         </thead>
 
@@ -466,16 +463,6 @@ const OrderSearch = (props) => {
                     : order?.LoaiHoaDon === 1
                     ? "Đã tạo"
                     : "Đã hủy"}
-                </td>
-                <td className="table__data">
-                  {convertToVND(
-                    calculateMoney(
-                      order.LoaiHoaDon,
-                      order.ListThucDon,
-                      order.ListBan,
-                      order.ListPhong
-                    )
-                  )}
                 </td>
                 <td className="table__data">
                   <Button

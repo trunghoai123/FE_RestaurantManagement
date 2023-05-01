@@ -292,7 +292,7 @@ const Profile = (props) => {
         SoDienThoai: values.phone.trim(),
         DiaChi: values.address.trim(),
         NgaySinh: values.dob,
-        GioiTinh: values.sex,
+        GioiTinh: Number(values.sex),
         HinhAnh: imageSelecting,
       };
       try {
