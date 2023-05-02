@@ -227,6 +227,7 @@ function AddOrUpdatePost() {
             
             <div>
                 <label className="title-input" for="content">Nội dung bài viết</label>
+                {errContent && <span className="message">{errContent}</span>}
                 <Editor 
                 id="content"
                 value={post.NoiDung}
@@ -287,7 +288,6 @@ function AddOrUpdatePost() {
                 }}
                 />
                 <input type="file" hidden id="input-image" />
-                {errContent && <span className="message">{errContent}</span>}
             </div>
             
         </AddOrUpdateStyles>
