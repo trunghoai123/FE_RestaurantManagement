@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { updateInvoice , getRoomMatchTimeAndSeat , getTypeOfRoomById } from "utils/api";
+import { updateInvoice , getRoomMatchTimeAndSeat , getTypeOfRoomById, updateManyRoom } from "utils/api";
 import { enqueueSnackbar } from "notistack";
 
 const MaLoaiPhongThuong = 1;
@@ -12,11 +12,13 @@ function ModalAddRoom({setIsModalAddRoom, loaiHoaDon , isSave,invoiceId,getInvoi
     const [data, setData] = useState([])
     const [dataUse , setDataUse] =useState([])
     const [maLoaiPhong, setMaLoaiPhong] =useState("")
+    const [dataOriginal, setDataOriginal] = useState([])
+
 
     useEffect(() => {
         getMaLoaiPhong()
         setDataUse(listPhong)
-        
+        setDataOriginal(listPhong)
     },[])
     useEffect(()=>{
         getData()
@@ -52,9 +54,26 @@ function ModalAddRoom({setIsModalAddRoom, loaiHoaDon , isSave,invoiceId,getInvoi
         if(isSave){
             let result = await updateInvoice({id:invoiceId, ListPhong: dataUse });
             if (result.success) {
+
+
+                let reslt1
+                let reslt2
+                let ids1 = dataOriginal?.map(obj => obj._id);
+                reslt1 =  await updateManyRoom({ ids: ids1 , TrangThai: 0})
+
+                let ids2 = dataUse?.map(obj => obj._id);
+                reslt2 =  await updateManyRoom({ ids: ids2 , TrangThai: 1})
+
+                if(!reslt1.success || !reslt2.success){
+                    enqueueSnackbar("Trạng thái bàn lỗi", {
+                        variant: "warning",
+                    });
+                }
+
                 enqueueSnackbar("Cập nhật phòng cho hóa đơn thành công", {
                     variant: "success",
                     });
+                
                 getInvoice(invoiceId)
                 setIsModalAddRoom(false)
             }else{
@@ -105,6 +124,10 @@ function ModalAddRoom({setIsModalAddRoom, loaiHoaDon , isSave,invoiceId,getInvoi
                                                 <div>
                                                     <span>Số chỗ ngồi:</span>
                                                     {item.SoChoNgoiToiDa}
+                                                </div>
+                                                <div>
+                                                    <span>Loại phòng:</span>
+                                                    {item.MaLoai.TenLoai}
                                                 </div>
                                                 <div className="btn-group">
                                                     <button disabled={item.TrangThai === 0 ? "" : "disabled"} className="btn-order handle"

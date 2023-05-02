@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { updateInvoice , getTableMatchTimeAndSeat } from "utils/api";
+import { updateInvoice , getTableMatchTimeAndSeat, updateManyTable } from "utils/api";
 import { enqueueSnackbar } from "notistack";
 
 
@@ -9,8 +9,10 @@ function ModalAddTable({setIsModalAddTable, loaiHoaDon , setLoading,
     soNguoi , thoiGianBatDau , listBan , setListBan , isSave, invoiceId ,getInvoice}) {
     const [data, setData] = useState([])
     const [dataUse , setDataUse] =useState([])
+    const [dataOriginal, setDataOriginal] = useState([])
 
     useEffect(() => {
+        setDataOriginal(listBan)
         setDataUse(listBan)
         getData()
     },[])
@@ -33,6 +35,22 @@ function ModalAddTable({setIsModalAddTable, loaiHoaDon , setLoading,
         if(isSave){
             let result = await updateInvoice({id:invoiceId, ListBan: dataUse });
             if (result.success) {
+
+                let reslt1
+                let reslt2
+                let ids1 = dataOriginal?.map(obj => obj._id);
+                reslt1 =  await updateManyTable({ ids: ids1 , TrangThai: 0})
+
+                let ids2 = dataUse?.map(obj => obj._id);
+                reslt2 =  await updateManyTable({ ids: ids2 , TrangThai: 1})
+
+                if(!reslt1.success || !reslt2.success){
+                    enqueueSnackbar("Trạng thái bàn lỗi", {
+                        variant: "warning",
+                    });
+                }
+
+
                 enqueueSnackbar("Cập nhật bàn cho hóa đơn thành công", {
                     variant: "success",
                     });

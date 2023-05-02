@@ -254,6 +254,22 @@ const adminNavbarItems = [
     ],
   },
   {
+    title: "Bài viết",
+    id: 8,
+    subNavs: [
+      {
+        id: 1,
+        title: "Quản lý loại bài viết",
+        to: "post/manage-type-post",
+      },
+      {
+        id: 2,
+        title: "Quản lý bài viết",
+        to: "post/manage-post",
+      },
+    ],
+  },
+  {
     title: "Tài Khoản",
     subNavs: [],
   },
