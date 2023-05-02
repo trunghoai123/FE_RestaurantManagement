@@ -87,6 +87,7 @@ const DishesStyles = styled.div`
             position: relative;
             cursor: pointer;
             user-select: none;
+            font-size: 14px;
             :hover {
               .kind__item--name {
                 color: ${colors.gold_1};

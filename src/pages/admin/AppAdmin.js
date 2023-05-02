@@ -10,8 +10,22 @@ import { useAuthContext } from "utils/context/AuthContext";
 import NotFound from "components/NotFound/NotFound";
 
 const AppAdmin = (props) => {
+  // const { user, updateAuthUser } = useAuthContext();
+  // const navigation = useNavigate();
+  // const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
+  // const handleLogout = () => {
+  //   updateAuthUser(null);
+  //   enqueueSnackbar("Đã đăng xuất", {
+  //     variant: "success",
+  //   });
+  // };
+  // useEffect(() => {
+  //   if (user?.LoaiTaiKhoan === 1) {
+  //     navigation("/admin");
+  //   }
+  // });
   const { user, updateAuthUser } = useAuthContext();
-  if (!user) return <NotFound></NotFound>;
+  if (!user || user?.LoaiTaiKhoan === 0) return <NotFound></NotFound>;
   else
     return (
       <>

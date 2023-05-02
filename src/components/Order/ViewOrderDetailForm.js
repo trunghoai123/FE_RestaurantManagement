@@ -18,7 +18,7 @@ import axios from "axios";
 import { useAuthContext } from "utils/context/AuthContext";
 import { clearCart } from "store/cart/cartSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
-import { getOrderById, getOrderDetailByOrder } from "utils/api";
+import { changeStatus, getOrderById, getOrderDetailByOrder, updateOrder } from "utils/api";
 import { convertToVND } from "utils/utils";
 const ViewModalDetailFormStyles = styled.div`
   transition: all ease 200ms;
@@ -313,6 +313,7 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
   const [totalMoney, setTotalMoney] = useState();
   const { user } = useAuthContext();
   const { viewOrderDetail, setViewOrderDetail } = useFormStateContext();
+
   useEffect(() => {
     const getOrder = async () => {
       const order = await getOrderById(orderId);
@@ -337,6 +338,25 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
     getOrder();
     getOrderDetails();
   }, []);
+
+  const handleCancelOrder = () => {
+    const getOrder = async () => {
+      try {
+        await changeStatus(orderId, 4);
+        handleCloseForm();
+        enqueueSnackbar("Hủy phiếu đặt thành công", {
+          variant: "success",
+        });
+      } catch (error) {
+        enqueueSnackbar("Không thể hủy phiếu đặt", {
+          variant: "warning",
+        });
+      }
+    };
+    getOrder();
+    getOrderDetails();
+  };
+
   const getOrderDetails = async () => {
     const orderDetails = await getOrderDetailByOrder(orderId);
     if (orderDetails.data) {
@@ -345,9 +365,11 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
       setOrderDetails(orderDetails.data);
     }
   };
+
   useEffect(() => {
     calculateTotalMoney();
   }, [orderDetails]);
+
   const calculateTotalMoney = () => {
     let total = 0;
     orderDetails.forEach((order) => {
@@ -358,18 +380,20 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
     });
     setTotalMoney(total);
   };
+
   const convertDateToVisualDate = (date) => {
     const day = new Date(date).getDate() + 1;
     const month = new Date(date).getMonth() + 1;
     const year = new Date(date).getFullYear();
     return day + "-" + month + "-" + year;
   };
-  console.log(order);
+
   const convertDateToVisualTime = (time) => {
     const hour = new Date(time).getHours();
     const minutes = new Date(time).getMinutes();
     return hour + ":" + minutes;
   };
+
   return (
     <ViewModalDetailFormStyles>
       <form className="main__form">
@@ -706,15 +730,17 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
             </h6>
             <div className="btn__container">
               <Button
-                type="submit"
+                type="button"
+                disabled={order?.TrangThai !== 0}
                 bgColor={colors.orange_2}
                 bgHover={colors.orange_2_hover}
                 className="btn__confirm"
+                onClick={handleCancelOrder}
               >
-                <div>Hủy đơn</div>
+                <div>Hủy phiếu</div>
               </Button>
               <Button
-                type="submit"
+                type="button"
                 bgColor={colors.orange_2}
                 bgHover={colors.orange_2_hover}
                 className="btn__confirm"

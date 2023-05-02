@@ -40,6 +40,7 @@ import InvoiceAdmin from "pages/admin/Invoice/InvoiceAdmin";
 import InvoiceDetailAdmin from "pages/admin/Invoice/InvoiceDetailAdmin";
 import InvoiceStatistic from "pages/admin/Invoice/InvoiceStatistic";
 import InvoiceSearch from "pages/admin/Invoice/InvoiceSearch";
+import OrderSearch from "pages/admin/Order/OrderSearch";
 
 const App = (props) => {
   return (
@@ -148,6 +149,10 @@ const router = createBrowserRouter([
       {
         path: "order/:orderId",
         element: <OrderDetailAdmin></OrderDetailAdmin>,
+      },
+      {
+        path: "order/search",
+        element: <OrderSearch></OrderSearch>,
       },
       {
         path: "invoice/add",

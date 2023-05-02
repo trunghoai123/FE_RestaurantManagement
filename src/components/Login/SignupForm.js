@@ -133,6 +133,7 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
     },
     resolver: yupResolver(schema),
   });
+
   const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
   const dispatch = useDispatch();
   const { user, updateAuthUser } = useAuthContext();
@@ -161,10 +162,12 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
         console.log("error while create account");
       });
   };
+
   const handleSwitchSignUpForm = () => {
     setOpenSignIn(true);
     setOpenSignUp(false);
   };
+
   return (
     <SignupFormStyles>
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>

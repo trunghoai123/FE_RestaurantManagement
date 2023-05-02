@@ -21,6 +21,12 @@ const InvoiceStatisticStyles = styled.div`
   .sum__money {
     text-align: right;
     padding: 4px 12px;
+    .value__content {
+      /* display: inline-block; */
+      .filter__value__input {
+        width: 200px;
+      }
+    }
   }
   .top__actions {
     display: flex;
@@ -131,6 +137,7 @@ const InvoiceStatistic = (props) => {
       dateFrom: "",
       dateTo: "",
       bookingType: 0,
+      statisType: -1,
     },
     resolver: yupResolver(schema),
   });
@@ -227,6 +234,7 @@ const InvoiceStatistic = (props) => {
     setValue("dateFrom", "");
     setValue("dateTo", "");
     setValue("bookingType", -1);
+    setValue("statisType", -1);
     // fetchInvoices();
   };
 
@@ -241,18 +249,34 @@ const InvoiceStatistic = (props) => {
 
   const calculateMoney = (bookingType, dishes, tables, rooms) => {
     let sum = 0;
-    if (dishes?.length) {
-      dishes.forEach((dish) => {
-        const { MaThucDon, SoLuong } = dish;
-        sum += MaThucDon.GiaMon * SoLuong;
-      });
-    }
-    if (bookingType === 1) {
-      // normal
-      sum += 50000 * rooms.length;
-    } else if (bookingType === 2) {
-      // VIP
-      sum += 100000 * rooms.length;
+    console.log(getValues("statisType"));
+    if (Number(getValues("statisType")) === 0) {
+      if (dishes?.length) {
+        dishes.forEach((dish) => {
+          const { MaThucDon, SoLuong } = dish;
+          sum += MaThucDon.GiaMon * SoLuong;
+        });
+      }
+    } else if (Number(getValues("statisType")) === 1) {
+      if (bookingType === 1) {
+        sum += 100000 * rooms.length;
+      } else if (bookingType === 2) {
+        sum += 300000 * rooms.length;
+      }
+    } else {
+      if (dishes?.length) {
+        dishes.forEach((dish) => {
+          const { MaThucDon, SoLuong } = dish;
+          sum += MaThucDon.GiaMon * SoLuong;
+        });
+      }
+      if (bookingType === 1) {
+        // normal
+        sum += 100000 * rooms.length;
+      } else if (bookingType === 2) {
+        // VIP
+        sum += 300000 * rooms.length;
+      }
     }
     return sum;
   };
@@ -289,8 +313,6 @@ const InvoiceStatistic = (props) => {
               </div>
               {errors?.dateTo && <div className="error__message">{errors?.dateTo?.message}</div>}
             </div>
-          </div>
-          <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
                 <label className="filter__value__label">Loại hóa đơn</label>
@@ -318,6 +340,8 @@ const InvoiceStatistic = (props) => {
                 <div className="error__message">{errors?.bookingType?.message}</div>
               )}
             </div>
+          </div>
+          <div className="filter__row">
             <div className="filter__value button__container">
               <div className="value__content">
                 <Button
@@ -346,7 +370,28 @@ const InvoiceStatistic = (props) => {
           </div>
         </form>
       </div>
-      <div className="sum__money">Tổng tiền: {convertToVND(sumStatistics)}</div>
+      <div className="sum__money">
+        Tổng tiền: {convertToVND(sumStatistics)}
+        <div className="value__content">
+          <label className="filter__value__label">Thống kê theo: </label>{" "}
+          <SelectBox
+            padding="6px 12px"
+            className="filter__value__input"
+            name="statisType"
+            {...register("statisType")}
+          >
+            <option className="option" value={-1}>
+              Tất cả
+            </option>
+            <option className="option" value={0}>
+              Món
+            </option>
+            <option className="option" value={1}>
+              Phòng
+            </option>
+          </SelectBox>
+        </div>
+      </div>
       <table className="main__table table table-striped">
         <thead className="table__head--container">
           <tr className="table__row">
