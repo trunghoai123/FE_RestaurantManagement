@@ -176,6 +176,11 @@ const Header = (props) => {
           </NavLink>
         </div>
         <div className="link__container">
+          <NavLink className="navlink" to={"posts"}>
+            Bài viết
+          </NavLink>
+        </div>
+        <div className="link__container">
           <NavLink className="navlink" to={"orders"}>
             Phiếu Đặt
           </NavLink>

@@ -690,3 +690,13 @@ export const getTypePostById = async ({
     return res.data;
   });
 };
+
+export const getPostByAll = async ({
+  MaLoai,HienThi , NoiBat
+}) => {
+  return axiosClient.post(`post/getPostByAll`, {
+    MaLoai,HienThi,NoiBat
+}).then((res) => {
+    return res.data;
+  });
+};

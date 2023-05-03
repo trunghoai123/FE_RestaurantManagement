@@ -45,6 +45,8 @@ import AddOrUpdatePost from "pages/admin/Post/AddOrUpdatePost";
 import Post from "pages/admin/Post/Post";
 import TypePost from "pages/admin/Post/TypePost";
 import PostReview from "pages/admin/Post/PostReview";
+import PostCustomer from "pages/customer/PostCustomer/Post";
+
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -96,6 +98,10 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile></Profile>,
+      },
+      {
+        path: "posts/:tab?",
+        element: <PostCustomer></PostCustomer>,
       },
     ],
   },
