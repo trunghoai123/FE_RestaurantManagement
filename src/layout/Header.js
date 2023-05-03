@@ -175,11 +175,13 @@ const Header = (props) => {
             Phòng
           </NavLink>
         </div>
-        <div className="link__container">
-          <NavLink className="navlink" to={"orders"}>
-            Phiếu Đặt
-          </NavLink>
-        </div>
+        {user && (
+          <div className="link__container">
+            <NavLink className="navlink" to={"orders"}>
+              Phiếu Đặt
+            </NavLink>
+          </div>
+        )}
         <div className="link__container external__links">
           <span className="link__external">
             <a className="external__link" href="/">

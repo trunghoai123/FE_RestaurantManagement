@@ -8,7 +8,7 @@ import {
   MDBIcon,
   MDBCheckbox,
 } from "mdb-react-ui-kit";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { colors } from "variables";
 import styled from "styled-components";
 import * as yup from "yup";
@@ -20,6 +20,8 @@ import { createAccount } from "store/auth/authSlice";
 import { enqueueSnackbar } from "notistack";
 import { useAuthContext } from "utils/context/AuthContext";
 import { useFormStateContext } from "utils/context/FormStateContext";
+import OTPVerifyForm from "components/Form/OTPVerifyForm";
+import { signUp } from "utils/api";
 const SignupFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -127,40 +129,89 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
   } = useForm({
     defaultValues: {
       // fullname: "trunghoai",
-      email: "hoaitrung@gmail.com",
+      email: "voprogamethu911@gmail.com",
       password: "123123123",
       retype_password: "123123123",
     },
     resolver: yupResolver(schema),
   });
 
-  const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
+  const {
+    openSignIn,
+    setOpenSignIn,
+    openSignUp,
+    setOpenSignUp,
+    openOTPVerifyForm,
+    setOpenOTPVerifyForm,
+  } = useFormStateContext();
   const dispatch = useDispatch();
-  const { user, updateAuthUser } = useAuthContext();
-  const onSubmit = (values) => {
+  const [emailVerifing, setEmailVerifing] = useState("");
+  const onSubmit = async (values) => {
     const processedValue = {
       Email: values.email,
       MatKhau: values.password,
-      LoaiTaiKhoan: 0,
-      TrangThai: 0,
+      // LoaiTaiKhoan: 0,
+      // TrangThai: false,
     };
-    dispatch(createAccount(processedValue))
-      .then((data) => {
-        if (data.error) {
-          enqueueSnackbar("Tạo tài khoản không thành công, hãy kiểm tra lại email", {
+    try {
+      const response = await signUp(processedValue);
+      if (response?.success) {
+        if (response?.verifyOTP === true) {
+          enqueueSnackbar(
+            "Đã tạo tài khoản thành công, Vui lòng nhập mã OTP được gửi về email để xác thực",
+            {
+              variant: "success",
+            }
+          );
+          setEmailVerifing(values.email);
+          setOpenOTPVerifyForm(true);
+        }
+      } else {
+        enqueueSnackbar("Không thể tạo tài khoản", {
+          variant: "warning",
+        });
+      }
+    } catch (error) {
+      const data = error?.response?.data;
+      if (data?.success === false) {
+        if (data?.message) {
+          enqueueSnackbar(data?.message, {
             variant: "warning",
           });
-        } else {
-          enqueueSnackbar("Đã tạo tài khoản thành công", {
-            variant: "success",
-          });
-          updateAuthUser({ ...data.payload.account, ...data.payload.tokens });
-          handleCloseForm();
         }
-      })
-      .catch((err) => {
-        console.log("error while create account");
-      });
+      }
+    }
+    // dispatch(createAccount(processedValue))
+    //   .then((data) => {
+    //     console.log(data);
+    //     console.log(data);
+    //     if (data.error) {
+    //       enqueueSnackbar("Tạo tài khoản không thành công, hãy kiểm tra lại email", {
+    //         variant: "warning",
+    //       });
+    //     } else {
+    //       if (data?.verifyOTP === true) {
+    //         enqueueSnackbar(
+    //           "Đã tạo tài khoản thành công, Vui lòng nhập mã OTP được gửi về email để xác thực",
+    //           {
+    //             variant: "success",
+    //           }
+    //         );
+    //         setEmailVerifing(values.email);
+    //         setOpenOTPVerifyForm(true);
+    //       }
+
+    //       //
+    //       // enqueueSnackbar("Đã tạo tài khoản thành công", {
+    //       //   variant: "success",
+    //       // });
+    //       // updateAuthUser({ ...data.payload.account, ...data.payload.tokens });
+    //       // handleCloseForm();
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log("Không thể tạo tài khoản");
+    //   });
   };
 
   const handleSwitchSignUpForm = () => {
@@ -168,9 +219,15 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
     setOpenSignUp(false);
   };
 
+  const handleCloseVerify = () => {
+    setOpenOTPVerifyForm(false);
+  };
   return (
     <SignupFormStyles>
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
+        {openOTPVerifyForm && (
+          <OTPVerifyForm email={emailVerifing} handleCloseForm={handleCloseVerify}></OTPVerifyForm>
+        )}
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">
           <MDBRow className="d-flex justify-content-center align-items-center h-100">

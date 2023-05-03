@@ -1,35 +1,23 @@
-import {
-  MDBBtn,
-  MDBRow,
-  MDBCol,
-  MDBCard,
-  MDBCardBody,
-  MDBInput,
-  MDBIcon,
-  MDBCheckbox,
-} from "mdb-react-ui-kit";
-import React, { useContext } from "react";
+import React from "react";
 import { colors } from "variables";
 import styled from "styled-components";
 import Button from "components/Button/Button";
 import { useForm } from "react-hook-form";
-import { AuthContext, useAuthContext } from "utils/context/AuthContext";
-import { signIn } from "store/auth/authSlice";
+import { convertBase64 } from "utils/utils";
+import { resendOTP, uploadImage, verifyOTP } from "utils/api";
+import { useState } from "react";
+import OtpInput from "react-otp-input";
 import { enqueueSnackbar } from "notistack";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useDispatch } from "react-redux";
+import { useAuthContext } from "utils/context/AuthContext";
 import { useFormStateContext } from "utils/context/FormStateContext";
-import { useNavigate } from "react-router-dom";
 const OTPVerifyFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
-  z-index: 999;
+  z-index: 1000;
   width: 100%;
   height: 100vh;
   top: 0px;
   .main__form {
-    transition: all ease 200ms;
     .overlay {
       transition: all ease 200ms;
       position: absolute;
@@ -39,44 +27,34 @@ const OTPVerifyFormStyles = styled.div`
       bottom: 0;
       background-color: rgba(0, 0, 0, 0.4);
     }
-    .modal__main {
-      max-width: 650px;
+    .modal__main__verify {
       transition: all ease 200ms;
       border-radius: 6px;
+      padding: 20px 5px 20px 20px;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 60%;
-      height: 90%;
+      background-color: white;
+      width: 40%;
+      height: 40%;
       display: flex;
       flex-direction: column;
-      .close__icon {
-        font-size: 24px;
-        position: absolute;
-        right: 5px;
-        top: 0;
-        cursor: pointer;
-        :hover {
-          color: red;
-          transition: all ease 150ms;
-        }
-      }
-      .btn__to__singup {
-        text-decoration: underline;
-        color: blue;
-        cursor: pointer;
-      }
-      .value__container {
-        margin-bottom: 8px;
-        position: relative;
-        .error__message {
-          width: 100%;
-          color: red;
-          font-size: 12px;
+      .modal__title {
+        .close__icon {
+          font-size: 24px;
           position: absolute;
-          bottom: -2px;
-          left: 0;
+          right: 5px;
+          top: 0;
+          cursor: pointer;
+          :hover {
+            color: red;
+            transition: all ease 150ms;
+          }
+        }
+        .title__container {
+          .title__text {
+          }
         }
       }
       .modal__footer {
@@ -85,135 +63,163 @@ const OTPVerifyFormStyles = styled.div`
         .btn__container {
           display: flex;
           justify-content: flex-end;
+          .btn__confirm {
+          }
+        }
+      }
+      .modal__body {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        overflow: auto;
+        padding-right: 10px;
+        ::-webkit-scrollbar {
+          width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+          background: lightgrey;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+          border-radius: 10px;
+          background: #888;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+        div {
+          width: 100%;
+          display: flex;
+          justify-content: space-around;
+
+          input {
+            /* width: 40px; */
+            /* height: 40px; */
+            background-color: ${colors.gray_1};
+            border: none;
+            outline: none;
+            font-size: 22px;
+          }
+        }
+      }
+      .modal__actions {
+        .resend__otp {
+          cursor: pointer;
+          color: blue;
+          font-size: 13px;
+          text-decoration: underline;
         }
       }
     }
   }
 `;
-const schema = yup
-  .object({
-    email: yup
-      .string("Hãy xem lại email")
-      .required("Hãy nhập email")
-      .email("Hãy xem lại địa chỉ Email"),
-    password: yup
-      .string("hãy xem lại mật khẩu")
-      .min(8, "Mật khẩu yêu cầu ít nhất 8 ký tự")
-      .required("Hãy nhập mật khẩu"),
-  })
-  .required();
-const OTPVerifyForm = ({ handleCloseForm = () => {} }) => {
+
+const OTPVerifyForm = ({ handleCloseForm = () => {}, email = "" }) => {
   const {
     register,
     handleSubmit,
-    watch,
-    getValues,
-    formState: { errors, isValid, isLoading, isSubmitting },
+    setValue,
+    clearErrors,
+    setError,
+    formState: { errors },
   } = useForm({
     defaultValues: {
-      email: "hoaitrung@gmail.com",
-      password: "123123123",
+      maxSize: 50,
     },
-    resolver: yupResolver(schema),
   });
-  const navigation = useNavigate();
-  const dispatch = useDispatch();
-  const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
-  const onSubmit = (values) => {
-    const processedValue = {
-      Email: values.email,
-      MatKhau: values.password,
-    };
-    dispatch(signIn(processedValue))
-      .then((data) => {
-        if (data.error) {
-          enqueueSnackbar("Không thể đăng nhập, tài khoản hoặc mật khẩu không chính xác", {
-            variant: "warning",
-          });
-        } else {
-          updateAuthUser({ ...data.payload.account, ...data.payload.tokens });
-          handleCloseForm();
-          if (data.payload.account.LoaiTaiKhoan === 1) {
-            enqueueSnackbar("Đăng nhập thành công với quyền nhân viên", {
-              variant: "success",
-            });
-            navigation("/admin");
-          } else {
-            enqueueSnackbar("Đăng nhập thành công", {
-              variant: "success",
-            });
-          }
-        }
-      })
-      .catch((err) => {
-        console.log("error while create account");
+  const {
+    openSignIn,
+    setOpenSignIn,
+    openSignUp,
+    setOpenSignUp,
+    openOTPVerifyForm,
+    setOpenOTPVerifyForm,
+  } = useFormStateContext();
+  const { updateAuthUser, user } = useAuthContext();
+  const [otp, setOtp] = useState("");
+  const onSubmit = async () => {
+    try {
+      const data = await verifyOTP({ Email: email, OTP: otp });
+      if (data?.success) {
+        enqueueSnackbar("Xác thực thành công", {
+          variant: "success",
+        });
+        updateAuthUser({ ...data.account, ...data.tokens });
+        handleCloseAllForm();
+      }
+    } catch (error) {
+      enqueueSnackbar("OTP bị sai hoặc quá thời hạn, hãy kiểm tra lại OTP", {
+        variant: "success",
       });
+      console.log(error);
+    }
   };
-  const handleSwitchSignUpForm = () => {
+  const handleCloseAllForm = () => {
     setOpenSignIn(false);
-    setOpenSignUp(true);
+    setOpenSignUp(false);
+    setOpenOTPVerifyForm(false);
   };
-  const { user, updateAuthUser } = useAuthContext();
+  const handleResendOTP = async () => {
+    try {
+      const value = await resendOTP({ Email: email });
+      if (value?.success) {
+        enqueueSnackbar("Gửi OTP mới thành công", {
+          variant: "success",
+        });
+      }
+    } catch (error) {
+      enqueueSnackbar("Không thể gửi lại mã", {
+        variant: "warning",
+      });
+      console.log(error);
+    }
+  };
   return (
     <OTPVerifyFormStyles>
-      <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
-        <div className="overlay" onClick={handleCloseForm}></div>
-        <div className="modal__main">
-          <MDBRow className="d-flex justify-content-center align-items-center h-100">
-            <MDBCol col="12">
-              <MDBCard className="mx-auto">
-                <MDBCardBody className="px-5 w-100 d-flex flex-column">
-                  <span className="close__icon" onClick={handleCloseForm}>
-                    <i className="fa-solid fa-xmark"></i>
-                  </span>
-                  <h2 className="fw-bold text-center">Đăng nhập</h2>
-                  <div className="value__container">
-                    <label htmlFor="email">Tài Khoản</label>
-                    <MDBInput
-                      autoComplete="off"
-                      wrapperClass="mb-3 w-100"
-                      id="email"
-                      type="text"
-                      size="md"
-                      name="email"
-                      {...register("email")}
-                    />
-                    {errors?.email && (
-                      <div className="error__message">{errors?.email?.message}</div>
-                    )}
-                  </div>
-                  <div className="value__container">
-                    <label htmlFor="password">Mật Khẩu</label>
-                    <MDBInput
-                      wrapperClass="mb-3 w-100"
-                      name="password"
-                      {...register("password")}
-                      id="password"
-                      type="password"
-                      size="md"
-                    />
-                    {errors?.password && (
-                      <div className="error__message">{errors?.password?.message}</div>
-                    )}
-                  </div>
-                  <Button type="submit" bgHover={colors.orange_2_hover} bgColor={colors.orange_2}>
-                    <div>Đăng Nhập</div>
-                  </Button>
-                  <div onClick={handleSwitchSignUpForm} className="btn__to__singup">
-                    Đăng ký
-                  </div>
-                  <hr className="my-4" />
-
-                  <Button bgColor={colors.facebook} bgHover={colors.facebook_hover} type="button">
-                    <div>
-                      <MDBIcon fab icon="facebook-f" className="mx-2" />
-                      Đăng nhập vằng Facebook
-                    </div>
-                  </Button>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-          </MDBRow>
+      <form className="main__form">
+        <div className="overlay" onClick={() => setOpenOTPVerifyForm(false)}></div>
+        <div className="modal__main__verify">
+          <div className="modal__title">
+            <span className="close__icon" onClick={() => setOpenOTPVerifyForm(false)}>
+              <i className="fa-solid fa-xmark"></i>
+            </span>
+            <div className="title__container">
+              <h4 className="title__text">Xác thực OTP</h4>
+            </div>
+          </div>
+          <div className="modal__body">
+            <OtpInput
+              value={otp}
+              onChange={setOtp}
+              numInputs={4}
+              renderSeparator={<span>-</span>}
+              renderInput={(props) => <input {...props} />}
+            />
+            {/* <div className="input__verify__container">
+              <input className="input__verify"></input>
+              <input className="input__verify"></input>
+              <input className="input__verify"></input>
+              <input className="input__verify"></input>
+            </div> */}
+          </div>
+          <div className="modal__actions">
+            <span className="resend__otp" onClick={handleResendOTP}>
+              Gửi lại mã
+            </span>
+          </div>
+          <div className="modal__footer">
+            <div className="btn__container">
+              <Button
+                type="button"
+                bgColor={colors.orange_2}
+                bgHover={colors.orange_2_hover}
+                className="btn__confirm"
+                onClick={onSubmit}
+              >
+                <div>Hoàn tất</div>
+              </Button>
+            </div>
+          </div>
         </div>
       </form>
     </OTPVerifyFormStyles>

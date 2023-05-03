@@ -8,19 +8,20 @@ import {
   MDBIcon,
   MDBCheckbox,
 } from "mdb-react-ui-kit";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { colors } from "variables";
 import styled from "styled-components";
 import Button from "components/Button/Button";
 import { useForm } from "react-hook-form";
 import { AuthContext, useAuthContext } from "utils/context/AuthContext";
-import { signIn } from "store/auth/authSlice";
 import { enqueueSnackbar } from "notistack";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import { useNavigate } from "react-router-dom";
+import OTPVerifyForm from "components/Form/OTPVerifyForm";
+import { signIn } from "utils/api";
 const LoginFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -111,29 +112,40 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
     formState: { errors, isValid, isLoading, isSubmitting },
   } = useForm({
     defaultValues: {
-      email: "hoaitrung@gmail.com",
+      email: "voprogamethu911@gmail.com",
       password: "123123123",
     },
     resolver: yupResolver(schema),
   });
+  const [emailVerifing, setEmailVerifing] = useState("");
   const navigation = useNavigate();
   const dispatch = useDispatch();
-  const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
-  const onSubmit = (values) => {
+  const {
+    openSignIn,
+    setOpenSignIn,
+    openSignUp,
+    setOpenSignUp,
+    openOTPVerifyForm,
+    setOpenOTPVerifyForm,
+  } = useFormStateContext();
+  const onSubmit = async (values) => {
     const processedValue = {
       Email: values.email,
       MatKhau: values.password,
     };
-    dispatch(signIn(processedValue))
-      .then((data) => {
-        if (data.error) {
-          enqueueSnackbar("Không thể đăng nhập, tài khoản hoặc mật khẩu không chính xác", {
-            variant: "warning",
+    try {
+      const response = await signIn(processedValue);
+      if (response?.success || response?.verifyOTP) {
+        if (response?.verifyOTP === true) {
+          enqueueSnackbar("Mã OTP đã được gửi về email, hãy xác thực tài khoản", {
+            variant: "success",
           });
+          setEmailVerifing(values.email);
+          setOpenOTPVerifyForm(true);
         } else {
-          updateAuthUser({ ...data.payload.account, ...data.payload.tokens });
+          updateAuthUser({ ...response.account, ...response.tokens });
           handleCloseForm();
-          if (data.payload.account.LoaiTaiKhoan === 1) {
+          if (response.account.LoaiTaiKhoan === 1) {
             enqueueSnackbar("Đăng nhập thành công với quyền nhân viên", {
               variant: "success",
             });
@@ -144,10 +156,58 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
             });
           }
         }
-      })
-      .catch((err) => {
-        console.log("Không thể đăng nhập");
-      });
+      } else {
+        enqueueSnackbar("Không thể đăng nhập", {
+          variant: "warning",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      const data = error?.response?.data;
+      if (!data?.success) {
+        if (data?.message) {
+          enqueueSnackbar(data?.message, {
+            variant: "warning",
+          });
+        } else {
+          enqueueSnackbar("Không thể đăng nhập", {
+            variant: "warning",
+          });
+        }
+      }
+    }
+    // dispatch(signIn(processedValue))
+    //   .then((data) => {
+    //     if (data.error) {
+    //       enqueueSnackbar("Không thể đăng nhập, tài khoản hoặc mật khẩu không chính xác", {
+    //         variant: "warning",
+    //       });
+    //     } else {
+    //       if (data.payload?.verifyOTP) {
+    //         enqueueSnackbar("Mã OTP đã được gửi về email, hãy xác thực tài khoản", {
+    //           variant: "success",
+    //         });
+    //         setEmailVerifing(values.email);
+    //         setOpenOTPVerifyForm(true);
+    //       } else {
+    //         updateAuthUser({ ...data.payload.account, ...data.payload.tokens });
+    //         handleCloseForm();
+    //         if (data.payload.account.LoaiTaiKhoan === 1) {
+    //           enqueueSnackbar("Đăng nhập thành công với quyền nhân viên", {
+    //             variant: "success",
+    //           });
+    //           navigation("/admin");
+    //         } else {
+    //           enqueueSnackbar("Đăng nhập thành công", {
+    //             variant: "success",
+    //           });
+    //         }
+    //       }
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log("Không thể đăng nhập");
+    //   });
   };
   const handleSwitchSignUpForm = () => {
     setOpenSignIn(false);
@@ -156,6 +216,7 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
   const { user, updateAuthUser } = useAuthContext();
   return (
     <LoginFormStyles>
+      {openOTPVerifyForm && <OTPVerifyForm email={emailVerifing}></OTPVerifyForm>}
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">

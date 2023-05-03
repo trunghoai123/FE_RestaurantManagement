@@ -249,15 +249,16 @@ const Profile = (props) => {
   };
 
   useEffect(() => {
-    const loadAllDishTypes = async () => {
+    const loadAllInfor = async () => {
       try {
         // const accountData = await getUserByAccessToken(user.accessToken);
         // setCurrentUser(accountData.data);
         if (true) {
           const customerData = await getCustomerByUserId(user._id);
+          console.log(customerData);
           if (customerData?.data) {
             const customer = customerData.data;
-            let dob = customer.NgaySinh.split("T")[0];
+            let dob = customer?.NgaySinh?.split("T")[0];
             // let dobValue = dob[0] + "-" + dob[2] + "-" + dob[1];
             // console.log(dob);
             setCurrentCustomer(customer);
@@ -277,7 +278,7 @@ const Profile = (props) => {
       }
     };
     if (user) {
-      loadAllDishTypes();
+      loadAllInfor();
     }
   }, [user]);
   const onSubmit = async (values) => {
