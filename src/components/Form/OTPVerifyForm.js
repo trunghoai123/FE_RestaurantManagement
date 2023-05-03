@@ -21,7 +21,7 @@ import * as yup from "yup";
 import { useDispatch } from "react-redux";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import { useNavigate } from "react-router-dom";
-const LoginFormStyles = styled.div`
+const OTPVerifyFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
   z-index: 999;
@@ -102,7 +102,7 @@ const schema = yup
       .required("Hãy nhập mật khẩu"),
   })
   .required();
-const LoginForm = ({ handleCloseForm = () => {} }) => {
+const OTPVerifyForm = ({ handleCloseForm = () => {} }) => {
   const {
     register,
     handleSubmit,
@@ -146,7 +146,7 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
         }
       })
       .catch((err) => {
-        console.log("Không thể đăng nhập");
+        console.log("error while create account");
       });
   };
   const handleSwitchSignUpForm = () => {
@@ -155,7 +155,7 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
   };
   const { user, updateAuthUser } = useAuthContext();
   return (
-    <LoginFormStyles>
+    <OTPVerifyFormStyles>
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">
@@ -216,10 +216,10 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
           </MDBRow>
         </div>
       </form>
-    </LoginFormStyles>
+    </OTPVerifyFormStyles>
   );
 };
 
-LoginForm.propTypes = {};
+OTPVerifyForm.propTypes = {};
 
-export default LoginForm;
+export default OTPVerifyForm;
