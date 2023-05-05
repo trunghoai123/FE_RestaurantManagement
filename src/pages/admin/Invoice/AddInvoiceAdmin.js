@@ -104,7 +104,15 @@ function AddInvoiceAdmin() {
 
         return check;
     }
-
+    const clearModel = ( ) =>{
+        setListThucDon([])
+        setHoTen("")
+        setSoDienThoai("")
+        setLoaiHoaDon(LOAIHOADON.BAN)
+        setListBan([])
+        setListPhongThuong([])
+        setListPhongVIP([])
+    }
     const handleAddOrder = async() => {
         if(isValid()) {
             const data = {
@@ -144,6 +152,7 @@ function AddInvoiceAdmin() {
                     enqueueSnackbar("Tạo hóa đơn thành công", {
                         variant: "success",
                     });
+                    clearModel()
                 }
                 else{
                     enqueueSnackbar("Chuyển trạng thái thất bại", {
@@ -194,7 +203,7 @@ function AddInvoiceAdmin() {
                                 <span className="label">
                                     Nhập họ tên: 
                                 </span>
-                                <input type="text" placeholder="vd: Đăng Khoa" onChange={(e)=>{
+                                <input type="text" placeholder="vd: Đăng Khoa" value={hoTen} onChange={(e)=>{
                                     setHoTen(e.target.value)
                                 }}/>
                                 {msgHT && <span className="error">{msgHT}</span>}
@@ -203,7 +212,7 @@ function AddInvoiceAdmin() {
                                 <span className="label">
                                     Nhập số điện thoại: 
                                 </span>
-                                <input type="text" placeholder="vd: 0923222555"
+                                <input type="text" value={soDienThoai} placeholder="vd: 0923222555"
                                 onChange={(e)=>{
                                     setSoDienThoai(e.target.value)
                                 }}/>

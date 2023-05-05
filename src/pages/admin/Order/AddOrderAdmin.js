@@ -71,6 +71,20 @@ function AddOrderAdmin() {
         ,0)
     }
 
+    const clearModel = ( ) =>{
+        setListBan([])
+        setEmail("")
+        setGhiChu("")
+        setHoTen("")
+        setSoDienThoai("")
+        setLoaiPhieuDat(LOAIPHIEUDAT.BAN)
+        setListThucDon([])
+        setListPhongThuong([])
+        setListPhongVIP([])
+        setSoLuongBanOrPhong(0)
+        setSoLuongNguoiTrenBanOrPhong(0)
+    }
+
     const isValid = () =>{
         let check = true;
         if(!hoTen){
@@ -150,9 +164,11 @@ function AddOrderAdmin() {
             setLoading(true)
             let result = await addOrder(data)
             if(result.success){
+                clearModel()
                 enqueueSnackbar("Tạo đơn đặt thành công", {
                     variant: "success",
                   });
+                
                 setLoading(false)
             }else{
                 enqueueSnackbar("Tạo đơn đặt thất bại", {
@@ -205,7 +221,7 @@ function AddOrderAdmin() {
                                 <span className="label">
                                     Nhập họ tên: 
                                 </span>
-                                <input type="text" placeholder="vd: Đăng Khoa" onChange={(e)=>{
+                                <input type="text" placeholder="vd: Đăng Khoa" value={hoTen} onChange={(e)=>{
                                     setHoTen(e.target.value)
                                 }}/>
                                 {msgHT && <span className="error">{msgHT}</span>}
@@ -214,7 +230,7 @@ function AddOrderAdmin() {
                                 <span className="label">
                                     Nhập số điện thoại: 
                                 </span>
-                                <input type="text" placeholder="vd: 0923222555"
+                                <input type="text" value={soDienThoai} placeholder="vd: 0923222555"
                                 onChange={(e)=>{
                                     setSoDienThoai(e.target.value)
                                 }}/>
@@ -225,7 +241,7 @@ function AddOrderAdmin() {
                                 <span className="label">
                                     Nhập email:
                                 </span>
-                                <input type="email" placeholder="vd: abc123@gmail.com"
+                                <input type="email" value={email} placeholder="vd: abc123@gmail.com"
                                 onChange={(e)=>{
                                     setEmail(e.target.value)
                                 }}/>
@@ -260,7 +276,7 @@ function AddOrderAdmin() {
                                     <span className="label">
                                     Số {loaiPhieuDat ==0 ? 'bàn':'phòng'}: 
                                     </span>
-                                    <input className="time-format  date" type="number" min={1} placeholder={`Số ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`} onChange={(e)=>{
+                                    <input className="time-format  date" type="number" value={soLuongBanOrPhong} min={1} placeholder={`Số ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`} onChange={(e)=>{
                                         setSoLuongBanOrPhong(e.target.value)
                                     }}/>
                                     {msgNum && <span className="error right">{msgNum}</span>}
@@ -269,7 +285,7 @@ function AddOrderAdmin() {
                                     <span className="label">
                                     Số người trên mỗi {loaiPhieuDat ==0 ? 'bàn':'phòng'}: 
                                     </span>  
-                                    <input className="time-format  date" type="number" min={2} placeholder={`Số người trên mỗi ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`}
+                                    <input className="time-format  date" type="number" value={soLuongNguoiTrenBanOrPhong} min={2} placeholder={`Số người trên mỗi ${loaiPhieuDat ==0 ? 'bàn':'phòng'}`}
                                         onChange={(e)=>{
                                             setSoLuongNguoiTrenBanOrPhong(e.target.value)
                                         }}
@@ -293,7 +309,7 @@ function AddOrderAdmin() {
                                             date.setHours(e.target.value)
                                             setThoiGianBatDau(date)
 
-                                        }} className="time-format mr-time" min={0} defaultValue={7} max={23} step={1} />
+                                        }} className="time-format mr-time"  min={0} defaultValue={7} max={23} step={1} />
                                     <span >
                                         giờ 
                                     </span>
@@ -302,7 +318,7 @@ function AddOrderAdmin() {
                                             let date = new Date(thoiGianBatDau)
                                             date.setMinutes(e.target.value)
                                             setThoiGianBatDau(date)
-                                        }} className="time-format mr-time" min={0} defaultValue={0} max={45} step={15} />
+                                        }} className="time-format mr-time" min={0}  defaultValue={0} max={45} step={15} />
                                     <span className="">
                                         phút 
                                     </span>
@@ -314,7 +330,7 @@ function AddOrderAdmin() {
                                 <span className="label">
                                     Ghi chú:
                                 </span> 
-                                <textarea placeholder="Nhập ghi chú" 
+                                <textarea value={ghiChu} placeholder="Nhập ghi chú" 
                                     onChange={(e)=>{
                                         setGhiChu(e.target.value)
                                     }}
