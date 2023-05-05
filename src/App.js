@@ -45,6 +45,7 @@ import AddOrUpdatePost from "pages/admin/Post/AddOrUpdatePost";
 import Post from "pages/admin/Post/Post";
 import TypePost from "pages/admin/Post/TypePost";
 import PostReview from "pages/admin/Post/PostReview";
+import DishStatistic from "pages/admin/Dish/DishStatistic";
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -146,6 +147,10 @@ const router = createBrowserRouter([
         element: <DishSearch></DishSearch>,
       },
       {
+        path: "dish/statistic",
+        element: <DishStatistic></DishStatistic>,
+      },
+      {
         path: "dish/update",
         element: <DishAdmin></DishAdmin>,
       },
@@ -184,15 +189,16 @@ const router = createBrowserRouter([
       {
         path: "post/manage-type-post",
         element: <TypePost></TypePost>,
-      },{
+      },
+      {
         path: "post/:id",
         element: <AddOrUpdatePost></AddOrUpdatePost>,
       },
-      ,{
+      ,
+      {
         path: "post/review/:id",
         element: <PostReview></PostReview>,
       },
-      
     ],
   },
 ]);

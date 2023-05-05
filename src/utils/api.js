@@ -266,6 +266,12 @@ export const getInvoiceByDate = async (data) => {
   });
 };
 
+export const getDishByDate = async (data) => {
+  return axiosClient.post(`invoice/getQuantityMenuFromDateToDate`, data).then((res) => {
+    return res.data;
+  });
+};
+
 export const getMenuByAll = async (filter) => {
   return axiosClient.post(`menu/getMenuByAll`, filter).then((res) => {
     return res.data;
