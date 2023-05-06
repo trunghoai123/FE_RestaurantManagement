@@ -288,7 +288,7 @@ const InvoiceStatistic = (props) => {
           <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Mã</label>
+                <label className="filter__value__label">Từ ngày</label>
                 <Input
                   className="filter__value__input"
                   placeHolder="Từ ngày"

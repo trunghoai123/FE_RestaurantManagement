@@ -4,7 +4,7 @@ export const createAccount = createAsyncThunk(
   "account/createAccount",
   async (accountInfor, thunkAPI) => {
     const response = await axiosClient.post(`account/signUp`, accountInfor);
-    return response.data;
+    return response;
   }
 );
 export const signIn = createAsyncThunk("account/signIn", async (accountInfor, thunkAPI) => {

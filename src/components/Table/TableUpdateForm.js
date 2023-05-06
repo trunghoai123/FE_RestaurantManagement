@@ -270,8 +270,14 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
       try {
         const data = await getRoomByAreaId(area._id);
         if (data?.data) {
-          setRooms(data.data);
-          setSelectedRoom(data.data[0]);
+          if (mode.mode === 2) {
+            const newRooms = getRoomOfRoomType(data?.data);
+            setRooms(newRooms);
+            setSelectedRoom(newRooms[0]);
+          } else {
+            setRooms(data.data);
+            setSelectedRoom(data.data[0]);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -324,11 +330,27 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     }
   }, [areas]);
 
+  const getRoomOfRoomType = (rooms = [], typeId = "641ed8bd029d9e5652b7a468") => {
+    const length = rooms?.length || 0;
+    let newRooms = [];
+    for (let i = 0; i < length; i++) {
+      // _id phòng ăn = 641ed8bd029d9e5652b7a468
+      if (rooms[i].MaLoai._id === typeId) {
+        newRooms.push(rooms[i]);
+      }
+    }
+    return newRooms;
+  };
   useEffect(() => {
     const loadRooms = async () => {
       const data = await getRoomByAreaId(selectedArea._id);
       if (data?.data) {
-        setRooms(data.data);
+        if (mode.mode === 2) {
+          const newRooms = getRoomOfRoomType(data?.data);
+          setRooms(newRooms);
+        } else {
+          setRooms(data.data);
+        }
       }
       setIsLoadedRoom(3);
     };
@@ -350,60 +372,60 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     }
   }, [selectedArea, rooms]);
 
-  const loadAllRoom = async () => {
-    try {
-      if (areas && areas?.length > 0) {
-        const data = await getRoomByAreaId(getValues("area"));
-        if (data?.data && data?.data?.length > 0) {
-          setRooms(data.data);
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  };
+  // const loadAllRoom = async () => {
+  //   try {
+  //     if (areas && areas?.length > 0) {
+  //       const data = await getRoomByAreaId(getValues("area"));
+  //       if (data?.data && data?.data?.length > 0) {
+  //         setRooms(data.data);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     return;
+  //   }
+  // };
 
-  const loadRoomOnUpdate = async () => {
-    try {
-      if (getValues("room")) {
-      } else {
-        const data = await getTableByTableId(mode.id);
-        const table = data.data;
-        if (table && mode.mode === 1) {
-          setValue("room", table.MaPhong.MaPhong);
-        }
-      }
-      // const data = await getTableById(mode.id);
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  };
+  // const loadRoomOnUpdate = async () => {
+  //   try {
+  //     if (getValues("room")) {
+  //     } else {
+  //       const data = await getTableByTableId(mode.id);
+  //       const table = data.data;
+  //       if (table && mode.mode === 1) {
+  //         setValue("room", table.MaPhong.MaPhong);
+  //       }
+  //     }
+  //     // const data = await getTableById(mode.id);
+  //   } catch (error) {
+  //     console.log(error);
+  //     return;
+  //   }
+  // };
 
-  const loadTableOnUpdate = async () => {
-    try {
-      // const data = await getTableById(mode.id);
-      const data = await getTableByTableId(mode.id);
-      const table = data.data;
-      setCurrentTable(table);
-      if (table) {
-        // setValue("area", table.MaKhuVuc.MaKhuVuc);
-        const area = await getAreaById(table.MaPhong.MaKhuVuc);
-        if (area?.data) {
-          // console.log(area);
-          setValue("area", table.MaPhong.MaKhuVuc);
-          // setValue("room", table.MaPhong.MaPhong);
-          setValue("id", table.MaBan);
-          setValue("size", table.SoChoNgoi);
-          setValue("status", table.TrangThai === 0 ? 0 : 1);
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  };
+  // const loadTableOnUpdate = async () => {
+  //   try {
+  //     // const data = await getTableById(mode.id);
+  //     const data = await getTableByTableId(mode.id);
+  //     const table = data.data;
+  //     setCurrentTable(table);
+  //     if (table) {
+  //       // setValue("area", table.MaKhuVuc.MaKhuVuc);
+  //       const area = await getAreaById(table.MaPhong.MaKhuVuc);
+  //       if (area?.data) {
+  //         // console.log(area);
+  //         setValue("area", table.MaPhong.MaKhuVuc);
+  //         // setValue("room", table.MaPhong.MaPhong);
+  //         setValue("id", table.MaBan);
+  //         setValue("size", table.SoChoNgoi);
+  //         setValue("status", table.TrangThai === 0 ? 0 : 1);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     return;
+  //   }
+  // };
 
   const onChangeArea = async (e) => {
     // setSelectedArea()
@@ -412,10 +434,16 @@ const TableUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
     if (area?.data) {
       setSelectedArea(area.data);
     }
-    const gotRooms = await getRoomByAreaId(value);
-    if (gotRooms?.data) {
-      setRooms(gotRooms.data);
-      setSelectedRoom(gotRooms.data[0]);
+    const data = await getRoomByAreaId(value);
+    if (data?.data) {
+      if (mode.mode === 2) {
+        const newRooms = getRoomOfRoomType(data?.data);
+        setRooms(newRooms);
+        setSelectedRoom(newRooms[0]);
+      } else {
+        setRooms(data.data);
+        setSelectedRoom(data.data[0]);
+      }
     }
   };
 

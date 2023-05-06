@@ -138,7 +138,7 @@ const RoomAdmin = (props) => {
           padding="4px 10px"
           to="/admin/room/search"
         >
-          Tìm kiếm
+          <div>Tìm kiếm</div>
         </Button>
         {/* <Search placeHolder="Tìm Kiếm"></Search> */}
         <DropdownManage borderRadius="6px">

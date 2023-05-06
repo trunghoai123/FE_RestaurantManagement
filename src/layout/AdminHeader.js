@@ -78,11 +78,11 @@ const AdminHeaderStyles = styled.div`
       position: absolute;
       left: 0px;
       height: 100vh;
-      width: 220px;
+      width: 250px;
       transition: all ease 300ms;
       /* overflow-y: auto; */
       &.hidden {
-        left: -220px;
+        left: -250px;
       }
       .icon__toggle__container {
         position: absolute;
@@ -203,6 +203,11 @@ const adminNavbarItems = [
         id: 2,
         title: "Cập nhật",
         to: "dish/update",
+      },
+      {
+        id: 3,
+        title: "Thống kê món bán chạy",
+        to: "dish/statistic",
       },
     ],
   },
