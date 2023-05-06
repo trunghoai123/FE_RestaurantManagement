@@ -739,12 +739,22 @@ export const getAllTypePost = async () => {
     return res.data;
   });
 };
-export const getTypePostById = async ({ id }) => {
-  return axiosClient
-    .post(`post/getTypePostById`, {
-      id,
-    })
-    .then((res) => {
-      return res.data;
-    });
+export const getTypePostById = async ({
+  id
+}) => {
+  return axiosClient.post(`post/getTypePostById`, {
+    id
+}).then((res) => {
+    return res.data;
+  });
+};
+
+export const getPostByAll = async ({
+  MaLoai,HienThi , NoiBat
+}) => {
+  return axiosClient.post(`post/getPostByAll`, {
+    MaLoai,HienThi,NoiBat
+}).then((res) => {
+    return res.data;
+  });
 };

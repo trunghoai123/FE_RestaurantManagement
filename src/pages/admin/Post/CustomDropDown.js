@@ -5,17 +5,18 @@ import styled from "styled-components";
 function CustomDropDown({ selectedItem, setSelectedItem, typePosts }) {
   const [dropdown, setDropdown] = useState(true);
   const [selected, setSelected] = useState();
-  
-  useEffect(()=>{
-    getSelected()
-  },[typePosts])
-  const getSelected = () =>{
-    typePosts?.forEach(item => {
-      if(item._id == selectedItem) {
-        setSelected(item)
-      }
-  });
-  }
+
+    useEffect(()=>{
+      getSelected()
+    },[selectedItem])
+
+    const getSelected = () =>{
+      typePosts?.forEach(item => {
+        if(item._id == selectedItem) {
+          setSelected(item)
+        }
+    });
+    }
 
   function renderDropDown() {
     return typePosts?.map((item, index) => {

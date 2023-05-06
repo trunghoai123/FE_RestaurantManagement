@@ -4,7 +4,6 @@ import styled from "styled-components";
 import { colors } from "../variables";
 
 const HeaderStyles = styled.div`
-  margin-top: 300px;
   .footer {
     .footer__top {
     }

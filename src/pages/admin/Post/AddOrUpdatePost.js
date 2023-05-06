@@ -79,7 +79,7 @@ function AddOrUpdatePost() {
         let result = await getPostById({id});
         if (result && result.data) {
             setPost(result.data);
-            setSelectedItem(result.data.MaLoai)
+            setSelectedItem(result.data.MaLoai._id)
             setLoading(false);
         } else {
             setPost({...initPost});
