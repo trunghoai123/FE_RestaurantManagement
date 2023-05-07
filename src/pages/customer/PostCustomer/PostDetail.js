@@ -25,7 +25,6 @@ const PostDetail = () => {
             getPost(id)
         }
         else{
-            setData([])
         }
     },[window.location.href])
   

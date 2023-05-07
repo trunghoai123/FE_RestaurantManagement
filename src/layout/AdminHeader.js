@@ -140,6 +140,11 @@ const adminNavbarItems = [
         title: "Lập phiếu đặt",
         to: "order/update",
       },
+      {
+        id: 2,
+        title: "Quản lý nhân viên",
+        to: "employee",
+      },
     ],
   },
   {

@@ -46,8 +46,9 @@ import Post from "pages/admin/Post/Post";
 import TypePost from "pages/admin/Post/TypePost";
 import PostReview from "pages/admin/Post/PostReview";
 import PostCustomer from "pages/customer/PostCustomer/Post";
-
 import DishStatistic from "pages/admin/Dish/DishStatistic";
+import EmployeeManagement from "pages/admin/Employee/EmployeeManagement"
+
 const App = (props) => {
   return (
     <Provider store={store}>
@@ -204,6 +205,10 @@ const router = createBrowserRouter([
       {
         path: "post/review/:id",
         element: <PostReview></PostReview>,
+      },
+      {
+        path: "employee",
+        element: <EmployeeManagement></EmployeeManagement>,
       },
     ],
   },

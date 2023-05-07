@@ -23,7 +23,7 @@ const Post = (props) => {
 
     useEffect(() => {
         let check = false;
-        const pathname = location.pathname;
+        const pathname = window.location.pathname;
         const arrLocation = pathname.split("/");
         const tab = arrLocation[arrLocation.length - 1];
         if (tab) {
@@ -37,10 +37,10 @@ const Post = (props) => {
                 setActive(SCREEN.LIST);
             }
         }
-    }, [location.pathname]);
+    }, [window.location.pathname]);
 
     useEffect(() => {
-        const pathname = location.pathname;
+        const pathname = window.location.pathname;
         setPathName(pathname);
         const url = new URL(window.location.href);
         const id = url.searchParams.get("id");
@@ -50,7 +50,7 @@ const Post = (props) => {
         }
 
 
-    },[location.pathname])
+    },[window.location.pathname])
 
     useEffect(()=>{
         getData()

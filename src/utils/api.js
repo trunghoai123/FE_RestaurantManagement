@@ -758,3 +758,38 @@ export const getPostByAll = async ({
     return res.data;
   });
 };
+
+export const getAllEmployee = async () => {
+  return axiosClient.post(`employee/getAllEmployee`).then((res) => {
+    return res.data;
+  });
+};
+
+export const deleteEmployee = async (id) => {
+  return axiosClient.post(`employee/deleteEmployee`,{id}).then((res) => {
+    return res.data;
+  });
+};
+
+export const getEmployeeById = async (
+  id
+) => {
+  return axiosClient.post(`employee/getEmployeeById`, {
+    id
+}).then((res) => {
+    return res.data;
+  });
+};
+
+export const addEmployee = async({TenNhanVien, HinhAnh , SoDienThoai , DiaChi , NgaySinh, GioiTinh ,Email}) =>{
+  return axiosClient.post(`employee/addEmployee`,{
+    TenNhanVien, HinhAnh , SoDienThoai , DiaChi , NgaySinh, GioiTinh ,Email}).then((res) => {
+    return res.data;
+  });
+}
+export const updateEmployee = async({id,TenNhanVien, HinhAnh , SoDienThoai , DiaChi , NgaySinh, GioiTinh}) =>{
+  return axiosClient.post(`employee/updateEmployee`,{
+    id,TenNhanVien, HinhAnh , SoDienThoai , DiaChi , NgaySinh, GioiTinh}).then((res) => {
+    return res.data;
+  });
+}
