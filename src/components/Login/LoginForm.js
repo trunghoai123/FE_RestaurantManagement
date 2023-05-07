@@ -22,6 +22,7 @@ import { useFormStateContext } from "utils/context/FormStateContext";
 import { useNavigate } from "react-router-dom";
 import OTPVerifyForm from "components/Form/OTPVerifyForm";
 import { signIn } from "utils/api";
+import OTPForgetPasswordForm from "components/Form/OTPForgetPasswordForm";
 const LoginFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -63,10 +64,21 @@ const LoginFormStyles = styled.div`
           transition: all ease 150ms;
         }
       }
-      .btn__to__singup {
-        text-decoration: underline;
-        color: blue;
-        cursor: pointer;
+      .switch__modals {
+        padding-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .btn__to__singup {
+          text-decoration: underline;
+          color: blue;
+          cursor: pointer;
+        }
+        .btn__forget__password {
+          text-decoration: underline;
+          color: blue;
+          cursor: pointer;
+        }
       }
       .value__container {
         margin-bottom: 8px;
@@ -91,6 +103,7 @@ const LoginFormStyles = styled.div`
     }
   }
 `;
+
 const schema = yup
   .object({
     email: yup
@@ -103,6 +116,7 @@ const schema = yup
       .required("Hãy nhập mật khẩu"),
   })
   .required();
+
 const LoginForm = ({ handleCloseForm = () => {} }) => {
   const {
     register,
@@ -121,12 +135,12 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
   const navigation = useNavigate();
   const dispatch = useDispatch();
   const {
-    openSignIn,
     setOpenSignIn,
-    openSignUp,
     setOpenSignUp,
     openOTPVerifyForm,
     setOpenOTPVerifyForm,
+    openOTPForgetPasswordForm,
+    setOpenOTPForgetPasswordForm,
   } = useFormStateContext();
   const onSubmit = async (values) => {
     const processedValue = {
@@ -216,6 +230,7 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
   const { user, updateAuthUser } = useAuthContext();
   return (
     <LoginFormStyles>
+      {openOTPForgetPasswordForm && <OTPForgetPasswordForm></OTPForgetPasswordForm>}
       {openOTPVerifyForm && <OTPVerifyForm email={emailVerifing}></OTPVerifyForm>}
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
         <div className="overlay" onClick={handleCloseForm}></div>
@@ -260,15 +275,22 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
                   <Button type="submit" bgHover={colors.orange_2_hover} bgColor={colors.orange_2}>
                     <div>Đăng Nhập</div>
                   </Button>
-                  <div onClick={handleSwitchSignUpForm} className="btn__to__singup">
-                    Đăng ký
+                  <div className="switch__modals">
+                    <span onClick={handleSwitchSignUpForm} className="btn__to__singup">
+                      Đăng ký
+                    </span>
+                    <span
+                      onClick={() => setOpenOTPForgetPasswordForm(true)}
+                      className="btn__forget__password"
+                    >
+                      Quên mật khẩu?
+                    </span>
                   </div>
                   <hr className="my-4" />
-
                   <Button bgColor={colors.facebook} bgHover={colors.facebook_hover} type="button">
                     <div>
                       <MDBIcon fab icon="facebook-f" className="mx-2" />
-                      Đăng nhập vằng Facebook
+                      Đăng nhập bằng Facebook
                     </div>
                   </Button>
                 </MDBCardBody>

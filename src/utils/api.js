@@ -302,6 +302,12 @@ export const verifyOTP = async (value) => {
   });
 };
 
+export const changePassword = async (value) => {
+  return axiosClient.post(`account/changePassword`, value).then((res) => {
+    return res.data;
+  });
+};
+
 export const resendOTP = async (value) => {
   return axiosClient.post(`account/sendOtp`, value).then((res) => {
     return res.data;
@@ -316,6 +322,12 @@ export const signUp = async (value) => {
 
 export const signIn = async (value) => {
   return axiosClient.post(`account/signIn`, value).then((res) => {
+    return res.data;
+  });
+};
+
+export const verifyForgetPassword = async (value) => {
+  return axiosClient.post(`account/verifyForgetPassword`, value).then((res) => {
     return res.data;
   });
 };
@@ -739,22 +751,24 @@ export const getAllTypePost = async () => {
     return res.data;
   });
 };
-export const getTypePostById = async ({
-  id
-}) => {
-  return axiosClient.post(`post/getTypePostById`, {
-    id
-}).then((res) => {
-    return res.data;
-  });
+export const getTypePostById = async ({ id }) => {
+  return axiosClient
+    .post(`post/getTypePostById`, {
+      id,
+    })
+    .then((res) => {
+      return res.data;
+    });
 };
 
-export const getPostByAll = async ({
-  MaLoai,HienThi , NoiBat
-}) => {
-  return axiosClient.post(`post/getPostByAll`, {
-    MaLoai,HienThi,NoiBat
-}).then((res) => {
-    return res.data;
-  });
+export const getPostByAll = async ({ MaLoai, HienThi, NoiBat }) => {
+  return axiosClient
+    .post(`post/getPostByAll`, {
+      MaLoai,
+      HienThi,
+      NoiBat,
+    })
+    .then((res) => {
+      return res.data;
+    });
 };

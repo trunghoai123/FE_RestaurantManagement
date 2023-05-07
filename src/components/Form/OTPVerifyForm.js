@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { colors } from "variables";
 import styled from "styled-components";
 import Button from "components/Button/Button";
@@ -93,10 +93,8 @@ const OTPVerifyFormStyles = styled.div`
           justify-content: space-around;
 
           input {
-            /* width: 40px; */
-            /* height: 40px; */
-            background-color: ${colors.gray_1};
-            border: none;
+            background-color: white;
+            border: 1px solid gray;
             outline: none;
             font-size: 22px;
           }
@@ -137,6 +135,16 @@ const OTPVerifyForm = ({ handleCloseForm = () => {}, email = "" }) => {
   } = useFormStateContext();
   const { updateAuthUser, user } = useAuthContext();
   const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(0);
+  useEffect(() => {
+    if (timer > 0) {
+      setTimeout(() => {
+        setTimer((oldTimer) => {
+          return oldTimer - 1;
+        });
+      }, 1000);
+    }
+  }, [timer]);
   const onSubmit = async () => {
     try {
       const data = await verifyOTP({ Email: email, OTP: otp });
@@ -160,6 +168,7 @@ const OTPVerifyForm = ({ handleCloseForm = () => {}, email = "" }) => {
     setOpenOTPVerifyForm(false);
   };
   const handleResendOTP = async () => {
+    setTimer(120);
     try {
       const value = await resendOTP({ Email: email });
       if (value?.success) {
@@ -203,8 +212,8 @@ const OTPVerifyForm = ({ handleCloseForm = () => {}, email = "" }) => {
             </div> */}
           </div>
           <div className="modal__actions">
-            <span className="resend__otp" onClick={handleResendOTP}>
-              Gửi lại mã
+            <span className="resend__otp" onClick={timer ? () => {} : handleResendOTP}>
+              Gửi lại mã {`${timer ? "(" + timer + ")" : ""}`}
             </span>
           </div>
           <div className="modal__footer">

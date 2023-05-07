@@ -19,12 +19,19 @@ import { colors } from "variables";
 import * as yup from "yup";
 import { useAuthContext } from "utils/context/AuthContext";
 import { enqueueSnackbar } from "notistack";
+import ChangePasswordForm from "components/Password/ChangePasswordForm";
 const ProfileStyles = styled.div`
   padding-top: 54px;
   display: flex;
   justify-content: center;
   .main__form {
     width: 80%;
+    .top__actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 4px 20px;
+    }
     .modal__main {
       transition: all ease 200ms;
       border-radius: 6px;
@@ -234,7 +241,7 @@ const Profile = (props) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoadedImage, setIsLoadedImage] = useState(false);
   const [imageSelecting, setImageSelecting] = useState("");
-
+  const [isChangePassword, setIsChangePassword] = useState(false);
   const handleChangeImage = async (e) => {
     if (e.target.files.length > 0) {
       setIsLoadedImage(true);
@@ -313,7 +320,20 @@ const Profile = (props) => {
   };
   return (
     <ProfileStyles>
+      {isChangePassword && (
+        <ChangePasswordForm handleCloseForm={() => setIsChangePassword(false)}></ChangePasswordForm>
+      )}
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
+        <div className="top__actions">
+          <Button
+            onClick={() => setIsChangePassword(true)}
+            type="button"
+            bgColor={colors.orange_2}
+            bgHover={colors.orange_2_hover}
+          >
+            <div>Đổi mật khẩu</div>
+          </Button>
+        </div>
         <div className="overlay"></div>
         <div className="modal__main">
           <div className="modal__title">
