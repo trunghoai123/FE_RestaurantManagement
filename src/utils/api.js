@@ -793,3 +793,13 @@ export const updateEmployee = async({id,TenNhanVien, HinhAnh , SoDienThoai , Dia
     return res.data;
   });
 }
+
+
+export const getCustomerByPhone = async({SoDienThoai}) =>{
+  return axiosClient.post(`customer/getCustomerByPhone`,{
+    SoDienThoai
+    }).then((res) => {
+    return res.data;
+  });
+}
+

@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import {addOrder, getEmployeeByUserId} from "utils/api";
+import {addOrder, getEmployeeByUserId, getCustomerByPhone} from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
@@ -43,6 +43,7 @@ function AddOrderAdmin() {
     const TrangThai = 0;
     const { user } = useAuthContext();
     const [idEm, setIdEm] = useState("")
+    const [maKH, setMaKH] = useState("")
 
   useEffect(()=>{
     getEmployee(user._id)
@@ -72,6 +73,7 @@ function AddOrderAdmin() {
     }
 
     const clearModel = ( ) =>{
+        setMaKH("")
         setListBan([])
         setEmail("")
         setGhiChu("")
@@ -151,7 +153,7 @@ function AddOrderAdmin() {
                 SoLuongNguoiTrenBanOrPhong: soLuongNguoiTrenBanOrPhong,
                 SoLuongBanOrPhong : soLuongBanOrPhong,
                 ThoiGianBatDau: thoiGianBatDau,
-                MaKhachHang: null,
+                MaKhachHang: maKH ? maKH : null,
                 ListThucDon: listThucDon,
                 ListPhong: loaiPhieuDat == 0 ? [] : loaiPhieuDat == 1 ? listPhongThuong : listPhongVIP,
                 ListBan: loaiPhieuDat == 0 ? listBan : [] ,
@@ -202,6 +204,17 @@ function AddOrderAdmin() {
       
     }
 
+    const handleFindCustomer = async (e)=>{
+        if(e.charCode === 13){
+            let result = await getCustomerByPhone({SoDienThoai: e.target.value})
+            if(result.success && result.data){
+                setHoTen(result.data.TenKhachHang)
+                setEmail(result.data.Email)
+                setMaKH(result.data._id)
+            }
+        }
+    }
+
     return ( 
         <OrderAdminStyle>
             {loading && <Loading/>}
@@ -230,7 +243,7 @@ function AddOrderAdmin() {
                                 <span className="label">
                                     Nhập số điện thoại: 
                                 </span>
-                                <input type="text" value={soDienThoai} placeholder="vd: 0923222555"
+                                <input onKeyPress={(e)=>{ handleFindCustomer(e)}} type="text" value={soDienThoai} placeholder="vd: 0923222555"
                                 onChange={(e)=>{
                                     setSoDienThoai(e.target.value)
                                 }}/>
