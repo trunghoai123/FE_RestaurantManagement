@@ -7,6 +7,7 @@ const FormStateProvider = (props) => {
   const [openSignUp, setOpenSignUp] = useState(false);
   const [viewOrderDetail, setViewOrderDetail] = useState(false);
   const [openOTPVerifyForm, setOpenOTPVerifyForm] = useState(false);
+  const [openOTPForgetPasswordForm, setOpenOTPForgetPasswordForm] = useState(false);
   const [adminNavbarState, setAdminNavbarState] = useState({
     isOpen: false,
     openning: [],
@@ -22,6 +23,8 @@ const FormStateProvider = (props) => {
     setViewOrderDetail,
     openOTPVerifyForm,
     setOpenOTPVerifyForm,
+    openOTPForgetPasswordForm,
+    setOpenOTPForgetPasswordForm,
   };
   useEffect(() => {}, []);
   return <FormStateContext.Provider value={value} {...props}></FormStateContext.Provider>;

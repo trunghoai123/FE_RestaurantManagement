@@ -364,6 +364,7 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             </span>
             <div className="title__container">
               <h4 className="title__text">
+                resend__otp
                 {mode?.mode === 1 ? "Cập Nhật Khu Vực" : "Thêm Khu Vực"}
               </h4>
             </div>

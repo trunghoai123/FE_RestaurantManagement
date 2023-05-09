@@ -134,6 +134,7 @@ const Header = (props) => {
     enqueueSnackbar("Đã đăng xuất", {
       variant: "success",
     });
+    navigation("/");
   };
   useEffect(() => {
     if (user?.LoaiTaiKhoan === 1) {

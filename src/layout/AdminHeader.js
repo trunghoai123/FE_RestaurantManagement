@@ -132,13 +132,14 @@ const adminNavbarItems = [
     subNavs: [
       {
         id: 1,
-        title: "Lập hóa đơn",
-        to: "order/search",
+        title: "Tạo phiếu đặt",
+        to: "order/add",
       },
+
       {
         id: 2,
-        title: "Lập phiếu đặt",
-        to: "order/update",
+        title: "Tạo hóa đơn",
+        to: "invoice/add",
       },
       {
         id: 2,
@@ -227,11 +228,6 @@ const adminNavbarItems = [
       },
       {
         id: 2,
-        title: "Tạo phiếu đặt",
-        to: "order/add",
-      },
-      {
-        id: 2,
         title: "Cập nhật",
         to: "order/update",
       },
@@ -248,16 +244,11 @@ const adminNavbarItems = [
       },
       {
         id: 2,
-        title: "Tạo hóa đơn",
-        to: "invoice/add",
-      },
-      {
-        id: 3,
         title: "Cập nhật",
         to: "invoice/update",
       },
       {
-        id: 4,
+        id: 3,
         title: "Thống kê doanh thu",
         to: "invoice/statistic",
       },
