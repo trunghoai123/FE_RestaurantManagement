@@ -187,7 +187,7 @@ function InvoiceDetailAdmin(props) {
                   let rs = handleChangeStatus(ids,0,invoice?.LoaiHoaDon)
                   if(rs){
                     
-                    enqueueSnackbar("Xác nhận thanh toán thành công", {
+                    enqueueSnackbar("Thanh toán thành công", {
                         variant: "success",
                     });
                   }else{
@@ -202,7 +202,7 @@ function InvoiceDetailAdmin(props) {
                 
                 } else {
                 setLoading(false);
-                enqueueSnackbar("Xác nhận thanh toán thất bại", {
+                enqueueSnackbar("Thanh toán thất bại", {
                     variant: "error",
                 });
                 }
