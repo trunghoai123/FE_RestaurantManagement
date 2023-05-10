@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
@@ -18,6 +18,9 @@ import { enqueueSnackbar } from "notistack";
 import { convertDate } from "../Order/OrderAdmin";
 import { convertToVND } from "utils/utils";
 import { useAuthContext } from "utils/context/AuthContext";
+import ReactToPrint, { useReactToPrint } from "react-to-print";
+import Button from "components/Button/Button";
+import { colors } from "variables";
 
 function InvoiceDetailAdmin(props) {
   const [invoice, setInvoice] = useState({});
@@ -99,7 +102,7 @@ function InvoiceDetailAdmin(props) {
         return (
           <>
             {renderPay()}
-            <div className="right-btn">
+            <div className="right-btn hidden">
               <button className="btn-order handle" onClick={handleOrderDeposit}>
                 Xác nhận đã thanh toán
               </button>
@@ -114,7 +117,7 @@ function InvoiceDetailAdmin(props) {
         return (
           <>
             {renderPay()}
-            <div className="right-btn">
+            <div className="right-btn hidden">
               <span className="btn-order success">Thành công</span>
             </div>
           </>
@@ -138,7 +141,7 @@ function InvoiceDetailAdmin(props) {
 
   const renderPay = () => {
     return (
-      <div className="deposit">
+      <div className="deposit hidden">
         <div>Khánh hàng phải thanh toán:</div>
         <div className="w60pc-depo">
           <span>Tổng giá trị món ăn</span>
@@ -200,6 +203,7 @@ function InvoiceDetailAdmin(props) {
 
               let rs = handleChangeStatus(ids, 0, invoice?.LoaiHoaDon);
               if (rs) {
+                handlePrintInvoice();
                 enqueueSnackbar("Thanh toán thành công", {
                   variant: "success",
                 });
@@ -285,13 +289,39 @@ function InvoiceDetailAdmin(props) {
       ],
     });
   };
+  const component = useRef();
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handlePrintInvoice = useReactToPrint({
+    content: () => component.current,
+  });
 
   return (
-    <InvoiceDetailAdminStyle>
+    <InvoiceDetailAdminStyle ref={component}>
       {loading && <Loading />}
-
-      <div className="title">Chi tiết hóa đơn</div>
-      <div className="btn-group">{renderButton()}</div>
+      <Button
+        className="hidden"
+        bgColor={colors.green_1}
+        bgHover={colors.green_1_hover}
+        // onClick={() => component.current && component.current.ownerDocument.defaultView.print()}
+        onClick={handlePrintInvoice}
+      >
+        Print invoice 1
+      </Button>
+      <div>
+        {/* <ReactToPrint
+        ref={component}
+        content={() => component.current}
+        trigger={() => {
+          return <button>Print invoice 2</button>;
+        }}
+        /> */}
+      </div>
+      <div className="title hidden">Chi tiết hóa đơn</div>
+      <div className="btn-group hidden">{renderButton()}</div>
       <div className="info-order">
         <h6>Thông tin hóa đơn</h6>
         <div className="box-info">
@@ -486,6 +516,11 @@ const InvoiceDetailAdminStyle = styled.div`
   padding: 64px 10px 10px;
   background-color: #f3f3f3;
   min-height: 90vh;
+  @media print {
+    .hidden {
+      display: none;
+    }
+  }
   .title {
     font-size: 20px;
     font-weight: bold;
