@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { getInvoiceById ,updateInvoice ,getOrderDetailByOrder, updateManyRoom, updateManyTable} from "utils/api";
+import {
+  getInvoiceById,
+  updateInvoice,
+  getOrderDetailByOrder,
+  updateManyRoom,
+  updateManyTable,
+} from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
@@ -13,7 +19,6 @@ import { convertDate } from "../Order/OrderAdmin";
 import { convertToVND } from "utils/utils";
 import { useAuthContext } from "utils/context/AuthContext";
 
-
 function InvoiceDetailAdmin(props) {
   const [invoice, setInvoice] = useState({});
   const [loading, setLoading] = useState(false);
@@ -21,10 +26,10 @@ function InvoiceDetailAdmin(props) {
   const [isModalAddTable, setIsModalAddTable] = useState(false);
   const [isModalAddRoom, setIsModalAddRoom] = useState(false);
   const [order, setOrder] = useState({});
-  const [listThucDon, setListThucDon] = useState([])
-  const [listBan, setListBan] = useState([])
-  const [listPhongThuong, setListPhongThuong] = useState([])
-  const [listPhongVIP, setListPhongVIP] = useState([])
+  const [listThucDon, setListThucDon] = useState([]);
+  const [listBan, setListBan] = useState([]);
+  const [listPhongThuong, setListPhongThuong] = useState([]);
+  const [listPhongVIP, setListPhongVIP] = useState([]);
 
   useEffect(() => {
     const arrLocation = window.location.href.split("/");
@@ -42,16 +47,16 @@ function InvoiceDetailAdmin(props) {
       setOrder({});
       setLoading(false);
     }
-  }
+  };
 
   const getInvoice = async (id) => {
     setLoading(true);
     let result = await getInvoiceById(id);
     if (result && result.data) {
       setInvoice(result.data);
-      setListThucDon(result.data.ListThucDon)
-      if(result.data.MaPhieuDat){
-        getOrder(result.data.MaPhieuDat)
+      setListThucDon(result.data.ListThucDon);
+      if (result.data.MaPhieuDat) {
+        getOrder(result.data.MaPhieuDat);
       }
       setLoading(false);
     } else {
@@ -60,231 +65,225 @@ function InvoiceDetailAdmin(props) {
     }
   };
 
-  const totalPay = ()=>{
+  const totalPay = () => {
     let dish = totalPrice(invoice?.ListThucDon);
     let room = 0;
-    if(invoice?.LoaiHoaDon == 1){
-        room = 150000*invoice?.ListPhong.length
+    if (invoice?.LoaiHoaDon == 1) {
+      room = 150000 * invoice?.ListPhong.length;
     }
-    if(invoice?.LoaiHoaDon == 2){
-        room = 300000*invoice?.ListPhong.length
+    if (invoice?.LoaiHoaDon == 2) {
+      room = 300000 * invoice?.ListPhong.length;
     }
 
-    return convertToVND(dish + room - totalDeposit())
-  }
+    return convertToVND(dish + room - totalDeposit());
+  };
 
-  const totalDeposit = ()=>{
-    if(invoice?.MaPhieuDat){
-      let dish = totalPrice(order?.ListThucDon)*30/100;
+  const totalDeposit = () => {
+    if (invoice?.MaPhieuDat) {
+      let dish = (totalPrice(order?.ListThucDon) * 30) / 100;
       let room = 0;
-      if(order?.MaPhieuDat?.LoaiPhieuDat == 1){
-          room = 50000*order?.ListPhong.length
+      if (order?.MaPhieuDat?.LoaiPhieuDat == 1) {
+        room = 50000 * order?.ListPhong.length;
       }
-      if(order?.MaPhieuDat?.LoaiPhieuDat == 2){
-          room = 100000*order?.ListPhong.length
+      if (order?.MaPhieuDat?.LoaiPhieuDat == 2) {
+        room = 100000 * order?.ListPhong.length;
       }
       return dish + room;
     }
-    return 0
-  }
+    return 0;
+  };
 
   const renderButton = () => {
     switch (invoice?.TrangThai) {
       case 0:
         return (
-            <>
+          <>
             {renderPay()}
             <div className="right-btn">
-            <button className="btn-order handle" onClick={handleOrderDeposit}>
-              Xác nhận đã thanh toán
-            </button>
-            <button className="btn-order cancel" onClick={handleOrderCancel}>
-              Hủy đơn
-            </button>
-          </div>
+              <button className="btn-order handle" onClick={handleOrderDeposit}>
+                Xác nhận đã thanh toán
+              </button>
+              <button className="btn-order cancel" onClick={handleOrderCancel}>
+                Hủy đơn
+              </button>
+            </div>
           </>
         );
         break;
       case 1:
         return (
-            <>
+          <>
             {renderPay()}
-          <div className="right-btn">
-            <span className="btn-order success">Thành công</span>
-          </div>
+            <div className="right-btn">
+              <span className="btn-order success">Thành công</span>
+            </div>
           </>
         );
         break;
       case 2:
         return (
-            <>
+          <>
             {renderPay()}
-          <div className="right-btn">
-            <span className="btn-order fail">Hóa đơn bị hủy</span>
-          </div>
+            <div className="right-btn">
+              <span className="btn-order fail">Hóa đơn bị hủy</span>
+            </div>
           </>
         );
         break;
-    
+
       default:
         break;
     }
   };
 
-  const renderPay = ()=>{
+  const renderPay = () => {
     return (
       <div className="deposit">
-                <div>Khánh hàng phải thanh toán:</div>
-                <div className="w60pc-depo">
-                    <span>Tổng giá trị món ăn</span>
-                    {convertToVND(totalPrice(invoice?.ListThucDon))}
-                </div>
-                {invoice?.LoaiHoaDon == 1 ?
-                <div className="w60pc-depo">
-                    <span>150.000đ mỗi phòng</span>
-                    {convertToVND(150000*invoice?.ListPhong.length)}
-                </div>: ""}
-                {invoice?.LoaiHoaDon == 2 ? 
-                <div className="w60pc-depo">
-                    <span>300.000đ mỗi phòng</span>
-                    {convertToVND(300000*invoice?.ListPhong.length)}
-                </div>: ""}
-                {invoice?.MaPhieuDat ?
-                <div className="w60pc-depo">
-                    <span>Số tiền đã đặt cọc trước: </span>
-                    {convertToVND(totalDeposit())}
-                </div>: ""}
-                <div className="w60pc-depo">
-                    <span>Tổng cộng phải trả:</span>
-                    <strong>{totalPay()}</strong>
-                </div>
-            </div>
-    )
-  }
+        <div>Khánh hàng phải thanh toán:</div>
+        <div className="w60pc-depo">
+          <span>Tổng giá trị món ăn</span>
+          {convertToVND(totalPrice(invoice?.ListThucDon))}
+        </div>
+        {invoice?.LoaiHoaDon == 1 ? (
+          <div className="w60pc-depo">
+            <span>150.000đ mỗi phòng</span>
+            {convertToVND(150000 * invoice?.ListPhong.length)}
+          </div>
+        ) : (
+          ""
+        )}
+        {invoice?.LoaiHoaDon == 2 ? (
+          <div className="w60pc-depo">
+            <span>300.000đ mỗi phòng</span>
+            {convertToVND(300000 * invoice?.ListPhong.length)}
+          </div>
+        ) : (
+          ""
+        )}
+        {invoice?.MaPhieuDat ? (
+          <div className="w60pc-depo">
+            <span>Số tiền đã đặt cọc trước: </span>
+            {convertToVND(totalDeposit())}
+          </div>
+        ) : (
+          ""
+        )}
+        <div className="w60pc-depo">
+          <span>Tổng cộng phải trả:</span>
+          <strong>{totalPay()}</strong>
+        </div>
+      </div>
+    );
+  };
 
   const totalPrice = (menus) => {
     return menus?.reduce((total, menu) => total + menu?.MaThucDon?.GiaMon * menu?.SoLuong, 0);
   };
 
-  const handleOrderDeposit = async() =>{
+  const handleOrderDeposit = async () => {
     confirmAlert({
-        title: "Xác nhận",
-        message: `Xác nhận đã nhận ${totalPay()} tiền thanh toán?`,
-        buttons: [
-          {
-            label: "Có",
-            onClick: async() => {
-                setLoading(true);
-                let id = invoice?._id
-                let status = 1;
-                let result = await updateInvoice({id, TrangThai: status});
-                if (result.success) {
-                  let ids = invoice?.LoaiHoaDon === 0 ? 
-                  invoice?.ListBan.map(obj => obj._id)
-                  :
-                  invoice?.ListPhong.map(obj => obj._id)
+      title: "Xác nhận",
+      message: `Xác nhận đã nhận ${totalPay()} tiền thanh toán?`,
+      buttons: [
+        {
+          label: "Có",
+          onClick: async () => {
+            setLoading(true);
+            let id = invoice?._id;
+            let status = 1;
+            let result = await updateInvoice({ id, TrangThai: status });
+            if (result.success) {
+              let ids =
+                invoice?.LoaiHoaDon === 0
+                  ? invoice?.ListBan.map((obj) => obj._id)
+                  : invoice?.ListPhong.map((obj) => obj._id);
 
-                  let rs = handleChangeStatus(ids,0,invoice?.LoaiHoaDon)
-                  if(rs){
-                    
-                    enqueueSnackbar("Xác nhận thanh toán thành công", {
-                        variant: "success",
-                    });
-                  }else{
-                    enqueueSnackbar("Chuyển trạng thái thất bại", {
-                      variant: "error",
-                  });
-                  }
-
-                  getInvoice(invoice?._id);
-                    setLoading(false);
-
-                
-                } else {
-                setLoading(false);
-                enqueueSnackbar("Xác nhận thanh toán thất bại", {
-                    variant: "error",
+              let rs = handleChangeStatus(ids, 0, invoice?.LoaiHoaDon);
+              if (rs) {
+                enqueueSnackbar("Thanh toán thành công", {
+                  variant: "success",
                 });
-                }
-            },
+              } else {
+                enqueueSnackbar("Chuyển trạng thái thất bại", {
+                  variant: "error",
+                });
+              }
+
+              getInvoice(invoice?._id);
+              setLoading(false);
+            } else {
+              setLoading(false);
+              enqueueSnackbar("Thanh toán thất bại", {
+                variant: "error",
+              });
+            }
           },
-          {
-            label: "Không",
-            onClick: () => {},
-          },
-        ],
-      });
-  }
+        },
+        {
+          label: "Không",
+          onClick: () => {},
+        },
+      ],
+    });
+  };
 
-
-
-const handleChangeStatus = async (ids, TrangThai , loaiHoaDon) =>{
-    let reslt
-    if(loaiHoaDon === 0){
-        reslt = await updateManyTable({ ids , TrangThai})
-    }else{
-        reslt = await updateManyRoom({ ids , TrangThai})
+  const handleChangeStatus = async (ids, TrangThai, loaiHoaDon) => {
+    let reslt;
+    if (loaiHoaDon === 0) {
+      reslt = await updateManyTable({ ids, TrangThai });
+    } else {
+      reslt = await updateManyRoom({ ids, TrangThai });
     }
-    return reslt.success
-}
-
-
+    return reslt.success;
+  };
 
   const handleOrderCancel = async () => {
     // eslint-disable-next-line no-restricted-globals
 
     confirmAlert({
-        title: "Xác nhận",
-        message: "Bạn có chắc chắn muốn hủy đơn ?",
-        buttons: [
-          {
-            label: "Có",
-            onClick: async() => {
-                setLoading(true);
-                let status = 2;
-                let id = invoice?._id;
-                let result = await updateInvoice({id, TrangThai: status});
-                if (result.success) {
+      title: "Xác nhận",
+      message: "Bạn có chắc chắn muốn hủy đơn ?",
+      buttons: [
+        {
+          label: "Có",
+          onClick: async () => {
+            setLoading(true);
+            let status = 2;
+            let id = invoice?._id;
+            let result = await updateInvoice({ id, TrangThai: status });
+            if (result.success) {
+              let ids =
+                invoice?.LoaiHoaDon === 0
+                  ? invoice?.ListBan.map((obj) => obj._id)
+                  : invoice?.ListPhong.map((obj) => obj._id);
 
+              let rs = handleChangeStatus(ids, 0, invoice?.LoaiHoaDon);
+              if (rs) {
+                enqueueSnackbar("Hủy hóa đơn thành công", {
+                  variant: "success",
+                });
+              } else {
+                enqueueSnackbar("Chuyển trạng thái thất bại", {
+                  variant: "error",
+                });
+              }
 
-                  let ids = invoice?.LoaiHoaDon === 0 ? 
-                  invoice?.ListBan.map(obj => obj._id)
-                  :
-                  invoice?.ListPhong.map(obj => obj._id)
-
-                  let rs = handleChangeStatus(ids,0,invoice?.LoaiHoaDon)
-                  if(rs){
-                    
-                    enqueueSnackbar("Hủy hóa đơn thành công", {
-                      variant: "success",
-                      });
-                  }else{
-                    enqueueSnackbar("Chuyển trạng thái thất bại", {
-                      variant: "error",
-                  });
-                  }
-
-
-
-
-                    getInvoice(invoice?._id);
-                    setLoading(false);
-                    
-                } else {
-                    setLoading(false);
-                    enqueueSnackbar("Hủy hóa đơn thất bại", {
-                    variant: "error",
-                    });
-                }
-            },
+              getInvoice(invoice?._id);
+              setLoading(false);
+            } else {
+              setLoading(false);
+              enqueueSnackbar("Hủy hóa đơn thất bại", {
+                variant: "error",
+              });
+            }
           },
-          {
-            label: "Không",
-            onClick: () => {},
-          },
-        ],
-      });
-   
+        },
+        {
+          label: "Không",
+          onClick: () => {},
+        },
+      ],
+    });
   };
 
   return (
@@ -299,19 +298,33 @@ const handleChangeStatus = async (ids, TrangThai , loaiHoaDon) =>{
           <div className="col">
             <div className="item">
               <div className="title">Thông tin khánh hàng</div>
-              <p className="desc"><span className="w160px">Họ tên khách hàng:</span> 
-              <strong>{invoice?.HoTen}</strong></p>
-              <p className="desc"><span className="w160px">Số điện thoại:</span> 
-              <strong>{invoice?.SoDienThoai}</strong></p>
+              <p className="desc">
+                <span className="w160px">Họ tên khách hàng:</span>
+                <strong>{invoice?.HoTen}</strong>
+              </p>
+              <p className="desc">
+                <span className="w160px">Số điện thoại:</span>
+                <strong>{invoice?.SoDienThoai}</strong>
+              </p>
             </div>
           </div>
           <div className="col">
             <div className="item">
               <div className="title">Thông tin hóa đơn</div>
-              <p className="desc"><span className="w220px">Thời gian vào: </span>
-              <strong>{convertDate(invoice?.ThoiGianBatDau)}</strong></p>
-              <p className="desc"><span className="w220px">Loại hóa đơn: </span>
-              <strong>{invoice?.LoaiHoaDon == 0 ? "đơn đặt bàn": invoice?.LoaiHoaDon == 1 ? "đơn đặt phòng thường": "đơn đặt phòng vip"}</strong></p>
+              <p className="desc">
+                <span className="w220px">Thời gian vào: </span>
+                <strong>{convertDate(invoice?.ThoiGianBatDau)}</strong>
+              </p>
+              <p className="desc">
+                <span className="w220px">Loại hóa đơn: </span>
+                <strong>
+                  {invoice?.LoaiHoaDon == 0
+                    ? "đơn đặt bàn"
+                    : invoice?.LoaiHoaDon == 1
+                    ? "đơn đặt phòng thường"
+                    : "đơn đặt phòng vip"}
+                </strong>
+              </p>
             </div>
           </div>
           <div className="col">
@@ -367,13 +380,9 @@ const handleChangeStatus = async (ids, TrangThai , loaiHoaDon) =>{
                   <button
                     className="btn-order info"
                     onClick={() => {
-                      invoice?.LoaiHoaDon == 0
-                        ? setIsModalAddTable(true)
-                        : setIsModalAddRoom(true);
+                      invoice?.LoaiHoaDon == 0 ? setIsModalAddTable(true) : setIsModalAddRoom(true);
                     }}
-                  >{`Cập nhật ${
-                    invoice?.LoaiHoaDon == 0 ? "bàn" : "phòng"
-                  }`}</button>
+                  >{`Cập nhật ${invoice?.LoaiHoaDon == 0 ? "bàn" : "phòng"}`}</button>
                 </div>
               ) : (
                 ""
@@ -397,13 +406,17 @@ const handleChangeStatus = async (ids, TrangThai , loaiHoaDon) =>{
                         <span className="name-col">{menu.MaThucDon.TenMon}</span>
                         <span className="">{convertToVND(menu.MaThucDon.GiaMon)}</span>
                         <span className="right stock-col">{menu.SoLuong}</span>
-                        <span className="right">{convertToVND(menu.MaThucDon.GiaMon * menu.SoLuong)}</span>
+                        <span className="right">
+                          {convertToVND(menu.MaThucDon.GiaMon * menu.SoLuong)}
+                        </span>
                       </li>
                     );
                   })}
                   <li className="total-row">
                     <span className="total">Tổng tiền</span>
-                    <span className="total w-75pc right">{convertToVND(totalPrice(invoice?.ListThucDon))}</span>
+                    <span className="total w-75pc right">
+                      {convertToVND(totalPrice(invoice?.ListThucDon))}
+                    </span>
                   </li>
                 </ul>
               ) : (
@@ -441,31 +454,29 @@ const handleChangeStatus = async (ids, TrangThai , loaiHoaDon) =>{
       {isModalAddTable && (
         <ModalAddTable
           setIsModalAddTable={setIsModalAddTable}
-          loaiHoaDon = {invoice?.LoaiHoaDon}
-          setLoading = {setLoading}
-          soNguoi = {0}
-          thoiGianBatDau = {invoice?.ThoiGianBatDau}
-          listBan = {invoice?.ListBan}
+          loaiHoaDon={invoice?.LoaiHoaDon}
+          setLoading={setLoading}
+          soNguoi={0}
+          thoiGianBatDau={invoice?.ThoiGianBatDau}
+          listBan={invoice?.ListBan}
           setListBan={setListBan}
-          isSave = {isModalAddTable}
+          isSave={isModalAddTable}
           invoiceId={invoice._id}
           getInvoice={getInvoice}
-
         />
       )}
       {isModalAddRoom && (
         <ModalAddRoom
           setIsModalAddRoom={setIsModalAddRoom}
-          loaiHoaDon = {invoice?.LoaiHoaDon}
-          setLoading = {setLoading}
-          soNguoi = {0}
-          thoiGianBatDau = {invoice?.ThoiGianBatDau}
-          listPhong = { invoice?.ListPhong }
+          loaiHoaDon={invoice?.LoaiHoaDon}
+          setLoading={setLoading}
+          soNguoi={0}
+          thoiGianBatDau={invoice?.ThoiGianBatDau}
+          listPhong={invoice?.ListPhong}
           setListPhong={invoice?.LoaiHoaDon == 1 ? setListPhongThuong : setListPhongVIP}
-          isSave = {isModalAddRoom}
+          isSave={isModalAddRoom}
           invoiceId={invoice._id}
           getInvoice={getInvoice}
-         
         />
       )}
     </InvoiceDetailAdminStyle>
@@ -505,17 +516,16 @@ const InvoiceDetailAdminStyle = styled.div`
             font-size: 15px;
             color: rgb(220, 180, 110, 1);
           }
-          .desc{
+          .desc {
             font-size: 15px;
             margin: 5px 0;
-
           }
 
-          .w160px{
+          .w160px {
             width: 165px;
             display: inline-block;
           }
-          .w220px{
+          .w220px {
             width: 220px;
             display: inline-block;
           }
@@ -567,29 +577,26 @@ const InvoiceDetailAdminStyle = styled.div`
   .btn-group {
     width: 100%;
     display: flex;
-    align-items:center;
+    align-items: center;
     justify-content: space-between;
 
-    .right-btn{
-       float: right;
+    .right-btn {
+      float: right;
     }
 
-    .deposit{
-        float: left;
+    .deposit {
+      float: left;
 
+      width: 50%;
 
-        width: 50%;
-
-        .w60pc-depo{
-            width: 100%;
-            span{
-                width: 60%;
-                display: inline-block;
-
-            }
+      .w60pc-depo {
+        width: 100%;
+        span {
+          width: 60%;
+          display: inline-block;
         }
+      }
     }
-    
   }
   .btn-order {
     border: none;
@@ -608,7 +615,7 @@ const InvoiceDetailAdminStyle = styled.div`
     }
     &.success {
       background-color: #28a745;
-      :hover{
+      :hover {
         opacity: 1;
       }
     }
@@ -617,7 +624,7 @@ const InvoiceDetailAdminStyle = styled.div`
     }
     &.fail {
       background-color: #6c757d;
-      :hover{
+      :hover {
         opacity: 1;
       }
     }

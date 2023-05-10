@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import {addInvoice,getEmployeeByUserId , updateManyTable, updateManyRoom} from "utils/api";
+import {addInvoice,getEmployeeByUserId , updateManyTable, updateManyRoom,getCustomerByPhone} from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
@@ -35,6 +35,7 @@ function AddInvoiceAdmin() {
     const TrangThai = 0;
     const { user } = useAuthContext();
     const [idEm, setIdEm] = useState("")
+    const [maKh, setMaKh] = useState("")
 
   useEffect(()=>{
     getEmployee(user._id)
@@ -105,6 +106,7 @@ function AddInvoiceAdmin() {
         return check;
     }
     const clearModel = ( ) =>{
+        setMaKh("")
         setListThucDon([])
         setHoTen("")
         setSoDienThoai("")
@@ -119,7 +121,7 @@ function AddInvoiceAdmin() {
                 LoaiHoaDon: loaiHoaDon,
                 TrangThai,
                 ThoiGianBatDau: thoiGianBatDau,
-                MaKhachHang: null,
+                MaKhachHang: maKh ? maKh :  null,
                 ListThucDon: listThucDon,
                 ListPhong: loaiHoaDon == 0 ? [] : loaiHoaDon == 1 ? listPhongThuong : listPhongVIP,
                 ListBan: loaiHoaDon == 0 ? listBan : [] ,
@@ -183,6 +185,15 @@ function AddInvoiceAdmin() {
 
       
     }
+    const handleFindCustomer = async (e)=>{
+        if(e.charCode === 13){
+            let result = await getCustomerByPhone({SoDienThoai: e.target.value})
+            if(result.success && result.data){
+                setHoTen(result.data.TenKhachHang)
+                setMaKh(result.data._id)
+            }
+        }
+    }
 
     return ( 
         <OrderAdminStyle>
@@ -212,7 +223,7 @@ function AddInvoiceAdmin() {
                                 <span className="label">
                                     Nhập số điện thoại: 
                                 </span>
-                                <input type="text" value={soDienThoai} placeholder="vd: 0923222555"
+                                <input type="text" value={soDienThoai} placeholder="vd: 0923222555" onKeyPress={(e)=>{handleFindCustomer(e)}}
                                 onChange={(e)=>{
                                     setSoDienThoai(e.target.value)
                                 }}/>

@@ -141,6 +141,11 @@ const adminNavbarItems = [
         title: "Tạo hóa đơn",
         to: "invoice/add",
       },
+      {
+        id: 2,
+        title: "Quản lý nhân viên",
+        to: "employee",
+      },
     ],
   },
   {
