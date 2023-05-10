@@ -308,7 +308,7 @@ const OTPForgetPasswordForm = () => {
                 className="btn__confirm"
                 onClick={onSubmitOTP}
               >
-                <div>Hoàn tất</div>
+                <div>Xác nhận</div>
               </Button>
             </div>
           </div>
