@@ -166,11 +166,11 @@ const Header = (props) => {
             Thực Đơn
           </NavLink>
         </div>
-        <div className="link__container">
+        {/* <div className="link__container">
           <NavLink className="navlink" to={"area"}>
             Khu Vực
           </NavLink>
-        </div>
+        </div> */}
         <div className="link__container">
           <NavLink className="navlink" to={"room"}>
             Phòng

@@ -270,10 +270,10 @@ const adminNavbarItems = [
       },
     ],
   },
-  {
-    title: "Tài Khoản",
-    subNavs: [],
-  },
+  // {
+  //   title: "Tài Khoản",
+  //   subNavs: [],
+  // },
 ];
 
 const AdminHeader = (props) => {
