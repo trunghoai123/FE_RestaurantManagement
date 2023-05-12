@@ -135,7 +135,6 @@ const adminNavbarItems = [
         title: "Tạo phiếu đặt",
         to: "order/add",
       },
-
       {
         id: 2,
         title: "Tạo hóa đơn",

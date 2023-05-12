@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:5500/api/",
+  baseURL: "https://restaurant-server-jqel.onrender.com/api/",
   timeout: 10000,
   headers: {
     "X-Custom-Header": "foobar",

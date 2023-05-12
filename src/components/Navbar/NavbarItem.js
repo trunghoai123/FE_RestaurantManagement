@@ -112,7 +112,10 @@ const NavbarItem = ({ navItem }) => {
       {expand && (
         <div className="sublinks__container">
           {navItem.subNavs.map((subNav) => {
-            if (subNav.to === "employee" && user?.LoaiTaiKhoan !== 2) {
+            if (
+              (subNav.to === "employee" || subNav.to.includes("statistic")) &&
+              user?.LoaiTaiKhoan !== 2
+            ) {
               return <></>;
             } else {
               return (

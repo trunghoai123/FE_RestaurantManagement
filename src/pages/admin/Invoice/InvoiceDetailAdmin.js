@@ -21,6 +21,8 @@ import { useAuthContext } from "utils/context/AuthContext";
 import ReactToPrint, { useReactToPrint } from "react-to-print";
 import Button from "components/Button/Button";
 import { colors } from "variables";
+import PDFFile from "components/PDFFile/PDFFile";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 
 function InvoiceDetailAdmin(props) {
   const [invoice, setInvoice] = useState({});
@@ -72,7 +74,7 @@ function InvoiceDetailAdmin(props) {
     let dish = totalPrice(invoice?.ListThucDon);
     let room = 0;
     if (invoice?.LoaiHoaDon == 1) {
-      room = 150000 * invoice?.ListPhong.length;
+      room = 100000 * invoice?.ListPhong.length;
     }
     if (invoice?.LoaiHoaDon == 2) {
       room = 300000 * invoice?.ListPhong.length;
@@ -119,6 +121,19 @@ function InvoiceDetailAdmin(props) {
             {renderPay()}
             <div className="right-btn hidden">
               <span className="btn-order success">Thành công</span>
+
+              <PDFDownloadLink
+                fileName={"invoice" + Math.floor(Math.random() * 10000) + ""}
+                document={
+                  <PDFFile
+                    wasPay={totalDeposit()}
+                    dishPrice={totalPrice(invoice?.ListThucDon)}
+                    invoice={invoice}
+                  ></PDFFile>
+                }
+              >
+                <button className="button__print__invoice btn-order success">In hóa đơn</button>
+              </PDFDownloadLink>
             </div>
           </>
         );
@@ -150,7 +165,7 @@ function InvoiceDetailAdmin(props) {
         {invoice?.LoaiHoaDon == 1 ? (
           <div className="w60pc-depo">
             <span>150.000đ mỗi phòng</span>
-            {convertToVND(150000 * invoice?.ListPhong.length)}
+            {convertToVND(100000 * invoice?.ListPhong.length)}
           </div>
         ) : (
           ""
@@ -203,7 +218,10 @@ function InvoiceDetailAdmin(props) {
 
               let rs = handleChangeStatus(ids, 0, invoice?.LoaiHoaDon);
               if (rs) {
-                handlePrintInvoice();
+                const btnPrint = document.querySelector(".button__print__invoice");
+                if (btnPrint) {
+                  btnPrint.click();
+                }
                 enqueueSnackbar("Thanh toán thành công", {
                   variant: "success",
                 });
@@ -294,15 +312,33 @@ function InvoiceDetailAdmin(props) {
   const handlePrint = () => {
     window.print();
   };
-
+  console.log(invoice);
   const handlePrintInvoice = useReactToPrint({
     content: () => component.current,
   });
-
   return (
     <InvoiceDetailAdminStyle ref={component}>
       {loading && <Loading />}
-      <Button
+
+      <PDFDownloadLink
+        fileName={"invoice" + Math.floor(Math.random() * 10000) + ""}
+        document={
+          <PDFFile
+            wasPay={totalDeposit()}
+            dishPrice={totalPrice(invoice?.ListThucDon)}
+            invoice={invoice}
+          ></PDFFile>
+        }
+      >
+        <button style={{ display: "none" }} className="button__print__invoice btn-order success">
+          In hóa đơn
+        </button>
+      </PDFDownloadLink>
+      {/* <PDFViewer>
+        <PDFFile dishPrice={totalPrice(invoice?.ListThucDon)} invoice={invoice}></PDFFile>
+      </PDFViewer> */}
+      {/* <PDFFile /> */}
+      {/* <Button
         className="hidden"
         bgColor={colors.green_1}
         bgHover={colors.green_1_hover}
@@ -310,16 +346,17 @@ function InvoiceDetailAdmin(props) {
         onClick={handlePrintInvoice}
       >
         Print invoice 1
-      </Button>
-      <div>
-        {/* <ReactToPrint
+      </Button> */}
+      {/* <div>
+        <ReactToPrint
         ref={component}
         content={() => component.current}
         trigger={() => {
           return <button>Print invoice 2</button>;
         }}
-        /> */}
-      </div>
+        />
+        
+      </div> */}
       <div className="title hidden">Chi tiết hóa đơn</div>
       <div className="btn-group hidden">{renderButton()}</div>
       <div className="info-order">

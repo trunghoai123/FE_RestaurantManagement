@@ -14,7 +14,6 @@ import styled from "styled-components";
 import Button from "components/Button/Button";
 import { useForm } from "react-hook-form";
 import { AuthContext, useAuthContext } from "utils/context/AuthContext";
-import { signIn } from "store/auth/authSlice";
 import { enqueueSnackbar } from "notistack";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";

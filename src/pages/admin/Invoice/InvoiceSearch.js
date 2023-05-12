@@ -398,7 +398,7 @@ const InvoiceSearch = (props) => {
                   padding="4px 20px"
                   width="120px"
                 >
-                  <div>Thống kê</div>
+                  <div>Tìm</div>
                 </Button>
               </div>
             </div>
@@ -450,11 +450,10 @@ const InvoiceSearch = (props) => {
                 </td>
                 <td className="table__data">{renderDate(invoice?.ThoiGianBatDau)}</td>
                 <td className="table__data">
-                  {" "}
                   {invoice?.TrangThai === 0
                     ? "Đang tạo"
-                    : invoice?.LoaiHoaDon === 1
-                    ? "Đã tạo"
+                    : invoice?.TrangThai === 1
+                    ? "Đã thanh toán"
                     : "Đã hủy"}
                 </td>
                 <td className="table__data">

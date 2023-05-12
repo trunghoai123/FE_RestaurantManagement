@@ -162,15 +162,15 @@ const Header = (props) => {
           </NavLink>
         </div>
         <div className="link__container">
+          <NavLink className="navlink" to={"/"}>
+            Trang Chủ
+          </NavLink>
+        </div>
+        <div className="link__container">
           <NavLink className="navlink" to={"dishes"}>
             Thực Đơn
           </NavLink>
         </div>
-        {/* <div className="link__container">
-          <NavLink className="navlink" to={"area"}>
-            Khu Vực
-          </NavLink>
-        </div> */}
         <div className="link__container">
           <NavLink className="navlink" to={"room"}>
             Phòng
@@ -181,11 +181,13 @@ const Header = (props) => {
             Bài viết
           </NavLink>
         </div>
-        <div className="link__container">
-          <NavLink className="navlink" to={"orders"}>
-            Phiếu Đặt
-          </NavLink>
-        </div>
+        {user && (
+          <div className="link__container">
+            <NavLink className="navlink" to={"orders"}>
+              Phiếu Đặt
+            </NavLink>
+          </div>
+        )}
         <div className="link__container external__links">
           <span className="link__external">
             <a className="external__link" href="/">
