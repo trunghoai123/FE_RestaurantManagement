@@ -17,7 +17,7 @@ const InputTextStyles = styled.input`
         background-repeat: no-repeat;
         background-position: center;
       `;
-  }}; ;
+  }};
 `;
 const Input = React.forwardRef(
   (
@@ -35,6 +35,7 @@ const Input = React.forwardRef(
   ) => {
     return (
       <InputTextStyles
+        accept={type === "file" ? ".jpg, .png, .jpeg, .svg" : ""}
         width={width}
         padding={padding}
         type={type}

@@ -28,6 +28,7 @@ import axios from "axios";
 import { addNewArea, getAreaByAreaId, getAreaById, updateArea, uploadImage } from "utils/api";
 import { useState } from "react";
 import { useEffect } from "react";
+import Loading from "components/Loading/Loading";
 const AreaUpdateFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -240,6 +241,8 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   });
   const [currentArea, setCurrentArea] = useState(null);
   const [imageSelecting, setImageSelecting] = useState("");
+  const [imageLoading, setImageLoading] = useState(false);
+
   useEffect(() => {
     if (mode.mode === 1) {
       const loadAreaOnUpdate = async () => {
@@ -343,10 +346,12 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   };
   const handleChangeImage = async (e) => {
     if (e.target.files.length > 0) {
+      setImageLoading(true);
       setIsLoadedImage(true);
       const base64 = await convertBase64(e.target.files[0]);
       uploadImage(base64).then((image) => {
         setImageSelecting(image.data);
+        setImageLoading(false);
       });
     } else {
       setIsLoadedImage(false);
@@ -355,6 +360,8 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   };
   return (
     <AreaUpdateFormStyles>
+      {imageLoading && <Loading></Loading>}
+
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">
@@ -364,7 +371,6 @@ const AreaUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             </span>
             <div className="title__container">
               <h4 className="title__text">
-                resend__otp
                 {mode?.mode === 1 ? "Cập Nhật Khu Vực" : "Thêm Khu Vực"}
               </h4>
             </div>

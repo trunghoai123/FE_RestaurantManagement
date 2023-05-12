@@ -20,6 +20,7 @@ import {
 } from "utils/api";
 import { useState } from "react";
 import { useEffect } from "react";
+import Loading from "components/Loading/Loading";
 const RoomUpdateFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -243,6 +244,7 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const [imageSelecting, setImageSelecting] = useState("");
   const [areas, setAreas] = useState([]);
   const [roomKinds, setRoomKinds] = useState([]);
+  const [imageLoading, setImageLoading] = useState(false);
 
   useEffect(() => {
     if (mode.mode === 1) {
@@ -410,10 +412,12 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   };
   const handleChangeImage = async (e) => {
     if (e.target.files.length > 0) {
+      setImageLoading(true);
       setIsLoadedImage(true);
       const base64 = await convertBase64(e.target.files[0]);
       uploadImage(base64).then((image) => {
         setImageSelecting(image.data);
+        setImageLoading(false);
       });
     } else {
       setIsLoadedImage(false);
@@ -423,6 +427,7 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const { user, updateAuthUser } = useAuthContext();
   return (
     <RoomUpdateFormStyles>
+      {imageLoading && <Loading></Loading>}
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">
@@ -576,6 +581,7 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
                       className="input"
                       name="image"
                       id="image"
+                      // accept=".jpg, .png, .jpeg, .svg"
                       {...register("image", {
                         onChange: (e) => handleChangeImage(e),
                       })}

@@ -26,6 +26,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import TextArea from "components/TextArea/TextArea";
 import { getValue } from "@testing-library/user-event/dist/utils";
+import Loading from "components/Loading/Loading";
 const DishUpdateFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -242,6 +243,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const [dishTypeStatus, setDishTypeStatus] = useState(0);
   const [dishTypes, setDishTypes] = useState([]);
   const [roomKinds, setRoomKinds] = useState([]);
+  const [imageLoading, setImageLoading] = useState(false);
 
   useEffect(() => {
     const loadUpdatingDish = async () => {
@@ -422,10 +424,12 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   };
   const handleChangeImage = async (e) => {
     if (e.target.files.length > 0) {
+      setImageLoading(true);
       setIsLoadedImage(true);
       const base64 = await convertBase64(e.target.files[0]);
       uploadImage(base64).then((image) => {
         setImageSelecting(image.data);
+        setImageLoading(false);
       });
     } else {
       setIsLoadedImage(false);
@@ -435,6 +439,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
   const { user, updateAuthUser } = useAuthContext();
   return (
     <DishUpdateFormStyles>
+      {imageLoading && <Loading></Loading>}
       <form className="main__form" onSubmit={handleSubmit(onSubmit)}>
         <div className="overlay" onClick={handleCloseForm}></div>
         <div className="modal__main">

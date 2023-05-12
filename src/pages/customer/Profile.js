@@ -20,6 +20,7 @@ import * as yup from "yup";
 import { useAuthContext } from "utils/context/AuthContext";
 import { enqueueSnackbar } from "notistack";
 import ChangePasswordForm from "components/Password/ChangePasswordForm";
+import Loading from "components/Loading/Loading";
 const ProfileStyles = styled.div`
   padding-top: 54px;
   display: flex;
@@ -236,18 +237,22 @@ const Profile = (props) => {
     },
     resolver: yupResolver(schema),
   });
+
   const { user, updateAuthUser } = useAuthContext();
   const [currentCustomer, setCurrentCustomer] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoadedImage, setIsLoadedImage] = useState(false);
   const [imageSelecting, setImageSelecting] = useState("");
   const [isChangePassword, setIsChangePassword] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const handleChangeImage = async (e) => {
     if (e.target.files.length > 0) {
+      setImageLoading(true);
       setIsLoadedImage(true);
       const base64 = await convertBase64(e.target.files[0]);
       uploadImage(base64).then((image) => {
         setImageSelecting(image.data);
+        setImageLoading(false);
       });
     } else {
       setIsLoadedImage(false);
@@ -288,6 +293,7 @@ const Profile = (props) => {
       loadAllInfor();
     }
   }, [user]);
+
   const onSubmit = async (values) => {
     // console.log(values);
     if (!isLoadedImage) {
@@ -318,8 +324,10 @@ const Profile = (props) => {
       }
     }
   };
+
   return (
     <ProfileStyles>
+      {imageLoading && <Loading></Loading>}
       {isChangePassword && (
         <ChangePasswordForm handleCloseForm={() => setIsChangePassword(false)}></ChangePasswordForm>
       )}
