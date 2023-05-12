@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import { colors } from "variables";
+import { useAuthContext } from "utils/context/AuthContext";
 const NavbarItemStyles = styled.div`
   cursor: pointer;
   /* height: 100%; */
@@ -89,6 +90,7 @@ const NavbarItemStyles = styled.div`
 `;
 
 const NavbarItem = ({ navItem }) => {
+  const { user, updateAuthUser } = useAuthContext();
   const [expand, setExpand] = useState(false);
   const handleExpand = () => {
     setExpand(!expand);
@@ -110,11 +112,15 @@ const NavbarItem = ({ navItem }) => {
       {expand && (
         <div className="sublinks__container">
           {navItem.subNavs.map((subNav) => {
-            return (
-              <NavLink to={subNav?.to} key={subNav?.id} className="sublink">
-                {subNav?.title}
-              </NavLink>
-            );
+            if (subNav.to === "employee" && user?.LoaiTaiKhoan !== 2) {
+              return <></>;
+            } else {
+              return (
+                <NavLink to={subNav?.to} key={subNav?.id} className="sublink">
+                  {subNav?.title}
+                </NavLink>
+              );
+            }
           })}
         </div>
       )}

@@ -142,7 +142,7 @@ const adminNavbarItems = [
         to: "invoice/add",
       },
       {
-        id: 2,
+        id: 3,
         title: "Quản lý nhân viên",
         to: "employee",
       },

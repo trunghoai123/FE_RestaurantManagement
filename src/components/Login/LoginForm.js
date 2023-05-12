@@ -164,6 +164,11 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
               variant: "success",
             });
             navigation("/admin");
+          } else if (response.account.LoaiTaiKhoan === 2) {
+            enqueueSnackbar("Đăng nhập thành công với quyền quản lý", {
+              variant: "success",
+            });
+            navigation("/admin");
           } else {
             enqueueSnackbar("Đăng nhập thành công", {
               variant: "success",

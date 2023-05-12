@@ -137,7 +137,7 @@ const Header = (props) => {
     navigation("/");
   };
   useEffect(() => {
-    if (user?.LoaiTaiKhoan === 1) {
+    if (user?.LoaiTaiKhoan === 1 || user?.LoaiTaiKhoan === 2) {
       navigation("/admin");
     }
   });
