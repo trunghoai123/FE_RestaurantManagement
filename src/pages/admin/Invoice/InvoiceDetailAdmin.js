@@ -8,6 +8,7 @@ import {
   getOrderDetailByOrder,
   updateManyRoom,
   updateManyTable,
+  getCustomerByPhone,
 } from "utils/api";
 import Loading from "components/Loading/Loading";
 import ModalAddTable from "./components/ModalAddTable";
@@ -35,6 +36,7 @@ function InvoiceDetailAdmin(props) {
   const [listBan, setListBan] = useState([]);
   const [listPhongThuong, setListPhongThuong] = useState([]);
   const [listPhongVIP, setListPhongVIP] = useState([]);
+  const [isInfo, setIsInfo] = useState(false);
 
   useEffect(() => {
     const arrLocation = window.location.href.split("/");
@@ -316,6 +318,41 @@ function InvoiceDetailAdmin(props) {
   const handlePrintInvoice = useReactToPrint({
     content: () => component.current,
   });
+
+  const hanldeUpdate = async () => {
+    setLoading(true);
+    let id = invoice?._id;
+    let result = await updateInvoice({
+      id,
+      HoTen: invoice?.HoTen,
+      SoDienThoai: invoice?.SoDienThoai,
+      MaKhachHang: invoice?.MaKhachHang,
+    });
+    if (result.success) {
+      enqueueSnackbar("Cập nhật thông tin thành công", {
+        variant: "success",
+      });
+      setLoading(false);
+    } else {
+      enqueueSnackbar("Cập nhật thông tin thất bại", {
+        variant: "error",
+      });
+      setLoading(false);
+    }
+  };
+  const handleFindCustomer = async (e) => {
+    if (e.charCode === 13) {
+      let result = await getCustomerByPhone({ SoDienThoai: e.target.value });
+      if (result.success && result.data) {
+        setInvoice({ ...invoice, HoTen: result.data.TenKhachHang, MaKhachHang: result.data._id });
+      } else {
+        enqueueSnackbar("Không tìm thấy khách hàng", {
+          variant: "warning",
+        });
+      }
+    }
+  };
+
   return (
     <InvoiceDetailAdminStyle ref={component}>
       {loading && <Loading />}
@@ -358,7 +395,7 @@ function InvoiceDetailAdmin(props) {
         
       </div> */}
       <div className="title hidden">Chi tiết hóa đơn</div>
-      <div className="btn-group hidden">{renderButton()}</div>
+      <div className="btn-group-box hidden">{renderButton()}</div>
       <div className="info-order">
         <h6>Thông tin hóa đơn</h6>
         <div className="box-info">
@@ -367,12 +404,58 @@ function InvoiceDetailAdmin(props) {
               <div className="title">Thông tin khánh hàng</div>
               <p className="desc">
                 <span className="w160px">Họ tên khách hàng:</span>
-                <strong>{invoice?.HoTen}</strong>
+                <input
+                  onChange={(e) => {
+                    setInvoice({ ...invoice, HoTen: e.target.value });
+                  }}
+                  className="input-style"
+                  disabled={isInfo ? "" : "disabled"}
+                  value={invoice?.HoTen}
+                  placeholder="Họ tên khách hàng"
+                />
               </p>
               <p className="desc">
                 <span className="w160px">Số điện thoại:</span>
-                <strong>{invoice?.SoDienThoai}</strong>
+                <input
+                  onChange={(e) => {
+                    setInvoice({ ...invoice, SoDienThoai: e.target.value });
+                  }}
+                  onKeyPress={(e) => {
+                    handleFindCustomer(e);
+                  }}
+                  className="input-style"
+                  disabled={isInfo ? "" : "disabled"}
+                  value={invoice?.SoDienThoai}
+                  placeholder="Số điện thoại"
+                />
               </p>
+              {invoice?.TrangThai == 0 ? (
+                <div className="btn-item">
+                  <button
+                    className="btn-order info"
+                    onClick={() => {
+                      if (isInfo) {
+                        hanldeUpdate();
+                      }
+                      setIsInfo(!isInfo);
+                    }}
+                  >
+                    {isInfo ? "Lưu" : "Cập nhật"}
+                  </button>
+                  {isInfo && (
+                    <button
+                      className="btn-order info"
+                      onClick={() => {
+                        setIsInfo(false);
+                      }}
+                    >
+                      Hủy
+                    </button>
+                  )}
+                </div>
+              ) : (
+                ""
+              )}
             </div>
           </div>
           <div className="col">
@@ -580,6 +663,7 @@ const InvoiceDetailAdminStyle = styled.div`
         max-width: 50%;
         margin-bottom: 10px;
         .item {
+          height: 100%;
           width: 100%;
           border-radius: 10px;
           background-color: #f3f3f3;
@@ -591,6 +675,24 @@ const InvoiceDetailAdminStyle = styled.div`
           .desc {
             font-size: 15px;
             margin: 5px 0;
+            display: flex;
+
+            .input-style {
+              flex: 1;
+              border-radius: 10px;
+              padding: 5px 10px;
+              border: 1px solid rgb(220, 180, 110, 1);
+              outline: none;
+
+              :focus {
+                outline: 1px solid rgb(220, 180, 110, 1);
+              }
+
+              ::placeholder {
+                opacity: 0.5;
+                font-size: 14px;
+              }
+            }
           }
 
           .w160px {
@@ -646,7 +748,7 @@ const InvoiceDetailAdminStyle = styled.div`
       }
     }
   }
-  .btn-group {
+  .btn-group-box {
     width: 100%;
     display: flex;
     align-items: center;
