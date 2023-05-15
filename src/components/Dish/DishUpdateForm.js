@@ -643,6 +643,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
           <div className="modal__footer">
             <div className="btn__container">
               <Button
+                borderRadius="7px"
                 type="button"
                 bgColor={mode.mode === 3 ? colors.green_1 : colors.red_1}
                 bgHover={mode.mode === 3 ? colors.green_1_hover : colors.red_1_hover}
@@ -653,6 +654,7 @@ const DishUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
               </Button>
               {mode.mode !== 3 && (
                 <Button
+                  borderRadius="7px"
                   type="submit"
                   bgColor={colors.orange_2}
                   bgHover={colors.orange_2_hover}

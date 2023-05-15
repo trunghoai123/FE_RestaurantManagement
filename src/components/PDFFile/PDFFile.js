@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Page, Text, Image, Document, StyleSheet, View } from "@react-pdf/renderer";
 import PropTypes from "prop-types";
 import { convertDate, convertInterDate } from "pages/admin/Order/OrderAdmin";
 import { convertToVND, removeVietnameseTones } from "utils/utils";
+import { getEmployeeById } from "utils/api";
 
 const styles = StyleSheet.create({
   body: {
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
 });
 
 const PDFFile = ({ invoice, dishPrice, wasPay }) => {
+  const [staff, setStaff] = useState(null);
   const sumRoomPrice = () => {
     let sum = 0;
     if (invoice?.LoaiHoaDon !== 0) {
@@ -65,6 +67,21 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
     }
     return sum;
   };
+  useEffect(() => {
+    const loadInfor = async () => {
+      try {
+        const data = await getEmployeeById(invoice?.MaNhanVien);
+        if (data?.data) {
+          setStaff(data.data);
+        }
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+    };
+    loadInfor();
+  }, []);
+
   return (
     <Document>
       <Page style={styles.body}>
@@ -84,6 +101,9 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
         </View>
         <View style={styles.normalText}>
           <Text>Ten khach hang: {invoice?.HoTen && removeVietnameseTones(invoice?.HoTen)}</Text>
+        </View>
+        <View style={styles.normalText}>
+          <Text>Ten nhan vien: {invoice?.HoTen && removeVietnameseTones(invoice?.HoTen)}</Text>
         </View>
         <View style={styles.normalText}>
           <Text>So Dien Thoai: {invoice?.SoDienThoai}</Text>
@@ -117,7 +137,9 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
           );
         })}
         <View>
-          <Text style={styles.viewFlexTitleRight}>Tong tien mon an: {convertToVND(dishPrice)}</Text>
+          <Text style={styles.viewFlexTitleRight}>
+            Tong tien mon an: {convertToVND(dishPrice) + "vnd"}
+          </Text>
         </View>
         <View>
           <Text style={styles.viewFlexTitle}>
@@ -143,7 +165,7 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
           {invoice?.LoaiHoaDon !== 0 && (
             <Text style={styles.viewFlexTitleRight}>
               Tong tien phong:
-              {convertToVND(sumRoomPrice())}
+              {convertToVND(sumRoomPrice()) + "vnd"}
             </Text>
           )}
           {/* {invoice?.LoaiHoaDon === 0 && (
@@ -167,11 +189,11 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
         <View>
           {invoice?.MaPhieuDat && (
             <Text style={styles.viewFlexTitleRight}>
-              So tien da dat coc: {convertToVND(wasPay)}
+              So tien da dat coc: {convertToVND(wasPay) + "vnd"}
             </Text>
           )}
           <Text style={styles.viewFlexTitleRight}>
-            Tong tien phai thanh toan:{convertToVND(dishPrice + sumRoomPrice() - wasPay)}
+            Tong tien phai thanh toan:{convertToVND(dishPrice + sumRoomPrice() - wasPay) + "vnd"}
           </Text>
         </View>
       </Page>

@@ -8,9 +8,17 @@ import Input from "components/Input/Input";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { getDishByDate } from "utils/api";
+import DishUpdateForm from "components/Dish/DishUpdateForm";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PDFInvoiceStatistic from "components/PDFFile/PDFInvoiceStatistic";
+import PDFDishStatistic from "components/PDFFile/PDFDishStatistic";
 
 const DishStatisticStyles = styled.div`
   padding-top: 54px;
+  .page__title {
+    font-size: 25px;
+    padding: 12px;
+  }
   .top__actions {
     display: flex;
     align-items: center;
@@ -48,6 +56,11 @@ const DishStatisticStyles = styled.div`
         }
       }
     }
+  }
+  .btn__print__container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px;
   }
   .main__table {
     .table__head--container {
@@ -113,11 +126,23 @@ const schema = yup
           return true;
         },
       }),
+    larger: yup
+      .string()
+      .required("Hãy nhập số lượng")
+      .test({
+        name: "is-true-amount",
+        skipAbsent: true,
+        test(value, ctx) {
+          if (Number(value) > 999 || Number(value) < 1) {
+            return ctx.createError({ message: "Hãy nhập số lượng > 1 và < 999" });
+          }
+          return true;
+        },
+      }),
   })
   .required();
 const DishStatistic = (props) => {
   const [dishes, setDishes] = useState();
-  const [dishTypes, setDishTypes] = useState();
   const [openUpdateForm, setOpenUpdateForm] = useState(false);
   const [mode, setMode] = useState({ mode: 0, id: null });
   const {
@@ -131,6 +156,7 @@ const DishStatistic = (props) => {
     defaultValues: {
       dateFrom: "",
       dateTo: "",
+      larger: "1",
     },
     resolver: yupResolver(schema),
   });
@@ -147,7 +173,10 @@ const DishStatistic = (props) => {
       };
       result = await getDishByDate(data);
       if (result?.data) {
-        const sortedDishes = quickSortByQuantity(result?.data);
+        const newDishes = result.data.filter(
+          (dish) => dish.SoLuongBan > Number(getValues("larger"))
+        );
+        const sortedDishes = quickSortByQuantity(newDishes);
         const addedTotal = addTotalMoney(sortedDishes);
         setDishes(addedTotal);
       }
@@ -157,6 +186,10 @@ const DishStatistic = (props) => {
     }
   };
 
+  const handleCloseUpdateForm = () => {
+    setMode({ id: null, mode: 0 });
+    setOpenUpdateForm(false);
+  };
   const handleClearFilter = () => {
     setValue("dateFrom", "");
     setValue("dateTo", "");
@@ -208,6 +241,7 @@ const DishStatistic = (props) => {
 
   return (
     <DishStatisticStyles>
+      <div className="page__title">Thống kê món bán chạy</div>
       <div className="top__actions">
         <form className="filter__container" onSubmit={handleSubmit(submitSearch)}>
           <div className="filter__row">
@@ -240,6 +274,20 @@ const DishStatistic = (props) => {
             </div>
           </div>
           <div className="filter__row">
+            <div className="filter__value">
+              <div className="value__content">
+                <label className="filter__value__label">Số lượng lớn hơn</label>
+                <Input
+                  className="filter__value__input"
+                  type="number"
+                  name="larger"
+                  min="1"
+                  max="9999"
+                  {...register("larger")}
+                ></Input>
+              </div>
+              {errors?.larger && <div className="error__message">{errors?.larger?.message}</div>}
+            </div>
             <div className="filter__value button__container">
               <div className="value__content">
                 <Button
@@ -268,6 +316,23 @@ const DishStatistic = (props) => {
           </div>
         </form>
       </div>
+      <div className="btn__print__container">
+        <PDFDownloadLink
+          fileName={"dishStatistics" + Math.floor(Math.random() * 10000) + ""}
+          document={<PDFDishStatistic dishes={dishes}></PDFDishStatistic>}
+        >
+          <Button
+            type="button"
+            bgColor={colors.green_1}
+            bgHover={colors.green_1_hover}
+            borderRadius="7px"
+            padding="4px 20px"
+            width="160px"
+          >
+            <div>Xuất thống kê</div>
+          </Button>
+        </PDFDownloadLink>
+      </div>
       <table className="main__table table table-striped">
         <thead className="table__head--container">
           <tr className="table__row">
@@ -285,6 +350,9 @@ const DishStatistic = (props) => {
             </th>
             <th className="table__head" scope="col">
               Số lượng bán
+            </th>
+            <th className="table__head" scope="col">
+              Doanh thu
             </th>
             <th className="table__head" scope="col">
               Hình Ảnh
@@ -328,6 +396,13 @@ const DishStatistic = (props) => {
       </table>
       {!dishes?.length && (
         <div style={{ textAlign: "center", marginBottom: "400px" }}>Không có món nào</div>
+      )}
+      {openUpdateForm && (
+        <DishUpdateForm
+          setMode={setMode}
+          mode={mode}
+          handleCloseForm={handleCloseUpdateForm}
+        ></DishUpdateForm>
       )}
     </DishStatisticStyles>
   );

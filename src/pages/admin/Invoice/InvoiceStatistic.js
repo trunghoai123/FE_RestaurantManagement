@@ -16,17 +16,30 @@ import { useForm } from "react-hook-form";
 import SelectBox from "SelectBox/SelectBox";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { convertToVND, renderDate } from "utils/utils";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PDFInvoiceStatistic from "components/PDFFile/PDFInvoiceStatistic";
 const InvoiceStatisticStyles = styled.div`
   padding-top: 54px;
   .sum__money {
     text-align: right;
     padding: 4px 12px;
+    .sum__value__container {
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: flex-end;
+      column-gap: 12px;
+      align-items: center;
+    }
     .value__content {
       /* display: inline-block; */
       .filter__value__input {
         width: 200px;
       }
     }
+  }
+  .page__title {
+    font-size: 25px;
+    padding: 12px;
   }
   .top__actions {
     display: flex;
@@ -136,7 +149,7 @@ const InvoiceStatistic = (props) => {
     defaultValues: {
       dateFrom: "",
       dateTo: "",
-      bookingType: 0,
+      bookingType: -1,
       statisType: -1,
     },
     resolver: yupResolver(schema),
@@ -221,7 +234,6 @@ const InvoiceStatistic = (props) => {
       };
       result = await getInvoiceByDate(data);
       if (result?.data) {
-        console.log(result.data);
         setInvoices(result.data);
         calculateSumStatics(result.data);
       }
@@ -249,7 +261,6 @@ const InvoiceStatistic = (props) => {
 
   const calculateMoney = (bookingType, dishes, tables, rooms) => {
     let sum = 0;
-    console.log(getValues("statisType"));
     if (Number(getValues("statisType")) === 0) {
       if (dishes?.length) {
         dishes.forEach((dish) => {
@@ -280,9 +291,9 @@ const InvoiceStatistic = (props) => {
     }
     return sum;
   };
-
   return (
     <InvoiceStatisticStyles>
+      <div className="page__title">Thống kê doanh thu</div>
       <div className="top__actions">
         <form className="filter__container" onSubmit={handleSubmit(submitSearch)}>
           <div className="filter__row">
@@ -371,7 +382,31 @@ const InvoiceStatistic = (props) => {
         </form>
       </div>
       <div className="sum__money">
-        Tổng tiền: {convertToVND(sumStatistics)}
+        <div className="sum__value__container">
+          <div>Tổng tiền: {convertToVND(sumStatistics)}</div>
+          <PDFDownloadLink
+            fileName={"invoiceStatistics" + Math.floor(Math.random() * 10000) + ""}
+            document={<PDFInvoiceStatistic invoice={invoices}></PDFInvoiceStatistic>}
+          >
+            <Button
+              type="button"
+              bgColor={colors.green_1}
+              bgHover={colors.green_1_hover}
+              borderRadius="7px"
+              padding="4px 20px"
+              width="160px"
+            >
+              <div>Xuất thống kê</div>
+            </Button>
+            {/* <button
+              style={{ display: "none" }}
+              className="button__print__invoice btn-order success"
+            >
+              In hóa đơn
+            </button> */}
+          </PDFDownloadLink>
+        </div>
+
         <div className="value__content">
           <label className="filter__value__label">Thống kê theo: </label>{" "}
           <SelectBox

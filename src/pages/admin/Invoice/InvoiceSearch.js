@@ -198,7 +198,6 @@ const InvoiceSearch = (props) => {
       // TrangThai,
       // ThoiGianBatDau,
       if (result?.data) {
-        console.log(result.data);
         setInvoices(result.data);
       }
     } catch (error) {

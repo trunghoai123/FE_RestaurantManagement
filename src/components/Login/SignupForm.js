@@ -16,7 +16,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Button from "components/Button/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { createAccount } from "store/auth/authSlice";
 import { enqueueSnackbar } from "notistack";
 import { useAuthContext } from "utils/context/AuthContext";
 import { useFormStateContext } from "utils/context/FormStateContext";
