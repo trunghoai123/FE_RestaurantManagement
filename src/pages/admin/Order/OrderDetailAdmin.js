@@ -20,6 +20,10 @@ import { enqueueSnackbar } from "notistack";
 import { convertDate } from "./OrderAdmin";
 import { convertToVND } from "utils/utils";
 import { useAuthContext } from "utils/context/AuthContext";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PDFDeposit from "components/PDFFile/PDFDeposit";
+import Button from "components/Button/Button";
+import { colors } from "variables";
 
 function OrderDetailAdmin(props) {
   const [orderDetail, setOrderDetail] = useState({});
@@ -113,6 +117,23 @@ function OrderDetailAdmin(props) {
               <button className="btn-order cancel" onClick={handleOrderCancel}>
                 Hủy đơn
               </button>
+              <PDFDownloadLink
+                fileName={"dishStatistics" + Math.floor(Math.random() * 10000) + ""}
+                document={<PDFDeposit orderDetail={orderDetail}></PDFDeposit>}
+              >
+                <Button
+                  style={{ display: "none" }}
+                  type="button"
+                  bgColor={colors.green_1}
+                  bgHover={colors.green_1_hover}
+                  borderRadius="7px"
+                  padding="4px 20px"
+                  width="160px"
+                  id="export"
+                >
+                  <div>Xuất thống kê</div>
+                </Button>
+              </PDFDownloadLink>
             </div>
           </>
         );
@@ -131,6 +152,24 @@ function OrderDetailAdmin(props) {
               <button className="btn-order cancel" onClick={handleOrderCancel}>
                 Hủy đơn
               </button>
+              <PDFDownloadLink
+                fileName={"orderDeposit" + Math.floor(Math.random() * 10000) + ""}
+                document={<PDFDeposit orderDetail={orderDetail}></PDFDeposit>}
+              >
+                <Button
+                  // style={{ display: "none" }}
+                  type="button"
+                  bgColor={colors.green_1}
+                  bgHover={colors.green_1_hover}
+                  borderRadius="7px"
+                  padding="4px 20px"
+                  width="190px"
+                  id="export"
+                  margin="5px 5px 0px 10px"
+                >
+                  <div>Xuất phiếu đặt cọc</div>
+                </Button>
+              </PDFDownloadLink>
             </div>
           </>
         );
@@ -224,6 +263,10 @@ function OrderDetailAdmin(props) {
               enqueueSnackbar("Xác nhận đặt cọc thành công", {
                 variant: "success",
               });
+              const exportBtn = document.querySelector("#export");
+              if (exportBtn) {
+                exportBtn.click();
+              }
             } else {
               setLoading(false);
               enqueueSnackbar("Xác nhận đặt cọc thất bại", {
