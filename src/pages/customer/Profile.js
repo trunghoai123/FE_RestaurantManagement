@@ -345,9 +345,9 @@ const Profile = (props) => {
         <div className="overlay"></div>
         <div className="modal__main">
           <div className="modal__title">
-            <span className="close__icon">
+            {/* <span className="close__icon">
               <i className="fa-solid fa-xmark"></i>
-            </span>
+            </span> */}
             <div className="title__container">
               <h4 className="title__text">Cập Nhật Thông Tin</h4>
             </div>

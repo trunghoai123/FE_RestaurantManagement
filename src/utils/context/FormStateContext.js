@@ -8,10 +8,12 @@ const FormStateProvider = (props) => {
   const [viewOrderDetail, setViewOrderDetail] = useState(false);
   const [openOTPVerifyForm, setOpenOTPVerifyForm] = useState(false);
   const [openOTPForgetPasswordForm, setOpenOTPForgetPasswordForm] = useState(false);
+
   const [adminNavbarState, setAdminNavbarState] = useState({
     isOpen: false,
     openning: [],
   });
+  const [navbarState, setNavbarState] = useState(false);
   const value = {
     openSignIn,
     setOpenSignIn,
@@ -25,6 +27,8 @@ const FormStateProvider = (props) => {
     setOpenOTPVerifyForm,
     openOTPForgetPasswordForm,
     setOpenOTPForgetPasswordForm,
+    navbarState,
+    setNavbarState,
   };
   useEffect(() => {}, []);
   return <FormStateContext.Provider value={value} {...props}></FormStateContext.Provider>;
