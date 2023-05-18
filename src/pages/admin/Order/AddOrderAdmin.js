@@ -44,6 +44,8 @@ function AddOrderAdmin() {
     const { user } = useAuthContext();
     const [idEm, setIdEm] = useState("")
     const [maKH, setMaKH] = useState("")
+    const [hours, setHours] = useState(7)
+    const [minutes, setMinutes] = useState(0)
 
   useEffect(()=>{
     getEmployee(user._id)
@@ -96,8 +98,8 @@ function AddOrderAdmin() {
             setMsgHT("")
         }
         if(!email){
-            setMsgEmail("Email không được để trống")
-            check =  false
+            // setMsgEmail("Email không được để trống")
+            // check =  false
         }else{
             setMsgEmail("")
         }
@@ -311,7 +313,10 @@ function AddOrderAdmin() {
                                         Thời gian đặt: 
                                     </span>
                                     <input type="date" className="time-format date" onChange={(e)=>{
-                                            setThoiGianBatDau(e.target.value)
+                                            let date = new Date(e.target.value)
+                                            date.setHours(hours)
+                                            date.setMinutes(minutes)
+                                            setThoiGianBatDau(date)
                                             setListBan([])
                                             setListPhongThuong([])
                                             setListPhongVIP([])
@@ -320,6 +325,7 @@ function AddOrderAdmin() {
                                    <input type="number" onChange={(e)=>{
                                             let date = new Date(thoiGianBatDau)
                                             date.setHours(e.target.value)
+                                            setHours(e.target.value)
                                             setThoiGianBatDau(date)
 
                                         }} className="time-format mr-time"  min={0} defaultValue={7} max={23} step={1} />
@@ -330,6 +336,7 @@ function AddOrderAdmin() {
                                     <input type="number" onChange={(e)=>{
                                             let date = new Date(thoiGianBatDau)
                                             date.setMinutes(e.target.value)
+                                            setMinutes(e.target.value)
                                             setThoiGianBatDau(date)
                                         }} className="time-format mr-time" min={0}  defaultValue={0} max={45} step={15} />
                                     <span className="">
