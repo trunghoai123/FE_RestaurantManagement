@@ -23,6 +23,9 @@ const HeaderStyles = styled.div`
     display: flex;
     justify-content: center;
     color: white;
+    .close__icon {
+      display: none;
+    }
     .profile__container {
       position: absolute;
       right: 40px;
@@ -126,7 +129,7 @@ const HeaderStyles = styled.div`
       }
     }
   }
-  @media screen and (max-width: 480px) {
+  @media screen and (max-width: 889px) {
     height: 100vh;
     width: 200px;
     left: -200px;

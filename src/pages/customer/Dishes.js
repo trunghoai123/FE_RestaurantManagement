@@ -3,19 +3,13 @@ import PropTypes from "prop-types";
 import { Link, useNavigation } from "react-router-dom";
 import styled from "styled-components";
 import { colors, kinds } from "variables";
-import axiosClient from "utils/axios";
 import ReactPaginate from "react-paginate";
 import { CaretLeft, CaretRight, CartPlus } from "react-bootstrap-icons";
 import Search from "components/Search";
 import BookingModal from "components/Modal/BookingModal";
 import Cart from "components/Cart/Cart";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addToCartById,
-  reloadTotalMoney,
-  addToCartWidthAmount,
-  setTotalMoney,
-} from "store/cart/cartSlice";
+import { addToCartById, reloadTotalMoney, addToCartWidthAmount } from "store/cart/cartSlice";
 import { useAuthContext } from "utils/context/AuthContext";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import { getAllDish, getAllTypeOfDish, getMenuByAll } from "utils/api";
@@ -124,22 +118,6 @@ const DishesStyles = styled.div`
       padding: 20px;
       flex: 1;
       background-color: white;
-      /* height: 800px; */
-      /* overflow-y: auto; */
-      /* ::-webkit-scrollbar {
-        width: 10px;
-      }
-      ::-webkit-scrollbar-track {
-        background: lightgrey;
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-        background: #888;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      } */
       .dishes__container {
         display: flex;
         flex-wrap: wrap;
@@ -264,6 +242,262 @@ const DishesStyles = styled.div`
                 :hover {
                   background-color: ${colors.orange_1};
                   color: ${colors.gray_1};
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  @media screen and (max-width: 889px) {
+    padding-top: 0px;
+    .top__actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: ${colors.light_gray_1};
+      padding: 0px 40px 0px 30px;
+      .input__group {
+        width: 80%;
+        flex-wrap: nowrap;
+        > input {
+          /* width: 80%; */
+        }
+      }
+    }
+    .main__container {
+      padding: 0px 40px;
+      display: flex;
+      column-gap: 14px;
+      background-color: ${colors.light_gray_1};
+
+      .left__container {
+        width: 300px;
+        background-color: white;
+        height: 800px;
+        overflow-y: auto;
+        ::-webkit-scrollbar {
+          width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+          background: lightgrey;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+          border-radius: 10px;
+          background: #888;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+        .all__type {
+          padding: 10px 10px 10px 20px;
+          text-decoration: underline;
+          cursor: pointer;
+          user-select: none;
+          &.active {
+            color: ${colors.gold_1};
+          }
+        }
+        .filter__kind {
+          padding: 0 20px 20px 20px;
+          column-count: 2;
+          column-gap: 10px;
+          .kind__container {
+            margin-bottom: 10px;
+            border: solid 2px ${colors.gray_1};
+            padding: 4px;
+            :hover {
+              border: solid 2px ${colors.gold_1};
+              transition: all ease 150ms;
+            }
+            &.active {
+              border: solid 2px ${colors.gold_1};
+              transition: all ease 150ms;
+            }
+            .kind__item {
+              position: relative;
+              cursor: pointer;
+              user-select: none;
+              font-size: 14px;
+              :hover {
+                .kind__item--name {
+                  color: ${colors.gold_1};
+                  transition: all ease 150ms;
+                }
+              }
+              .kind__image {
+                width: 100%;
+                height: 60px;
+                object-fit: cover;
+              }
+              .kind__item--name {
+                position: absolute;
+                text-align: center;
+                color: white;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 1;
+              }
+              .overlay {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                top: 0;
+                background-color: rgba(0, 0, 0, 0.3);
+              }
+            }
+          }
+        }
+      }
+      .right__container {
+        padding: 20px;
+        flex: 1;
+        background-color: white;
+        /* height: 800px; */
+        /* overflow-y: auto; */
+        /* ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: lightgrey;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: #888;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      } */
+        .dishes__container {
+          display: flex;
+          flex-wrap: wrap;
+          .dish {
+            user-select: none;
+            width: 25%;
+            min-width: 200px;
+            .dish__container {
+              position: relative;
+              padding: 10px;
+              :hover {
+                transform: translateY(-6px);
+                transition: all ease 150ms;
+              }
+              .img__container {
+                overflow: hidden;
+                position: relative;
+                .img {
+                  object-fit: cover;
+                  height: 180px;
+                  width: 100%;
+                }
+                .overlay {
+                  position: absolute;
+                  bottom: 0;
+                  width: 100%;
+                  height: 0px;
+                  box-shadow: 0px 0px 60px 35px black;
+                }
+                ::before {
+                  content: "";
+                  position: absolute;
+                  top: 0;
+                  width: 100%;
+                  height: 0px;
+                  box-shadow: 0px 0px 35px 10px black;
+                }
+                .add__container {
+                  z-index: 2;
+                  padding: 6px;
+                  background-color: ${colors.orange_2};
+                  position: absolute;
+                  top: 0px;
+                  right: 0px;
+                  transition: all ease 150ms;
+                  :hover {
+                    background-color: ${colors.orange_2_hover};
+                  }
+                  .icon__add {
+                    color: white;
+                  }
+                }
+              }
+              .dish__name {
+                width: calc(100% - 20px);
+                padding: 2px;
+                color: white;
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                text-align: center;
+              }
+              .dish__price {
+                z-index: 1;
+                width: calc(100% - 20px);
+                padding: 2px;
+                color: white;
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                font-size: 14px;
+                /* text-align: center; */
+              }
+            }
+          }
+        }
+        .pagination__container {
+          user-select: none;
+          .pagination__list {
+            background-color: ${colors.orange_1};
+            padding: 8px;
+            margin-left: 10px;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            > li {
+              margin: 0 2px;
+              border-radius: 4px;
+              list-style-type: none;
+              color: white;
+              font-weight: 500;
+              /* display: flex;
+            align-items: center; */
+              &.selected {
+                background-color: ${colors.light_gray_1};
+                color: ${colors.orange_1};
+              }
+
+              > a {
+                display: flex;
+                justify-content: center;
+                transition: all ease 150ms;
+                align-items: center;
+                height: 40px;
+                width: 34px;
+                display: inline-block;
+                display: flex;
+                align-items: center;
+                :hover {
+                  border-radius: 4px;
+                  background-color: ${colors.light_gray_1};
+                  color: ${colors.gold_1};
+                }
+              }
+              &.disabled {
+                color: gray;
+                a {
+                  background-color: ${colors.orange_1};
+                  color: ${colors.gray_1};
+                  :hover {
+                    background-color: ${colors.orange_1};
+                    color: ${colors.gray_1};
+                  }
                 }
               }
             }
@@ -463,6 +697,7 @@ const Dishes = (props) => {
           value={search}
           onClickSearch={handleClickSearch}
           onChange={handleTypeSearch}
+          className="search__input"
           placeholder="Tìm Kiếm"
         ></Search>
         <Button

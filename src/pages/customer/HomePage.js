@@ -120,6 +120,108 @@ const HomePageStyles = styled.div`
       }
     }
   }
+  @media screen and (max-width: 889px) {
+    padding-top: 0px;
+    .slider {
+      display: relative;
+      .slide {
+        img {
+          height: calc(100vh - 53px);
+          width: 100%;
+          object-fit: cover;
+        }
+      }
+      .logo__container {
+        padding: 20px 20px 20px 20px;
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        .img__overlay {
+          background-color: rgba(152, 152, 152, 0.4);
+          border-radius: 50%;
+          border: 2px solid white;
+          .logo__img {
+            width: 80px;
+          }
+        }
+      }
+    }
+    .section__all {
+      .all__main {
+        .service__row {
+          .service__item {
+            .service__link {
+              .service__title {
+                font-size: 18px;
+              }
+              position: relative;
+              color: white;
+              text-decoration: none;
+              .service__image {
+                width: 100%;
+                height: 100%;
+              }
+              .service__frame {
+                z-index: 2;
+                margin: 10px;
+                border: 2px solid white;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+    .section__discovery {
+      .discovery {
+        .service__title {
+          display: flex;
+          justify-content: center;
+          font-size: 24px;
+          color: ${colors.brown_shadow};
+          font-weight: 500;
+          .title__text {
+            text-align: center;
+            border-bottom: 1px solid ${colors.brown_shadow};
+            width: 30%;
+            padding: 0 0 14px 0;
+          }
+        }
+        .service__main {
+          padding: 36px 0px 36px 0px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          row-gap: 22px;
+          .main__left {
+            padding-left: 0px;
+            width: 80%;
+            .left__intro {
+            }
+            .left__button {
+              display: inline-block;
+              border-radius: 4px;
+              border: none;
+              color: white;
+              padding: 4px 22px 4px 22px;
+              cursor: pointer;
+              outline: none;
+              margin-top: 20px;
+              background-color: ${colors.gold_1};
+            }
+          }
+          .main__right {
+            padding-right: 0px;
+            width: 80%;
+          }
+        }
+      }
+    }
+  }
 `;
 const HomePage = (props) => {
   return (
