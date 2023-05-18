@@ -257,6 +257,110 @@ const BookingModalStyles = styled.div`
     }
   }
   @media screen and (max-width: 889px) {
+    .main__form {
+      .modal__main {
+        border-radius: 0px;
+        width: 100%;
+        height: 100%;
+        .close__icon {
+          :hover {
+          }
+        }
+        .modal__title {
+          .title__container {
+            .title__text {
+            }
+          }
+        }
+        .modal__footer {
+          .btn__container {
+            .btn__confirm {
+            }
+          }
+        }
+        .modal__body {
+          .general__infor {
+            .group__title {
+            }
+            .row__container {
+              .value__container {
+                .label__container {
+                  .label {
+                  }
+                }
+                .input__container {
+                  &.phone__input__container {
+                    .shared__place {
+                      /* width: auto; */
+                      /* flex: 1; */
+                    }
+                    .btn__search--phone {
+                      /* margin-left: auto; */
+                    }
+                  }
+                  &.time__picker__container {
+                    .time__picker {
+                    }
+                    .additonal__tail {
+                    }
+                  }
+                  .input__text {
+                  }
+                }
+                .error__container {
+                  .error__message {
+                  }
+                }
+              }
+            }
+          }
+          .main__infor {
+            .type__tabs {
+              .type__tab {
+                &.left {
+                }
+                &.right {
+                }
+                &.active {
+                }
+              }
+            }
+            .row__container {
+              .value__container {
+                .label__container {
+                  .label {
+                  }
+                }
+                .input__container {
+                  .select__box {
+                  }
+                  &.time__picker__container {
+                    .time__picker {
+                    }
+                    .additonal__tail {
+                    }
+                  }
+                  &.radio__group {
+                    .radio__container {
+                      .radio__label {
+                      }
+                      .input__radio {
+                      }
+                    }
+                  }
+                  .input__text {
+                  }
+                }
+                .error__container {
+                  .error__message {
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 `;
 
