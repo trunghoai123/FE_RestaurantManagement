@@ -18,6 +18,7 @@ import DishViewDetails from "components/Dish/DishViewDetails";
 import Button from "components/Button/Button";
 import { confirmAlert } from "react-confirm-alert";
 import { enqueueSnackbar } from "notistack";
+import SelectBox from "SelectBox/SelectBox";
 const DishesStyles = styled.div`
   padding-top: 54px;
   .top__actions {
@@ -26,13 +27,19 @@ const DishesStyles = styled.div`
     justify-content: space-between;
     background-color: ${colors.light_gray_1};
     padding: 0px 40px 0px 30px;
+    .search__input {
+      outline: none;
+      border: 1px solid #dfdfdf;
+    }
   }
   .main__container {
     padding: 0px 40px;
     display: flex;
     column-gap: 14px;
     background-color: ${colors.light_gray_1};
-
+    .top__container {
+      display: none;
+    }
     .left__container {
       width: 300px;
       background-color: white;
@@ -257,7 +264,7 @@ const DishesStyles = styled.div`
       align-items: center;
       justify-content: space-between;
       background-color: ${colors.light_gray_1};
-      padding: 0px 40px 0px 30px;
+      padding: 0px 0px 0px 30px;
       .input__group {
         width: 80%;
         flex-wrap: nowrap;
@@ -265,14 +272,51 @@ const DishesStyles = styled.div`
           /* width: 80%; */
         }
       }
+      .button__booking__open {
+        margin-right: 0px;
+      }
     }
     .main__container {
-      padding: 0px 40px;
-      display: flex;
+      padding: 0px 0px;
+      display: block;
       column-gap: 14px;
       background-color: ${colors.light_gray_1};
-
+      .top__container {
+        display: block;
+        padding: 12px 8px;
+        > .top__actions__type {
+          margin: 0 0 12px 0;
+          > .type {
+            margin-right: 20px;
+          }
+          > .select__box {
+            border: 1px solid rgb(223, 223, 223);
+            outline: none;
+            padding: 4px 12px;
+            width: 200px;
+            border-radius: 0px;
+            > .select__option {
+            }
+          }
+        }
+        > .state__selections {
+          .type {
+            padding: 4px 14px;
+            border-radius: 20px;
+            background-color: ${() => colors.blue_1};
+            color: white;
+            margin-right: 12px;
+          }
+          .search {
+            padding: 4px 14px;
+            border-radius: 20px;
+            background-color: ${() => colors.blue_1};
+            color: white;
+          }
+        }
+      }
       .left__container {
+        display: none;
         width: 300px;
         background-color: white;
         height: 800px;
@@ -354,32 +398,14 @@ const DishesStyles = styled.div`
         }
       }
       .right__container {
-        padding: 20px;
-        flex: 1;
-        background-color: white;
-        /* height: 800px; */
-        /* overflow-y: auto; */
-        /* ::-webkit-scrollbar {
-        width: 10px;
-      }
-      ::-webkit-scrollbar-track {
-        background: lightgrey;
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb {
-        border-radius: 10px;
-        background: #888;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      } */
+        padding: 0px;
         .dishes__container {
           display: flex;
           flex-wrap: wrap;
           .dish {
             user-select: none;
-            width: 25%;
-            min-width: 200px;
+            width: 50%;
+            min-width: auto;
             .dish__container {
               position: relative;
               padding: 10px;
@@ -521,8 +547,8 @@ const Dishes = (props) => {
     search: "",
     kindOfDish: "",
   });
+  const [selectionKind, setSelectionkind] = useState("Tất cả");
   const { cartItems, totalMoney } = useSelector((state) => state.cart);
-  // const [total, setTotal] = useState(0);
   const { user, updateAuthUser } = useAuthContext();
   const { openSignIn, setOpenSignIn, openSignUp, setOpenSignUp } = useFormStateContext();
   const endOffset = itemOffset + itemsPerPage;
@@ -641,12 +667,16 @@ const Dishes = (props) => {
     });
   };
 
-  const handleClickKind = (id) => {
+  const handleClickKind = async (id) => {
     setItemOffset(0);
     setFilter((oldVal) => {
       return { ...oldVal, search: "", kindOfDish: id };
     });
     setSearch("");
+    const type = document.querySelector("#type__selection").selectedOptions[0].text;
+    if (type) {
+      setSelectionkind(type);
+    }
   };
 
   const handlePageClick = (event) => {
@@ -680,6 +710,14 @@ const Dishes = (props) => {
     }
   };
 
+  const handleChangeKind = (event) => {
+    const id = event?.target?.value;
+    if (id) {
+      handleClickKind(id);
+    } else if (id === "") {
+      handleClickKind(id);
+    }
+  };
   return (
     <DishesStyles>
       {showForm && (
@@ -705,12 +743,34 @@ const Dishes = (props) => {
           onClick={handleConfirm}
           bgColor={colors.orange_1}
           bgHover={colors.orange_1_hover}
+          className="button__booking__open"
         >
           <div>Đặt bàn</div>
         </Button>
       </div>
       <div className="main__container">
         <Cart total={totalMoney} cartList={cartItems} handleShowModal={handleShowModal}></Cart>
+        <div className="top__container">
+          <div className="top__actions__type">
+            <span className="type"> Loại:</span>
+            <select id="type__selection" onChange={handleChangeKind} className="select__box">
+              <option className="select__option" value="">
+                Tất cả
+              </option>
+              {dishTypes.map((kind) => {
+                return (
+                  <option key={kind?._id} value={kind?._id} className="select__option">
+                    {kind?.TenLoai}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div className="state__selections">
+            <span className="type">{selectionKind}</span>
+            {filter?.search && <span className="search">{filter?.search}</span>}
+          </div>
+        </div>
         <div className="left__container">
           <div
             className={`all__type ${filter?.kindOfDish || "active"}`}

@@ -94,6 +94,77 @@ const DishViewDetailsStyles = styled.div`
       }
     }
   }
+  @media screen and (max-width: 889px) {
+    .main__form {
+      .modal__main {
+        border-radius: 6px;
+        padding: 20px 20px 20px 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        width: 90%;
+        height: 80%;
+        display: flex;
+        flex-direction: column;
+        .close__icon {
+          font-size: 24px;
+          position: absolute;
+          right: 5px;
+          top: 0;
+          cursor: pointer;
+          :hover {
+            color: red;
+            transition: all ease 150ms;
+          }
+        }
+        .modal__title {
+          .title__container {
+            .title__text {
+            }
+          }
+        }
+        .modal__footer {
+          padding: 20px 0 0 0;
+          border-top: 1px solid ${colors.gray_1};
+          .btn__container {
+            display: flex;
+            justify-content: flex-end;
+            .btn__confirm {
+            }
+          }
+        }
+        .modal__body {
+          flex: 1;
+          .general__infor {
+            display: block;
+            .img__container {
+              width: 100%;
+              height: 200px;
+              border: 2px solid ${colors.gray_1};
+              margin-right: 8px;
+              .img__detail {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+              }
+            }
+            .info__container {
+              width: 60%;
+              .value__container {
+                margin-bottom: 6px;
+                &.long__value {
+                  max-height: 180px;
+                  overflow-y: auto;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 `;
 
 const DishViewDetails = ({ handleClose = () => {}, dish, handleApplyAmount = () => {} }) => {

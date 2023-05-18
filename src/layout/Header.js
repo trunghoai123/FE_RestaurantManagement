@@ -135,7 +135,7 @@ const HeaderStyles = styled.div`
     left: -200px;
     transition: all ease 250ms;
     ${(props) =>
-      props.display
+      props.display === "true"
         ? css`
             left: 0px;
           `
@@ -292,7 +292,7 @@ const Header = (props) => {
     setOpenSignUp(false);
   };
   return (
-    <HeaderStyles display={navbarState}>
+    <HeaderStyles display={navbarState + ""}>
       <div className="navbar__list">
         <span className="close__icon" onClick={() => setNavbarState((oldState) => !oldState)}>
           {navbarState ? (
