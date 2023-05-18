@@ -256,6 +256,8 @@ const BookingModalStyles = styled.div`
       }
     }
   }
+  @media screen and (max-width: 889px) {
+  }
 `;
 
 const schema = yup

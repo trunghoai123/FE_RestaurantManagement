@@ -126,37 +126,23 @@ const DishViewDetailsStyles = styled.div`
           }
         }
         .modal__footer {
-          padding: 20px 0 0 0;
-          border-top: 1px solid ${colors.gray_1};
           .btn__container {
-            display: flex;
-            justify-content: flex-end;
             .btn__confirm {
             }
           }
         }
         .modal__body {
-          flex: 1;
           .general__infor {
             display: block;
             .img__container {
               width: 100%;
               height: 200px;
-              border: 2px solid ${colors.gray_1};
-              margin-right: 8px;
               .img__detail {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
               }
             }
             .info__container {
-              width: 60%;
               .value__container {
-                margin-bottom: 6px;
                 &.long__value {
-                  max-height: 180px;
-                  overflow-y: auto;
                 }
               }
             }
