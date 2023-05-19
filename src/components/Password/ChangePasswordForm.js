@@ -186,6 +186,158 @@ const ChangePasswordFormStyles = styled.div`
       }
     }
   }
+  @media screen and (max-width: 889px) {
+    .main__form {
+      .modal__main {
+        transition: all ease 200ms;
+        border-radius: 6px;
+        padding: 20px 5px 20px 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        width: 80%;
+        height: 70%;
+        display: flex;
+        flex-direction: column;
+        .modal__title {
+          .close__icon {
+            font-size: 24px;
+            position: absolute;
+            right: 5px;
+            top: 0;
+            cursor: pointer;
+            :hover {
+              color: red;
+              transition: all ease 150ms;
+            }
+          }
+          .title__container {
+            .title__text {
+            }
+          }
+        }
+        .modal__footer {
+          padding: 20px 0 0 0;
+          border-top: 1px solid ${colors.gray_1};
+          .btn__container {
+            display: flex;
+            justify-content: flex-end;
+            .btn__confirm {
+            }
+          }
+        }
+        .modal__body {
+          flex: 1;
+          overflow: auto;
+          padding-right: 10px;
+          ::-webkit-scrollbar {
+            width: 5px;
+          }
+          ::-webkit-scrollbar-track {
+            background: lightgrey;
+            border-radius: 10px;
+          }
+          ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #888;
+          }
+          ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+          }
+          .general__infor {
+            .group__title {
+              padding-bottom: 20px;
+              text-align: center;
+              border-top: 1px solid lightgray;
+            }
+            .row__container {
+              margin-bottom: 30px;
+              display: flex;
+              align-items: center;
+              column-gap: 20px;
+              .value__container {
+                align-self: start;
+                position: relative;
+                width: 100% !important;
+                .label__container {
+                  padding-bottom: 6px;
+                  min-width: 20%;
+                  .label {
+                  }
+                }
+                .input__container {
+                  &.img__file__container {
+                    position: relative;
+                    input[type="file"] {
+                      cursor: pointer;
+                    }
+                    .label__upload {
+                      cursor: pointer;
+                      position: absolute;
+                      top: 50%;
+                      left: 90px;
+                      font-size: 22px;
+                      text-align: center;
+                      transform: translate(-50%, -50%);
+                      color: black;
+                      background-color: rgba(0, 0, 0, 0.15);
+                      padding: 10px;
+                      height: 50px;
+                      width: 50px;
+                      border-radius: 50%;
+                    }
+                  }
+                  &.phone__input__container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    column-gap: 12px;
+                    .shared__place {
+                      /* width: auto; */
+                      /* flex: 1; */
+                    }
+                    .btn__search--phone {
+                      /* margin-left: auto; */
+                    }
+                  }
+                  &.time__picker__container {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    .time__picker {
+                      padding-right: 60px;
+                    }
+                    .additonal__tail {
+                      padding-left: 20px;
+                      flex: 1;
+                      position: absolute;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      right: 20px;
+                    }
+                  }
+                  .input__text {
+                    width: 100%;
+                  }
+                }
+                .error__container {
+                  position: absolute;
+                  bottom: -20px;
+                  left: 0px;
+                  color: red;
+                  font-size: 13px;
+                  .error__message {
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 `;
 
 const ChangePasswordForm = ({ handleCloseForm = () => {} }) => {

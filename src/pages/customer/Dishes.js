@@ -211,7 +211,6 @@ const DishesStyles = styled.div`
           display: flex;
           justify-content: center;
           align-items: center;
-
           > li {
             margin: 0 2px;
             border-radius: 4px;

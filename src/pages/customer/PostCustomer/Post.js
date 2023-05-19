@@ -189,6 +189,71 @@ const PostStyles = styled.div`
       min-height: 100vh;
     }
   }
+  @media screen and (max-width: 889px) {
+    padding: 40px 0px 0px 0px;
+    flex-direction: column-reverse;
+    .post-3 {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      min-width: 100%;
+      padding-right: -5px;
+
+      .content-type {
+        position: block;
+        margin: 0 5px;
+        top: 64px;
+        border-radius: 10px;
+        background-color: #fff;
+        padding: 10px;
+
+        h4 {
+          font-size: 20px;
+          margin: 10px 0;
+        }
+
+        ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          width: 100%;
+
+          li {
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            border-radius: 10px;
+            font-weight: 400;
+            cursor: pointer;
+
+            &.active {
+              background-color: #dcb46e !important;
+              color: #fff;
+              cursor: default;
+            }
+
+            :hover {
+              background-color: rgb(220, 180, 110, 0.3);
+            }
+          }
+        }
+      }
+    }
+    .post-9 {
+      width: 100%;
+      max-width: 100%;
+      min-width: 100%;
+      padding-left: -5px;
+      .content-post {
+        margin: 0 5px;
+        background-color: #fff;
+        border-radius: 10px;
+        min-height: 100vh;
+      }
+    }
+  }
 `;
 
 Post.propTypes = {};

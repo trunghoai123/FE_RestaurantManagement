@@ -12,7 +12,6 @@ import {
   getOrderDetailByOrder,
 } from "utils/api";
 import { useAuthContext } from "utils/context/AuthContext";
-import { getDishById } from "store/dish/dishSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import ViewOrderDetailForm from "components/Order/ViewOrderDetailForm";
 import { renderDate } from "utils/utils";
@@ -21,6 +20,14 @@ const OrdersStyles = styled.div`
   .main__orders {
     background-color: ${colors.light_gray_1};
     padding: 30px 40px;
+    .search__container {
+      .input__group {
+        .search {
+          outline: none;
+          border: 1px solid lightgray;
+        }
+      }
+    }
     .main__container {
       .state__tabs {
         .tabs__container {
@@ -89,6 +96,95 @@ const OrdersStyles = styled.div`
                     }
                     .icon__item {
                       margin-left: 6px;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  @media screen and (max-width: 889px) {
+    padding: 0px;
+    .main__orders {
+      padding: 40px 0 0 0;
+      .search {
+        padding-left: 20px;
+      }
+      .main__container {
+        .state__tabs {
+          .tabs__container {
+            .tab__item {
+              padding: 2px;
+              width: 20%;
+              transition: all ease 200ms;
+              border-bottom: 2px solid ${colors.gray_1};
+              :hover {
+                color: ${colors.orange_2};
+              }
+              &.active {
+                border-bottom: 2px solid ${colors.orange_2};
+              }
+              .item__text {
+                text-align: center;
+              }
+            }
+          }
+        }
+        .orders__container {
+          .order__main {
+            .main__table {
+              margin-top: 30px;
+              .table__head--container {
+                .table__row {
+                  .table__head {
+                    text-align: center;
+                    &.col__hidden {
+                      display: none;
+                    }
+                  }
+                }
+              }
+              .table__body {
+                .table__row {
+                  .table__data {
+                    &.col__hidden {
+                      display: none;
+                    }
+                    width: 200px;
+                    overflow-wrap: break-word;
+                    text-align: center;
+                    &.item__id {
+                      width: 100px;
+                      max-width: 100px;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                    &.data__image {
+                      width: 200px;
+                      .img__container {
+                        width: 100%;
+                        .data__img {
+                          margin: 0px;
+                          object-fit: cover;
+                          width: 150px;
+                          height: 80px;
+                        }
+                      }
+                    }
+                    .button {
+                      margin-left: 8px;
+                      margin-bottom: 12px;
+                      &.button__remove {
+                      }
+                      .text {
+                      }
+                      .icon__item {
+                        margin-left: 6px;
+                      }
                     }
                   }
                 }
@@ -209,7 +305,9 @@ const Orders = (props) => {
         ></ViewOrderDetailForm>
       )}
       <div className="main__orders">
-        <Search placeHolder="Tìm Kiếm"></Search>
+        {/* <div className="search__container">
+          <Search className="search" placeHolder="Tìm Kiếm"></Search>
+        </div> */}
         <div className="main__container">
           <div className="state__tabs">
             <div className="tabs__container">
@@ -250,7 +348,7 @@ const Orders = (props) => {
               <table className="main__table table table-striped">
                 <thead className="table__head--container">
                   <tr className="table__row">
-                    <th className="table__head item__id" scope="col">
+                    <th className="table__head item__id col__hidden" scope="col">
                       Mã phiếu đặt
                     </th>
                     <th className="table__head" scope="col">
@@ -278,7 +376,7 @@ const Orders = (props) => {
                     // const total = calculateTotalPrice(order?._id);
                     return (
                       <tr className="table__row" key={order._id}>
-                        <td className="table__data item__id">
+                        <td className="table__data item__id col__hidden">
                           {order?._id.substring(0, 6) + "..."}
                         </td>
                         <td className="table__data">{renderDate(order?.createdAt)}</td>

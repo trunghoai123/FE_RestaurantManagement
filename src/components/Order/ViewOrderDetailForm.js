@@ -20,6 +20,7 @@ import { clearCart } from "store/cart/cartSlice";
 import { useFormStateContext } from "utils/context/FormStateContext";
 import { changeStatus, getOrderById, getOrderDetailByOrder, updateOrder } from "utils/api";
 import { convertToVND } from "utils/utils";
+import { confirmAlert } from "react-confirm-alert";
 const ViewModalDetailFormStyles = styled.div`
   transition: all ease 200ms;
   position: fixed;
@@ -295,6 +296,279 @@ const ViewModalDetailFormStyles = styled.div`
       }
     }
   }
+  @media screen and (max-width: 889px) {
+    width: 100%;
+    height: 100vh;
+    top: 0px;
+    .main__form {
+      .overlay {
+        transition: all ease 200ms;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .modal__main {
+        transition: all ease 200ms;
+        border-radius: 0px;
+        padding: 20px 5px 20px 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        .close__icon {
+          font-size: 24px;
+          position: absolute;
+          right: 5px;
+          top: 0;
+          cursor: pointer;
+          :hover {
+            color: red;
+            transition: all ease 150ms;
+          }
+        }
+        .modal__title {
+          .title__container {
+            .title__text {
+            }
+          }
+        }
+        .modal__footer {
+          padding: 20px 0 0 0;
+          border-top: 1px solid ${colors.gray_1};
+          .btn__container {
+            display: flex;
+            justify-content: flex-end;
+            .btn__confirm {
+              margin-left: 12px;
+            }
+          }
+          .tooltip__container {
+            position: relative;
+            &:hover {
+              cursor: pointer;
+              .tooltip__content {
+                display: block;
+              }
+            }
+            .tooltip__content {
+              font-size: 13px;
+              display: none;
+              padding: 5px;
+              box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.6);
+              background-color: white;
+              border-radius: 4px;
+              position: absolute;
+              bottom: 20px;
+              left: 0px;
+              width: 200px;
+              /* height: 120px; */
+            }
+          }
+        }
+        .modal__body {
+          flex: 1;
+          overflow: auto;
+          padding-right: 10px;
+          position: relative;
+          ::-webkit-scrollbar {
+            width: 5px;
+          }
+          ::-webkit-scrollbar-track {
+            background: lightgrey;
+            border-radius: 10px;
+          }
+          ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background: #888;
+          }
+          ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+          }
+
+          .general__infor {
+            .group__title {
+              padding-bottom: 20px;
+              text-align: center;
+              border-top: 1px solid lightgray;
+            }
+            .row__container {
+              margin-bottom: 30px;
+              display: flex;
+              align-items: center;
+              column-gap: 20px;
+              .value__container {
+                position: relative;
+                width: 50%;
+                .label__container {
+                  padding-bottom: 6px;
+                  min-width: 20%;
+                  .label {
+                  }
+                }
+                .input__container {
+                  &.phone__input__container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    column-gap: 12px;
+                    .shared__place {
+                    }
+                    .btn__search--phone {
+                    }
+                  }
+                  &.time__picker__container {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    .time__picker {
+                      padding-right: 60px;
+                    }
+                    .additonal__tail {
+                      padding-left: 20px;
+                      flex: 1;
+                      position: absolute;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      right: 20px;
+                    }
+                  }
+                  .input__text {
+                  }
+                }
+                .error__container {
+                  position: absolute;
+                  bottom: -20px;
+                  left: 0px;
+                  color: red;
+                  font-size: 13px;
+                  .error__message {
+                  }
+                }
+              }
+            }
+          }
+          .main__infor {
+            .type__tabs {
+              padding-bottom: 10px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              cursor: pointer;
+              user-select: none;
+              border-bottom: 1px solid ${colors.gold_1};
+              margin-bottom: 10px;
+              .type__tab {
+                min-width: 76px;
+                text-align: center;
+                background-color: ${colors.light_gray_1};
+                border: 1px solid ${colors.gray_1};
+                padding: 4px 10px;
+                &.left {
+                  border-radius: 5px 0px 0px 0px;
+                }
+                &.right {
+                  border-radius: 0px 5px 0px 0px;
+                }
+                &.active {
+                  background-color: ${colors.gold_1};
+                  color: white;
+                }
+              }
+            }
+            .row__container {
+              margin-bottom: 30px;
+              display: flex;
+              align-items: center;
+              column-gap: 20px;
+              .value__container {
+                position: relative;
+                place-self: flex-start;
+                width: 50%;
+                .label__container {
+                  padding-bottom: 6px;
+                  min-width: 20%;
+                  .label {
+                  }
+                }
+                .input__container {
+                  .select__box {
+                    width: 100%;
+                    border: 1px solid lightGray;
+                    padding: 6px 12px;
+                    outline: none;
+                  }
+                  &.time__picker__container {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    .time__picker {
+                      padding-right: 60px;
+                    }
+                    .additonal__tail {
+                      padding-left: 20px;
+                      flex: 1;
+                      position: absolute;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      right: 20px;
+                    }
+                  }
+                  &.radio__group {
+                    display: flex;
+                    justify-content: space-around;
+                    align-items: center;
+                    .radio__container {
+                      display: flex;
+                      align-items: center;
+                      .radio__label {
+                        user-select: none;
+                        padding-right: 20px;
+                      }
+                      .input__radio {
+                      }
+                    }
+                  }
+                  .input__text {
+                  }
+                }
+                .error__container {
+                  position: absolute;
+                  bottom: -20px;
+                  left: 0px;
+                  color: red;
+                  font-size: 13px;
+                  .error__message {
+                  }
+                }
+              }
+            }
+          }
+          .orders__container {
+            .order__main {
+              .table__body {
+                .table__data {
+                  .img__dish {
+                    border: 1px solid gray;
+                    width: 50px;
+                    height: 50px;
+                    object-fit: contain;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 `;
 
 const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
@@ -340,7 +614,7 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
   }, []);
 
   const handleCancelOrder = () => {
-    const getOrder = async () => {
+    const deleteOrder = async () => {
       try {
         await changeStatus(orderId, 4);
         handleCloseForm();
@@ -353,8 +627,26 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
         });
       }
     };
-    getOrder();
-    getOrderDetails();
+
+    confirmAlert({
+      title: "Xác nhận",
+      message: "Bạn có muốn xóa phiếu đặt đã chọn không?",
+      buttons: [
+        {
+          label: "Có",
+          onClick: () => {
+            deleteOrder();
+            getOrderDetails();
+          },
+        },
+        {
+          label: "Không",
+          onClick: () => {},
+        },
+      ],
+    });
+    // getOrder();
+    // getOrderDetails();
   };
 
   const getOrderDetails = async () => {
