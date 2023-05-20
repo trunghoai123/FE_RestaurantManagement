@@ -238,16 +238,12 @@ const Orders = (props) => {
     const getCustomer = async () => {
       if (user) {
         const data = await getCustomerByUserId(user._id);
-        console.log(data);
         if (data.data) {
           const customer = data.data;
-          console.log(customer);
-          console.log(orderState);
           const orderList = await getOrderByAll({
             MaKhachHang: customer._id,
             TrangThai: orderState,
           });
-          console.log(orderList);
           if (orderList.data) {
             // const clonedList = [];
             // for (let i = 0; i < orderList.data.length; i++) {

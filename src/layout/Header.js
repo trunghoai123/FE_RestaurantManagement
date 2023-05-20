@@ -376,7 +376,7 @@ const Header = (props) => {
           )}
           {user && (
             <div className="img__container">
-              <img className="img__profile" src="/images/VIP_room.jpg" alt="" />
+              <img className="img__profile" src={user?.HinhAnh || `/images/user.png`} alt="" />
               <div className="menu__hovered">
                 <div className="menu__list">
                   <Link to={"/profile"} className="menu__item">

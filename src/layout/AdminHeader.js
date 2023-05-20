@@ -372,13 +372,13 @@ const AdminHeader = (props) => {
           )}
           {user && (
             <div className="img__container">
-              <img className="img__profile" src="/images/VIP_room.jpg" alt="" />
+              <img className="img__profile" src="/images/user.png" alt="" />
               <div className="menu__hovered">
                 <div className="menu__list">
-                  {/* <Link to={"/"} className="menu__item">
+                  {/* <Link to={"/profile"} className="menu__item">
                     Thông tin tài khoản
                   </Link>
-                  <Link to={"/"} className="menu__item">
+                     <Link to={"/"} className="menu__item">
                     Phiếu đặt
                   </Link> */}
                   <span onClick={handleLogout} className="menu__item">

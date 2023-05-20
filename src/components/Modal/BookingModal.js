@@ -409,13 +409,13 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   } = useForm({
     defaultValues: {
       // size: "2",
-      time: "07:43",
-      date: "2023-04-15",
+      time: "09:15",
+      date: "2023-05-25",
       kind: "0",
-      note: "Không có gì",
-      phone: "0906461526",
-      fullname: "trung hoai",
-      email: "trunghoaiitiuh@gmail.com",
+      note: "Không có yêu cầu gì",
+      phone: "", //0906461526
+      fullname: "", //trung hoai
+      email: "", //trunghoaiitiuh@gmail.com
       peoplePerTable: "2",
       peoplePerRoom: "2",
       roomSize: "1",
@@ -429,8 +429,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   const { user, updateAuthUser } = useAuthContext();
   useEffect(() => {
     if (user) {
-      console.log("setted infor");
-      setValue("fullname", user?.HoTen);
+      setValue("fullname", user?.TenKhachHang);
       setValue("phone", user?.SoDienThoai);
       setValue("email", user?.Email);
     }
@@ -503,7 +502,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
           TrangThai: Number(0),
           ThoiGianBatDau: startAt,
           ThoiGianKetThuc: null,
-          MaKhachHang: user?._id || null,
+          MaKhachHang: user?.cusId || null,
           ListThucDon: clonedCartItems,
           // Email: user.Email,
           ListPhong: [],

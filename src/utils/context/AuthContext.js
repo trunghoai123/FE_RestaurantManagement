@@ -21,7 +21,6 @@ const AuthProvider = (props) => {
     setAccessToken(accessToken);
   };
   const value = { user, updateAuthUser: handleSetUser };
-  console.log(user);
   useEffect(() => {
     if (
       accessToken ||
@@ -36,10 +35,11 @@ const AuthProvider = (props) => {
         const getAccount = async () => {
           const res = await getUserByAccessToken(localUser.accessToken);
           if (res?.data) {
-            const account = res.data?.account[0];
-            const customer = res.data?.customer[0];
-            console.log(res);
-            setUser({ ...account, ...customer });
+            setUser({
+              ...res.data?.customer,
+              cusId: res.data?.customer?._id,
+              ...res.data?.account,
+            });
           }
         };
         getAccount();

@@ -314,6 +314,7 @@ const Profile = (props) => {
           enqueueSnackbar("Cập nhật thông tin thành công", {
             variant: "success",
           });
+          window.location.reload(true);
         }
       } catch (error) {
         console.log(error);
