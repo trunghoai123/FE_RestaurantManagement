@@ -429,6 +429,11 @@ const Orders = (props) => {
           </div>
         </div>
       </div>
+      {!orders?.length && (
+        <div style={{ textAlign: "center", marginBottom: "350px" }} className="empty__infor">
+          Không có phiếu đặt nào
+        </div>
+      )}
     </OrdersStyles>
   );
 };

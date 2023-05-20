@@ -157,7 +157,8 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
           setEmailVerifing(values.email);
           setOpenOTPVerifyForm(true);
         } else {
-          updateAuthUser({ ...response.account, ...response.tokens });
+          // updateAuthUser({ ...response.account, ...response.tokens });
+          updateAuthUser({ ...response.tokens });
           handleCloseForm();
           if (response.account.LoaiTaiKhoan === 1) {
             enqueueSnackbar("Đăng nhập thành công với quyền nhân viên", {

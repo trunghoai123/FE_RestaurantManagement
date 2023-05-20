@@ -152,7 +152,7 @@ const OTPVerifyForm = ({ handleCloseForm = () => {}, email = "" }) => {
         enqueueSnackbar("Xác thực thành công", {
           variant: "success",
         });
-        updateAuthUser({ ...data.account, ...data.tokens });
+        updateAuthUser({ ...data.tokens });
         handleCloseAllForm();
       }
     } catch (error) {

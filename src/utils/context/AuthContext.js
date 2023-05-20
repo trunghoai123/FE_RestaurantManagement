@@ -1,5 +1,7 @@
 // import { createContext } from "react";
 
+import { getUserByAccessToken } from "utils/api";
+
 // export const AuthContext = createContext({
 //   updateAuthUser: () => {},
 // });
@@ -10,27 +12,41 @@ const AuthContext = createContext();
 
 const AuthProvider = (props) => {
   const [user, setUser] = useState(null);
-  
-
-
-
-  const handleSetUser = (account) => {
+  const [accessToken, setAccessToken] = useState("");
+  const handleSetUser = (accessToken) => {
     localStorage.removeItem("Restaurant-Account");
-    localStorage.setItem("Restaurant-Account", JSON.stringify(account));
-    setUser(account);
+    if (accessToken) {
+      localStorage.setItem("Restaurant-Account", JSON.stringify(accessToken));
+    }
+    setAccessToken(accessToken);
   };
+  console.log(accessToken);
   const value = { user, updateAuthUser: handleSetUser };
   useEffect(() => {
+    console.log("useEffect runned");
+    console.log(localStorage.getItem("Restaurant-Account"));
     if (
-      localStorage.getItem("Restaurant-Account") !== undefined &&
-      localStorage.getItem("Restaurant-Account") !== "undefined"
+      (localStorage.getItem("Restaurant-Account") !== undefined &&
+        localStorage.getItem("Restaurant-Account") !== "undefined" &&
+        localStorage.getItem("Restaurant-Account") !== null) ||
+      accessToken
     ) {
-      const localUser = JSON.parse(localStorage.getItem("Restaurant-Account"));
+      const localUser =
+        accessToken?.AccessToken || JSON.parse(localStorage.getItem("Restaurant-Account"));
       if (localUser) {
-        setUser(localUser);
+        const getAccount = async () => {
+          const res = await getUserByAccessToken(localUser.accessToken);
+          if (res.data) {
+            setUser({ ...res.data?.account, ...res.data?.customer });
+          }
+        };
+        getAccount();
       }
+    } else {
+      setUser(null);
+      console.log("user is null");
     }
-  }, []);
+  }, [accessToken]);
   return <AuthContext.Provider value={value} {...props}></AuthContext.Provider>;
 };
 
