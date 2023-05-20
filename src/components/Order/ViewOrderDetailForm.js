@@ -988,7 +988,7 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
             <h6>
               Tiền đặt cọc món ăn: {convertToVND((totalMoney * 30) / 100) + " (30%) "}{" "}
               <span className="tooltip__container">
-                <i class="fa-regular fa-circle-question"></i>
+                <i className="fa-regular fa-circle-question"></i>
                 <div className="tooltip__content">
                   Tiền đặt cọc món ăn được tính là 30% tổng giá trị các món ăn
                 </div>
@@ -1002,7 +1002,7 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
                   : convertToVND(100000 * order?.SoLuongBanOrPhong)}
                 {` (${order?.SoLuongBanOrPhong} phòng) `}
                 <span className="tooltip__container">
-                  <i class="fa-regular fa-circle-question"></i>
+                  <i className="fa-regular fa-circle-question"></i>
                   <div className="tooltip__content">
                     <div>
                       Phòng thường 50.000 đ/phòng <br />

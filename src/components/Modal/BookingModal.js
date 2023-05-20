@@ -415,7 +415,7 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
       note: "Không có gì",
       phone: "0906461526",
       fullname: "trung hoai",
-      email: "trunghoai@gamil.com",
+      email: "trunghoaiitiuh@gmail.com",
       peoplePerTable: "2",
       peoplePerRoom: "2",
       roomSize: "1",
@@ -429,11 +429,10 @@ const BookingModal = ({ handleCloseForm = () => {}, cartItems = [] }) => {
   const { user, updateAuthUser } = useAuthContext();
   useEffect(() => {
     if (user) {
-      if (user?.LoaiTaiKhoan === 0) {
-        setValue("fullname", user?.HoTen);
-        setValue("phone", user?.SoDienThoai);
-        setValue("email", user?.Email);
-      }
+      console.log("setted infor");
+      setValue("fullname", user?.HoTen);
+      setValue("phone", user?.SoDienThoai);
+      setValue("email", user?.Email);
     }
   }, [user]);
   useEffect(() => {

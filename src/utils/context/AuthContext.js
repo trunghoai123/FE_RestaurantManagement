@@ -20,31 +20,32 @@ const AuthProvider = (props) => {
     }
     setAccessToken(accessToken);
   };
-  console.log(accessToken);
   const value = { user, updateAuthUser: handleSetUser };
+  console.log(user);
   useEffect(() => {
-    console.log("useEffect runned");
-    console.log(localStorage.getItem("Restaurant-Account"));
     if (
+      accessToken ||
       (localStorage.getItem("Restaurant-Account") !== undefined &&
         localStorage.getItem("Restaurant-Account") !== "undefined" &&
-        localStorage.getItem("Restaurant-Account") !== null) ||
-      accessToken
+        localStorage.getItem("Restaurant-Account") !== null &&
+        localStorage.getItem("Restaurant-Account") !== "null")
     ) {
       const localUser =
         accessToken?.AccessToken || JSON.parse(localStorage.getItem("Restaurant-Account"));
       if (localUser) {
         const getAccount = async () => {
           const res = await getUserByAccessToken(localUser.accessToken);
-          if (res.data) {
-            setUser({ ...res.data?.account, ...res.data?.customer });
+          if (res?.data) {
+            const account = res.data?.account[0];
+            const customer = res.data?.customer[0];
+            console.log(res);
+            setUser({ ...account, ...customer });
           }
         };
         getAccount();
       }
     } else {
       setUser(null);
-      console.log("user is null");
     }
   }, [accessToken]);
   return <AuthContext.Provider value={value} {...props}></AuthContext.Provider>;

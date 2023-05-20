@@ -267,7 +267,6 @@ const Profile = (props) => {
         // setCurrentUser(accountData.data);
         if (true) {
           const customerData = await getCustomerByUserId(user._id);
-          console.log(customerData);
           if (customerData?.data) {
             const customer = customerData.data;
             let dob = customer?.NgaySinh?.split("T")[0];
