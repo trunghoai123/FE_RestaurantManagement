@@ -780,40 +780,74 @@ export const getAllEmployee = async () => {
 };
 
 export const deleteEmployee = async (id) => {
-  return axiosClient.post(`employee/deleteEmployee`,{id}).then((res) => {
+  return axiosClient.post(`employee/deleteEmployee`, { id }).then((res) => {
     return res.data;
   });
 };
 
-export const getEmployeeById = async (
-  id
-) => {
-  return axiosClient.post(`employee/getEmployeeById`, {
-    id
-}).then((res) => {
-    return res.data;
-  });
+export const getEmployeeById = async (id) => {
+  return axiosClient
+    .post(`employee/getEmployeeById`, {
+      id,
+    })
+    .then((res) => {
+      return res.data;
+    });
 };
 
-export const addEmployee = async({TenNhanVien, HinhAnh , SoDienThoai , DiaChi , NgaySinh, GioiTinh ,Email}) =>{
-  return axiosClient.post(`employee/addEmployee`,{
-    TenNhanVien, HinhAnh , SoDienThoai , DiaChi , NgaySinh, GioiTinh ,Email}).then((res) => {
-    return res.data;
-  });
-}
-export const updateEmployee = async({id,TenNhanVien, HinhAnh , SoDienThoai , DiaChi , NgaySinh, GioiTinh}) =>{
-  return axiosClient.post(`employee/updateEmployee`,{
-    id,TenNhanVien, HinhAnh , SoDienThoai , DiaChi , NgaySinh, GioiTinh}).then((res) => {
-    return res.data;
-  });
-}
+export const addEmployee = async ({
+  TenNhanVien,
+  HinhAnh,
+  SoDienThoai,
+  DiaChi,
+  NgaySinh,
+  GioiTinh,
+  Email,
+}) => {
+  return axiosClient
+    .post(`employee/addEmployee`, {
+      TenNhanVien,
+      HinhAnh,
+      SoDienThoai,
+      DiaChi,
+      NgaySinh,
+      GioiTinh,
+      Email,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
+export const updateEmployee = async ({
+  id,
+  TenNhanVien,
+  HinhAnh,
+  SoDienThoai,
+  DiaChi,
+  NgaySinh,
+  GioiTinh,
+}) => {
+  return axiosClient
+    .post(`employee/updateEmployee`, {
+      id,
+      TenNhanVien,
+      HinhAnh,
+      SoDienThoai,
+      DiaChi,
+      NgaySinh,
+      GioiTinh,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
 
-
-export const getCustomerByPhone = async({SoDienThoai}) =>{
-  return axiosClient.post(`customer/getCustomerByPhone`,{
-    SoDienThoai
-    }).then((res) => {
-    return res.data;
-  });
-}
-
+export const getCustomerByPhone = async ({ SoDienThoai }) => {
+  return axiosClient
+    .post(`customer/getCustomerByPhone`, {
+      SoDienThoai,
+    })
+    .then((res) => {
+      return res.data;
+    });
+};
