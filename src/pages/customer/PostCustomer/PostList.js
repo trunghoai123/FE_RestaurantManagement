@@ -83,13 +83,16 @@ const PostListStyles = styled.div`
 
   .row-post {
     display: flex;
+    flex-wrap: wrap;
     padding: 0 -5px;
+    /* column-gap: 8px; */
+    row-gap: 8px;
     .col-post {
       width: 33.3333%;
       min-width: 33.3333%;
       max-width: 33.3333%;
-      margin: 0 5px;
-
+      margin: 0px;
+      padding: 6px;
       .item-post {
         width: 100%;
         border-radius: 10px;
@@ -140,10 +143,10 @@ const PostListStyles = styled.div`
       flex-wrap: wrap;
       row-gap: 8px;
       .col-post {
-        width: 45%;
-        min-width: 45%;
-        max-width: 45%;
-        margin: 0 5px;
+        width: 50%;
+        min-width: 50%;
+        max-width: 50%;
+        margin: 0px;
 
         .item-post {
           width: 100%;
