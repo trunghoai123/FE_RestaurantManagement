@@ -292,13 +292,13 @@ const LoginForm = ({ handleCloseForm = () => {} }) => {
                       Quên mật khẩu?
                     </span>
                   </div>
-                  <hr className="my-4" />
-                  <Button bgColor={colors.facebook} bgHover={colors.facebook_hover} type="button">
+                  {/* <hr className="my-4" /> */}
+                  {/* <Button bgColor={colors.facebook} bgHover={colors.facebook_hover} type="button">
                     <div>
                       <MDBIcon fab icon="facebook-f" className="mx-2" />
                       Đăng nhập bằng Facebook
                     </div>
-                  </Button>
+                  </Button> */}
                 </MDBCardBody>
               </MDBCard>
             </MDBCol>

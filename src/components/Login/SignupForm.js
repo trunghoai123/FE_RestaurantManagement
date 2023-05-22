@@ -301,13 +301,13 @@ const SignupForm = ({ handleCloseForm = () => {} }) => {
                   <div onClick={handleSwitchSignUpForm} className="btn__to__singup">
                     Đăng nhập
                   </div>
-                  <hr className="my-4" />
+                  {/* <hr className="my-4" />
                   <Button bgColor={colors.facebook} bgHover={colors.facebook_hover} type="button">
                     <div>
                       <MDBIcon fab icon="facebook-f" className="mx-2" />
                       Đăng nhập vằng Facebook
                     </div>
-                  </Button>
+                  </Button> */}
                 </MDBCardBody>
               </MDBCard>
             </MDBCol>

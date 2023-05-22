@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import styled from "styled-components";
 import { colors } from "../variables";
 
@@ -29,7 +28,7 @@ const Footer = (props) => {
         <div className="footer__top"></div>
         <div className="footer__bottom">
           <div className="bottom_left">COPYRIGHT © | 2023 EVERGREEN GARDEN</div>
-          <div className="bottom_right">DESIGNED BY TRUNG HOAI</div>
+          <div className="bottom_right">🐠</div>
         </div>
       </div>
     </HeaderStyles>

@@ -487,7 +487,7 @@ function InvoiceDetailAdmin(props) {
                 invoice?.ListBan?.length > 0 ? (
                   <ul className="list-menu">
                     <li>
-                    <span className="title-table col-25pc">Mã bàn</span>
+                      <span className="title-table col-25pc">Mã bàn</span>
                       <span className="title-table stock-col ">Số chỗ ngồi</span>
                       <span className="title-table name-col ">Vị trí</span>
                       <span className="title-table">Số thứ tự bàn</span>
@@ -497,7 +497,9 @@ function InvoiceDetailAdmin(props) {
                         <li key={index}>
                           <span className="col-25pc">{item.MaBan}</span>
                           <span className=" stock-col">{item.SoChoNgoi}</span>
-                          <span className=" name-col">{item.MaPhong?.MaKhuVuc?.TenKhuVuc + ", " + item.MaPhong?.TenPhong}</span>
+                          <span className=" name-col">
+                            {item.MaPhong?.MaKhuVuc?.TenKhuVuc + ", " + item.MaPhong?.TenPhong}
+                          </span>
                           <span className="">{item.SoThuTuBan}</span>
                         </li>
                       );
@@ -509,7 +511,7 @@ function InvoiceDetailAdmin(props) {
               ) : invoice?.ListPhong?.length > 0 ? (
                 <ul className="list-menu">
                   <li>
-                  <span className="title-table col-25pc">Mã phòng</span>
+                    <span className="title-table col-25pc">Mã phòng</span>
                     <span className="title-table stock-col ">Số chỗ ngồi</span>
                     <span className="title-table name-col ">Vị trí</span>
                     <span className="title-table">Số phòng</span>
@@ -722,7 +724,7 @@ const InvoiceDetailAdminStyle = styled.div`
               .name-col {
                 width: 35%;
               }
-              .col-25pc{
+              .col-25pc {
                 width: 25%;
               }
               .stock-col {

@@ -47,7 +47,7 @@ import TypePost from "pages/admin/Post/TypePost";
 import PostReview from "pages/admin/Post/PostReview";
 import PostCustomer from "pages/customer/PostCustomer/Post";
 import DishStatistic from "pages/admin/Dish/DishStatistic";
-import EmployeeManagement from "pages/admin/Employee/EmployeeManagement"
+import EmployeeManagement from "pages/admin/Employee/EmployeeManagement";
 
 const App = (props) => {
   return (

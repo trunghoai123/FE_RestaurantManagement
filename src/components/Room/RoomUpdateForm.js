@@ -370,7 +370,7 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             TrangThai: Number(values.status),
             SoChoNgoiToiDa: Number(values.size),
             HinhAnh: imageSelecting,
-            MaLoai: values.kind,
+            MaLoai: values.kindOfRoom,
             MaKhuVuc: values.area,
             //-------------
             // MaKhuVuc: values.id.trim(),
@@ -389,6 +389,7 @@ const RoomUpdateForm = ({ handleCloseForm = () => {}, mode, setMode }) => {
             // MaKhuVuc,
           };
           try {
+            console.log(newRoom);
             const addRoomRs = await addNewRoom(newRoom);
             if (addRoomRs.data._id) {
               enqueueSnackbar("Thêm phòng thành công", {

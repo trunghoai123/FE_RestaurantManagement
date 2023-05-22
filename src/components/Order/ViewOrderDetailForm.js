@@ -630,7 +630,7 @@ const ViewOrderDetailForm = ({ handleCloseForm = () => {}, orderId = "" }) => {
 
     confirmAlert({
       title: "Xác nhận",
-      message: "Bạn có muốn xóa phiếu đặt đã chọn không?",
+      message: "Bạn có muốn hủy phiếu đặt đã chọn không?",
       buttons: [
         {
           label: "Có",

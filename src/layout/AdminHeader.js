@@ -285,13 +285,14 @@ const AdminHeader = (props) => {
     adminNavbarState,
     setAdminNavbarState,
   } = useFormStateContext();
-  const navigation = useNavigate();
+  // const navigation = useNavigate();
   const handleLogout = () => {
     updateAuthUser(null);
     enqueueSnackbar("Đã đăng xuất", {
       variant: "success",
     });
-    navigation("/");
+    // navigation("/");
+    window.location.href = "/";
   };
   const handleToggleAdminNavbar = () => {
     setAdminNavbarState((oldState) => {
