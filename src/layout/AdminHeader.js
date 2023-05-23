@@ -311,6 +311,7 @@ const AdminHeader = (props) => {
   const handleCloseSignupForm = () => {
     setOpenSignUp(false);
   };
+  console.log(user);
   return (
     <AdminHeaderStyles>
       <div className="navbar__list">
@@ -373,7 +374,7 @@ const AdminHeader = (props) => {
           )}
           {user && (
             <div className="img__container">
-              <img className="img__profile" src="/images/user.png" alt="" />
+              <img className="img__profile" src={user?.HinhAnh} alt="" />
               <div className="menu__hovered">
                 <div className="menu__list">
                   {/* <Link to={"/profile"} className="menu__item">

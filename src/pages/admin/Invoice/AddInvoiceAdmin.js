@@ -14,15 +14,31 @@ import ModalAddTable from "./components/ModalAddTable";
 import ModalAddRoom from "./components/ModalAddRoom";
 import ModalAddMenu from "./components/ModalAddMenu";
 import { enqueueSnackbar } from "notistack";
-import { convertDate } from "../Order/OrderAdmin";
 import { useAuthContext } from "utils/context/AuthContext";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const LOAIHOADON = {
   BAN: 0,
   PHONGTHUONG: 1,
   PHONGVIP: 2,
 };
-
+const schema = yup
+  .object({
+    phone: yup
+      .string("hãy xem lại số điện thoại")
+      .required("hãy nhập số điện thoại")
+      .matches(/[0][1-9][0-9]{8}\b/, "Số điện thoại sai"),
+    fullname: yup
+      .string("hãy xem lại họ tên")
+      .required("hãy nhập họ tên")
+      .matches(
+        /^(([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\s\'ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]))*$/,
+        "hãy kiểm tra lại họ tên"
+      ),
+  })
+  .required();
 function AddInvoiceAdmin() {
   const [loading, setLoading] = useState(false);
   const [isModalAddMenu, setIsModalAddMenu] = useState(false);
@@ -34,15 +50,29 @@ function AddInvoiceAdmin() {
   const [listPhongVIP, setListPhongVIP] = useState([]);
   const [loaiHoaDon, setLoaiHoaDon] = useState(LOAIHOADON.BAN);
   const [thoiGianBatDau, setThoiGianBatDau] = useState(new Date());
-  const [hoTen, setHoTen] = useState("");
+  // const [hoTen, setHoTen] = useState("");
   const [msgHT, setMsgHT] = useState("");
   const [msgSDT, setMsgSDT] = useState("");
-  const [soDienThoai, setSoDienThoai] = useState("");
+  // const [soDienThoai, setSoDienThoai] = useState("");
   const TrangThai = 0;
   const { user } = useAuthContext();
   const [idEm, setIdEm] = useState("");
   const [maKh, setMaKh] = useState("");
-
+  // const [file, setFile] = useState();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    getValues,
+    setValue,
+    formState: { errors, isLoading, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      phone: "", //0906461526
+      fullname: "", //trung hoai
+    },
+    resolver: yupResolver(schema),
+  });
   useEffect(() => {
     getEmployee(user._id);
   }, []);
@@ -77,25 +107,23 @@ function AddInvoiceAdmin() {
     // }else{
     //     setMsgSDT("")
     // }
+
     if (loaiHoaDon === 0 && listBan?.length === 0) {
       enqueueSnackbar("Chưa chọn bàn", {
         variant: "warning",
       });
       check = false;
-    }
-    if (loaiHoaDon === 1 && listPhongThuong?.length === 0) {
+    } else if (loaiHoaDon === 1 && listPhongThuong?.length === 0) {
       enqueueSnackbar("Chưa chọn phòng", {
         variant: "warning",
       });
       check = false;
-    }
-    if (loaiHoaDon === 2 && listPhongVIP?.length === 0) {
+    } else if (loaiHoaDon === 2 && listPhongVIP?.length === 0) {
       enqueueSnackbar("Chưa chọn phòng", {
         variant: "warning",
       });
       check = false;
-    }
-    if (listThucDon?.length === 0) {
+    } else if (listThucDon?.length === 0) {
       enqueueSnackbar("Chưa chọn món ăn", {
         variant: "warning",
       });
@@ -107,14 +135,17 @@ function AddInvoiceAdmin() {
   const clearModel = () => {
     setMaKh("");
     setListThucDon([]);
-    setHoTen("");
-    setSoDienThoai("");
+    setValue("phone", "");
+    setValue("fullname", "");
+    // setHoTen("");
+    // setSoDienThoai("");
     setLoaiHoaDon(LOAIHOADON.BAN);
     setListBan([]);
     setListPhongThuong([]);
     setListPhongVIP([]);
   };
-  const handleAddOrder = async () => {
+  const onSubmit = async (values) => {
+    const { phone, fullname } = values;
     if (isValid()) {
       const data = {
         LoaiHoaDon: loaiHoaDon,
@@ -124,8 +155,8 @@ function AddInvoiceAdmin() {
         ListThucDon: listThucDon,
         ListPhong: loaiHoaDon == 0 ? [] : loaiHoaDon == 1 ? listPhongThuong : listPhongVIP,
         ListBan: loaiHoaDon == 0 ? listBan : [],
-        HoTen: hoTen,
-        SoDienThoai: soDienThoai,
+        HoTen: fullname,
+        SoDienThoai: phone,
         MaPhieuDat: null,
         MaNhanVien: idEm,
       };
@@ -166,6 +197,13 @@ function AddInvoiceAdmin() {
     }
   };
 
+  const handleAddOrder = async () => {
+    const sumbit = document.querySelector("#button__submit");
+    if (sumbit) {
+      sumbit.click();
+    }
+  };
+
   const handleOpenModal = () => {
     if (loaiHoaDon === 0) {
       setIsModalAddTable(true);
@@ -177,7 +215,7 @@ function AddInvoiceAdmin() {
     if (e.charCode === 13) {
       let result = await getCustomerByPhone({ SoDienThoai: e.target.value });
       if (result.success && result.data) {
-        setHoTen(result.data.TenKhachHang);
+        setValue("fullname", result.data.TenKhachHang);
         setMaKh(result.data._id);
       }
     }
@@ -197,36 +235,39 @@ function AddInvoiceAdmin() {
         <h6>Thông tin đơn hàng</h6>
         <div className="box-info">
           <div className="col">
-            <div className="item">
+            <form onSubmit={handleSubmit(onSubmit)} id="main__form" className="item">
+              <button style={{ display: "none" }} type="submit" id="button__submit"></button>
               <div className="title">Thông tin khánh hàng</div>
               <div className="row-item">
                 <span className="label">Nhập họ tên:</span>
                 <input
                   type="text"
                   placeholder="vd: Đăng Khoa"
-                  value={hoTen}
-                  onChange={(e) => {
-                    setHoTen(e.target.value);
-                  }}
+                  // value={hoTen}
+                  // onChange={(e) => {
+                  //   setHoTen(e.target.value);
+                  // }}
+                  {...register("fullname")}
                 />
-                {msgHT && <span className="error">{msgHT}</span>}
+                {errors?.fullname && <span className="error">{errors?.fullname?.message}</span>}
               </div>
               <div className="row-item">
                 <span className="label">Nhập số điện thoại:</span>
                 <input
                   type="text"
-                  value={soDienThoai}
+                  // value={soDienThoai}
                   placeholder="vd: 0923222555"
                   onKeyPress={(e) => {
                     handleFindCustomer(e);
                   }}
-                  onChange={(e) => {
-                    setSoDienThoai(e.target.value);
-                  }}
+                  // onChange={(e) => {
+                  //   setSoDienThoai(e.target.value);
+                  // }}
+                  {...register("phone")}
                 />
-                {msgSDT && <span className="error">{msgSDT}</span>}
+                {errors?.phone && <span className="error">{errors?.phone?.message}</span>}
               </div>
-            </div>
+            </form>
           </div>
           <div className="col">
             <div className="item">
