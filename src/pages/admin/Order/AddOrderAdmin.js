@@ -476,16 +476,18 @@ function AddOrderAdmin() {
                 listBan?.length > 0 ? (
                   <ul className="list-menu">
                     <li>
-                      <span className="title-table name-col">Mã bàn</span>
+                    <span className="title-table col-25pc">Mã bàn</span>
+                      <span className="title-table stock-col ">Số chỗ ngồi</span>
+                      <span className="title-table name-col ">Vị trí</span>
                       <span className="title-table">Số thứ tự bàn</span>
-                      <span className="title-table stock-col right">Số chỗ ngồi</span>
                     </li>
                     {listBan?.map((item, index) => {
                       return (
                         <li key={index}>
-                          <span className="name-col">{item.MaBan}</span>
+                          <span className="col-25pc">{item.MaBan}</span>
+                          <span className=" stock-col">{item.SoChoNgoi}</span>
+                          <span className=" name-col">{item.MaPhong?.MaKhuVuc?.TenKhuVuc + ", " + item.MaPhong?.TenPhong}</span>
                           <span className="">{item.SoThuTuBan}</span>
-                          <span className="right stock-col">{item.SoChoNgoi}</span>
                         </li>
                       );
                     })}
@@ -497,16 +499,18 @@ function AddOrderAdmin() {
                 listPhongThuong?.length > 0 ? (
                   <ul className="list-menu">
                     <li>
-                      <span className="title-table name-col">Mã phòng</span>
-                      <span className="title-table">Tên phòng</span>
-                      <span className="title-table stock-col right">Số chỗ ngồi</span>
+                    <span className="title-table col-25pc">Mã phòng</span>
+                    <span className="title-table stock-col ">Số chỗ ngồi</span>
+                    <span className="title-table name-col ">Vị trí</span>
+                    <span className="title-table">Số phòng</span>
                     </li>
                     {listPhongThuong?.map((item, index) => {
                       return (
                         <li key={index}>
-                          <span className="name-col">{item.MaPhong}</span>
-                          <span className="">{item.TenPhong}</span>
-                          <span className="right stock-col">{item.SoChoNgoiToiDa}</span>
+                          <span className="col-25pc">{item.MaPhong}</span>
+                        <span className=" stock-col">{item.SoChoNgoiToiDa}</span>
+                        <span className=" name-col">{item.MaKhuVuc?.TenKhuVuc}</span>
+                        <span className="">{item.TenPhong}</span>
                         </li>
                       );
                     })}
@@ -517,16 +521,18 @@ function AddOrderAdmin() {
               ) : listPhongVIP?.length > 0 ? (
                 <ul className="list-menu">
                   <li>
-                    <span className="title-table name-col">Mã phòng</span>
-                    <span className="title-table">Tên phòng</span>
-                    <span className="title-table stock-col right">Số chỗ ngồi</span>
+                  <span className="title-table col-25pc">Mã phòng</span>
+                    <span className="title-table stock-col ">Số chỗ ngồi</span>
+                    <span className="title-table name-col ">Vị trí</span>
+                    <span className="title-table">Số phòng</span>
                   </li>
                   {listPhongVIP?.map((item, index) => {
                     return (
                       <li key={index}>
-                        <span className="name-col">{item.MaPhong}</span>
+                        <span className="col-25pc">{item.MaPhong}</span>
+                        <span className=" stock-col">{item.SoChoNgoiToiDa}</span>
+                        <span className=" name-col">{item.MaKhuVuc?.TenKhuVuc}</span>
                         <span className="">{item.TenPhong}</span>
-                        <span className="right stock-col">{item.SoChoNgoiToiDa}</span>
                       </li>
                     );
                   })}
@@ -777,6 +783,9 @@ const OrderAdminStyle = styled.div`
               }
               .name-col {
                 width: 35%;
+              }
+              .col-25pc {
+                width: 25%;
               }
               .stock-col {
                 width: 15%;

@@ -114,20 +114,24 @@ function ModalAddRoom({setIsModalAddRoom, loaiHoaDon , isSave,invoiceId,getInvoi
                                         <li key={idx}>
                                             <div className={`item ${item.TrangThai == 1 ? "active": ""}`}>
                                                 <div>
-                                                    <span>Mã phòng:</span>
+                                                    <span>Mã phòng:</span>{"  "}
                                                     {item.MaPhong}
                                                 </div>
                                                 <div>
-                                                    <span>Tên phòng:</span>
-                                                    {item.TenPhong}
-                                                </div>
-                                                <div>
-                                                    <span>Số chỗ ngồi:</span>
+                                                    <span>Số chỗ ngồi:</span>{"  "}
                                                     {item.SoChoNgoiToiDa}
                                                 </div>
                                                 <div>
-                                                    <span>Loại phòng:</span>
+                                                    <span>Loại phòng:</span>{"  "}
                                                     {item.MaLoai.TenLoai}
+                                                </div>
+                                                <div>
+                                                    <span>Tên phòng:</span>{"  "}
+                                                    {item.TenPhong}
+                                                </div>
+                                                <div>
+                                                    <span>Khu vực:</span>{"  "}
+                                                    {item.MaKhuVuc.TenKhuVuc}
                                                 </div>
                                                 <div className="btn-group">
                                                     <button disabled={item.TrangThai === 0 ? "" : "disabled"} className="btn-order handle"
@@ -161,13 +165,26 @@ function ModalAddRoom({setIsModalAddRoom, loaiHoaDon , isSave,invoiceId,getInvoi
                                     dataUse ? dataUse.map((item,index)=>{
                                         return (
                                             <li key={index}>
-                                                <div><span>Mã phòng:</span>
+                                                <div>
+                                                    <span>Mã phòng:</span>{"  "}
                                                     {item.MaPhong}
                                                 </div>
-                                                <div><span>Tên phòng:</span>
-                                                {item.TenPhong}</div>
-                                                <div><span>Số chỗ ngồi:</span>
-                                                {item.SoChoNgoiToiDa}</div>
+                                                <div>
+                                                    <span>Số chỗ ngồi:</span>{"  "}
+                                                    {item.SoChoNgoiToiDa}
+                                                </div>
+                                                <div>
+                                                    <span>Loại phòng:</span>{"  "}
+                                                    {item.MaLoai.TenLoai}
+                                                </div>
+                                                <div>
+                                                    <span>Tên phòng:</span>{"  "}
+                                                    {item.TenPhong}
+                                                </div>
+                                                <div>
+                                                    <span>Khu vực:</span>{"  "}
+                                                    {item.MaKhuVuc.TenKhuVuc}
+                                                </div>
                                                 <div className="btn-group">
                                                     <button className="btn-order cancel"
                                                         onClick={()=>{

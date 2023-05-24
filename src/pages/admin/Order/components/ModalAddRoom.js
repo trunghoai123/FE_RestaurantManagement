@@ -79,17 +79,25 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                     return (
                                         <li key={idx}>
                                             <div className="item">
-                                                <div>
-                                                    <span>Mã phòng:</span>
+                                            <div>
+                                                    <span>Mã phòng:</span>{"  "}
                                                     {item.MaPhong}
                                                 </div>
                                                 <div>
-                                                    <span>Tên phòng:</span>
+                                                    <span>Số chỗ ngồi:</span>{"  "}
+                                                    {item.SoChoNgoiToiDa}
+                                                </div>
+                                                <div>
+                                                    <span>Loại phòng:</span>{"  "}
+                                                    {item.MaLoai.TenLoai}
+                                                </div>
+                                                <div>
+                                                    <span>Tên phòng:</span>{"  "}
                                                     {item.TenPhong}
                                                 </div>
                                                 <div>
-                                                    <span>Số chỗ ngồi:</span>
-                                                    {item.SoChoNgoiToiDa}
+                                                    <span>Khu vực:</span>{"  "}
+                                                    {item.MaKhuVuc.TenKhuVuc}
                                                 </div>
                                                 <div className="btn-group">
                                                     <button className="btn-order handle"
@@ -123,13 +131,26 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                     dataUse ? dataUse.map((item,index)=>{
                                         return (
                                             <li key={index}>
-                                                <div><span>Mã phòng:</span>
+                                                <div>
+                                                    <span>Mã phòng:</span>{"  "}
                                                     {item.MaPhong}
                                                 </div>
-                                                <div><span>Tên phòng:</span>
-                                                {item.TenPhong}</div>
-                                                <div><span>Số chỗ ngồi:</span>
-                                                {item.SoChoNgoiToiDa}</div>
+                                                <div>
+                                                    <span>Số chỗ ngồi:</span>{"  "}
+                                                    {item.SoChoNgoiToiDa}
+                                                </div>
+                                                <div>
+                                                    <span>Loại phòng:</span>{"  "}
+                                                    {item.MaLoai.TenLoai}
+                                                </div>
+                                                <div>
+                                                    <span>Tên phòng:</span>{"  "}
+                                                    {item.TenPhong}
+                                                </div>
+                                                <div>
+                                                    <span>Khu vực:</span>{"  "}
+                                                    {item.MaKhuVuc.TenKhuVuc}
+                                                </div>
                                                 <div className="btn-group">
                                                     <button className="btn-order cancel"
                                                         onClick={()=>{

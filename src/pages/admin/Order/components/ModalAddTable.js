@@ -62,17 +62,25 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
                                     return (
                                         <li key={idx}>
                                             <div className="item">
-                                                <div>
-                                                    <span>Mã bàn:</span>
+                                            <div>
+                                                    <span>Mã bàn:</span>{"  "}
                                                     <span>{item.MaBan}</span>
                                                 </div>
                                                 <div>
-                                                    <span>Số thứ tự bàn:</span>
-                                                    {item.SoThuTuBan}
+                                                    <span>Số chỗ ngồi:</span>{"  "}
+                                                    {item.SoChoNgoi}
                                                 </div>
                                                 <div>
-                                                    <span>Số chỗ ngồi:</span>
-                                                    {item.SoChoNgoi}
+                                                    <span>Khu vực:</span>{"  "}
+                                                    {item.MaPhong.MaKhuVuc.TenKhuVuc}
+                                                </div>
+                                                <div>
+                                                    <span>Phòng:</span>{"  "}
+                                                    {item.MaPhong.TenPhong}
+                                                </div>
+                                                <div>
+                                                    <span>Số thứ tự bàn:</span>{"  "}
+                                                    {item.SoThuTuBan}
                                                 </div>
                                                 <div className="btn-group">
                                                     <button className="btn-order handle"
@@ -106,13 +114,26 @@ function ModalAddTable({setIsModalAddTable, loaiPhieuDat , setLoading,
                                     dataUse ? dataUse.map((item,index)=>{
                                         return (
                                             <li key={index}>
-                                                <div><span>Mã bàn:</span>
-                                                    {item.MaBan}
+                                                <div>
+                                                    <span>Mã bàn:</span>{"  "}
+                                                    <span>{item.MaBan}</span>
                                                 </div>
-                                                <div><span>Số thứ tự bàn:</span>
-                                                {item.SoThuTuBan}</div>
-                                                <div><span>Số chỗ ngồi:</span>
-                                                {item.SoChoNgoi}</div>
+                                                <div>
+                                                    <span>Số chỗ ngồi:</span>{"  "}
+                                                    {item.SoChoNgoi}
+                                                </div>
+                                                <div>
+                                                    <span>Khu vực:</span>{"  "}
+                                                    {item.MaPhong.MaKhuVuc.TenKhuVuc}
+                                                </div>
+                                                <div>
+                                                    <span>Phòng:</span>{"  "}
+                                                    {item.MaPhong.TenPhong}
+                                                </div>
+                                                <div>
+                                                    <span>Số thứ tự bàn:</span>{"  "}
+                                                    {item.SoThuTuBan}
+                                                </div>
                                                 <div className="btn-group">
                                                     <button className="btn-order cancel"
                                                         onClick={()=>{
