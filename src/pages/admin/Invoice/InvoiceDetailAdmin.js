@@ -24,7 +24,24 @@ import Button from "components/Button/Button";
 import { colors } from "variables";
 import PDFFile from "components/PDFFile/PDFFile";
 import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
-
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+const schema = yup
+  .object({
+    phone: yup
+      .string("hãy xem lại số điện thoại")
+      .required("hãy nhập số điện thoại")
+      .matches(/[0][1-9][0-9]{8}\b/, "Số điện thoại sai"),
+    fullname: yup
+      .string("hãy xem lại họ tên")
+      .required("hãy nhập họ tên")
+      .matches(
+        /^(([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\s\'ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]))*$/,
+        "hãy kiểm tra lại họ tên"
+      ),
+  })
+  .required();
 function InvoiceDetailAdmin(props) {
   const [invoice, setInvoice] = useState({});
   const [loading, setLoading] = useState(false);
@@ -37,6 +54,18 @@ function InvoiceDetailAdmin(props) {
   const [listPhongThuong, setListPhongThuong] = useState([]);
   const [listPhongVIP, setListPhongVIP] = useState([]);
   const [isInfo, setIsInfo] = useState(false);
+  const [oldInfor, setOldInfor] = useState();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    getValues,
+    setValue,
+    formState: { errors, isLoading, isSubmitting },
+  } = useForm({
+    defaultValues: {},
+    resolver: yupResolver(schema),
+  });
 
   useEffect(() => {
     const arrLocation = window.location.href.split("/");
@@ -61,6 +90,9 @@ function InvoiceDetailAdmin(props) {
     let result = await getInvoiceById(id);
     if (result && result.data) {
       setInvoice(result.data);
+      setOldInfor(result.data);
+      setValue("fullname", result.data.HoTen);
+      setValue("phone", result.data.SoDienThoai);
       setListThucDon(result.data.ListThucDon);
       if (result.data.MaPhieuDat) {
         getOrder(result.data.MaPhieuDat);
@@ -315,24 +347,34 @@ function InvoiceDetailAdmin(props) {
   const handlePrint = () => {
     window.print();
   };
-  console.log(invoice);
   const handlePrintInvoice = useReactToPrint({
     content: () => component.current,
   });
 
-  const hanldeUpdate = async () => {
+  const hanldeUpdate = () => {
+    const sumbit = document.querySelector("#button__submit");
+    if (sumbit) {
+      sumbit.click();
+    }
+  };
+
+  const onSubmit = async (values) => {
+    const { fullname, phone } = values;
     setLoading(true);
     let id = invoice?._id;
     let result = await updateInvoice({
       id,
-      HoTen: invoice?.HoTen,
-      SoDienThoai: invoice?.SoDienThoai,
+      SoDienThoai: phone,
+      HoTen: fullname,
       MaKhachHang: invoice?.MaKhachHang,
+      // HoTen: invoice?.HoTen,
+      // MaKhachHang: invoice?.MaKhachHang,
     });
     if (result.success) {
       enqueueSnackbar("Cập nhật thông tin thành công", {
         variant: "success",
       });
+      setIsInfo(!isInfo);
       setLoading(false);
     } else {
       enqueueSnackbar("Cập nhật thông tin thất bại", {
@@ -341,10 +383,13 @@ function InvoiceDetailAdmin(props) {
       setLoading(false);
     }
   };
+
   const handleFindCustomer = async (e) => {
     if (e.charCode === 13) {
+      e.preventDefault();
       let result = await getCustomerByPhone({ SoDienThoai: e.target.value });
       if (result.success && result.data) {
+        setValue("fullname", result.data.TenKhachHang);
         setInvoice({ ...invoice, HoTen: result.data.TenKhachHang, MaKhachHang: result.data._id });
       } else {
         enqueueSnackbar("Không tìm thấy khách hàng", {
@@ -353,7 +398,6 @@ function InvoiceDetailAdmin(props) {
       }
     }
   };
-
   return (
     <InvoiceDetailAdminStyle ref={component}>
       {loading && <Loading />}
@@ -401,44 +445,51 @@ function InvoiceDetailAdmin(props) {
         <h6>Thông tin hóa đơn</h6>
         <div className="box-info">
           <div className="col">
-            <div className="item">
+            <form onSubmit={handleSubmit(onSubmit)} className="item">
+              <button style={{ display: "none" }} type="submit" id="button__submit"></button>
               <div className="title">Thông tin khánh hàng</div>
               <p className="desc">
                 <span className="w160px">Họ tên khách hàng:</span>
                 <input
-                  onChange={(e) => {
-                    setInvoice({ ...invoice, HoTen: e.target.value });
-                  }}
                   className="input-style"
                   disabled={isInfo ? "" : "disabled"}
-                  value={invoice?.HoTen}
                   placeholder="Họ tên khách hàng"
+                  {...register("fullname")}
+                  // value={invoice?.HoTen}
+                  // onChange={(e) => {
+                  //   setInvoice({ ...invoice, HoTen: e.target.value });
+                  // }}
                 />
               </p>
+              {errors?.fullname && <div className="error">{errors?.fullname?.message}</div>}
               <p className="desc">
                 <span className="w160px">Số điện thoại:</span>
                 <input
-                  onChange={(e) => {
-                    setInvoice({ ...invoice, SoDienThoai: e.target.value });
-                  }}
                   onKeyPress={(e) => {
                     handleFindCustomer(e);
                   }}
                   className="input-style"
                   disabled={isInfo ? "" : "disabled"}
-                  value={invoice?.SoDienThoai}
                   placeholder="Số điện thoại"
+                  {...register("phone")}
+                  // value={invoice?.SoDienThoai}
+                  // onChange={(e) => {
+                  //   setInvoice({ ...invoice, SoDienThoai: e.target.value });
+                  // }}
                 />
               </p>
+              {errors?.phone && <div className="error">{errors?.phone?.message}</div>}
               {invoice?.TrangThai == 0 ? (
                 <div className="btn-item">
                   <button
+                    type="button"
                     className="btn-order info"
                     onClick={() => {
                       if (isInfo) {
                         hanldeUpdate();
+                      } else {
+                        setIsInfo(true);
                       }
-                      setIsInfo(!isInfo);
                     }}
                   >
                     {isInfo ? "Lưu" : "Cập nhật"}
@@ -447,6 +498,8 @@ function InvoiceDetailAdmin(props) {
                     <button
                       className="btn-order info"
                       onClick={() => {
+                        setValue("fullname", oldInfor?.HoTen);
+                        setValue("phone", oldInfor?.SoDienThoai);
                         setIsInfo(false);
                       }}
                     >
@@ -457,7 +510,7 @@ function InvoiceDetailAdmin(props) {
               ) : (
                 ""
               )}
-            </div>
+            </form>
           </div>
           <div className="col">
             <div className="item">
@@ -679,6 +732,11 @@ const InvoiceDetailAdminStyle = styled.div`
           .title {
             font-size: 15px;
             color: rgb(220, 180, 110, 1);
+          }
+          .error {
+            font-size: 14px;
+            color: red;
+            text-align: right;
           }
           .desc {
             font-size: 15px;
