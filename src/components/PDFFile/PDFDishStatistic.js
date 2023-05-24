@@ -38,6 +38,14 @@ const styles = StyleSheet.create({
     width: "20%",
     marginBottom: "6px",
   },
+  columnDish_10: {
+    width: "10%",
+    marginBottom: "6px",
+  },
+  columnDish_30: {
+    width: "30%",
+    marginBottom: "6px",
+  },
   columnDishLong: {
     width: "40%",
     marginBottom: "6px",
@@ -113,20 +121,20 @@ const PDFDishStatistic = ({ dishes = [] }) => {
         </View>
         <View style={styles.viewFlexTitle}>
           <Text style={styles.columnDish}>Ma mon</Text>
-          <Text style={styles.columnDish}>Ten mon</Text>
+          <Text style={styles.columnDish_30}>Ten mon</Text>
           <Text style={styles.columnDish}>Gia</Text>
-          <Text style={styles.columnDish}>So luong</Text>
+          <Text style={styles.columnDish_10}>So luong</Text>
           <Text style={styles.columnDish}>Doanh thu</Text>
         </View>
         {dishes?.map((dish) => {
           return (
             <View key={dish._id} style={styles.viewFlex}>
               <Text style={styles.columnDish}>{dish?._id?.slice(0, 5)}</Text>
-              <Text style={styles.columnDish}>
+              <Text style={styles.columnDish_30}>
                 {dish?.TenMon && removeVietnameseTones(dish?.TenMon)}
               </Text>
               <Text style={styles.columnDish}>{dish?.GiaMon}</Text>
-              <Text style={styles.columnDish}>{dish?.SoLuongBan}</Text>
+              <Text style={styles.columnDish_10}>{dish?.SoLuongBan}</Text>
               <Text style={styles.columnDish}>{dish?.SoLuongBan * dish?.GiaMon}</Text>
             </View>
           );
