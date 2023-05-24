@@ -351,6 +351,7 @@ export const getOrderByAll = async ({
   SoDienThoai,
   MaNhanVien,
   MaKhachHang,
+  MaPhieuDat,
 }) => {
   return axiosClient
     .post(`order/getOrderByAll`, {
@@ -365,6 +366,7 @@ export const getOrderByAll = async ({
       SoDienThoai,
       MaNhanVien,
       MaKhachHang,
+      MaPhieuDat,
     })
     .then((res) => {
       return res.data;

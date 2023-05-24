@@ -185,7 +185,7 @@ const OrderSearch = (props) => {
         result = await getOrderByAll(data);
       } else {
         const data = {
-          MaKhachHang: getValues("clientId"),
+          // MaKhachHang: getValues("clientId"),
           LoaiPhieuDat:
             Number(getValues("bookingType")) === -1 ? null : Number(getValues("bookingType")),
           TrangThai: Number(getValues("status")) === -1 ? null : Number(getValues("status")),
@@ -197,6 +197,7 @@ const OrderSearch = (props) => {
           Email: getValues("email"),
           SoDienThoai: getValues("phone"),
           MaNhanVien: null,
+          MaPhieuDat: getValues("clientId"),
           // MaPhieuDat: getValues("clientId").trim(),
           // MaNhanVien: getValues("staffId").trim(),
           // MaKhachHang: getValues("clientId").trim(),
@@ -281,7 +282,7 @@ const OrderSearch = (props) => {
           <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Mã người đặt</label>
+                <label className="filter__value__label">Mã phiếu đặt</label>
                 <Input
                   className="filter__value__input"
                   name="clientId"
@@ -377,12 +378,18 @@ const OrderSearch = (props) => {
                     Tất cả
                   </option>
                   <option className="option" value={0}>
-                    Đang tạo
+                    Chờ xác nhận
                   </option>
                   <option className="option" value={1}>
-                    Đã tạo
+                    Chờ đặt cọc
                   </option>
                   <option className="option" value={2}>
+                    Đã thanh toán
+                  </option>
+                  <option className="option" value={3}>
+                    Đã nhận
+                  </option>
+                  <option className="option" value={4}>
                     Đã hủy
                   </option>
                 </SelectBox>
@@ -459,10 +466,16 @@ const OrderSearch = (props) => {
                 </td>
                 <td className="table__data">
                   {order?.TrangThai === 0
-                    ? "Đang tạo"
-                    : order?.LoaiHoaDon === 1
-                    ? "Đã tạo"
-                    : "Đã hủy"}
+                    ? "Chờ xác nhận"
+                    : order?.TrangThai === 1
+                    ? "Chờ đặt cọc"
+                    : order?.TrangThai === 2
+                    ? "Đã thanh toán"
+                    : order?.TrangThai === 3
+                    ? "Đã nhận"
+                    : order?.TrangThai === 4
+                    ? "Đã hủy"
+                    : ""}
                 </td>
                 <td className="table__data">
                   <Button
