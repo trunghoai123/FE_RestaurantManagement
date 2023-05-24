@@ -136,8 +136,8 @@ const PDFDeposit = ({ orderDetail }) => {
           <View style={styles.viewFlex}>
             <Text style={styles.normalText}>
               Ten nhan vien:{" "}
-              {orderDetail?.MaPhieuDat.MaNhanVien.TenNhanVien &&
-                removeVietnameseTones(orderDetail?.MaPhieuDat.MaNhanVien.TenNhanVien)}
+              {orderDetail?.MaPhieuDat?.MaNhanVien?.TenNhanVien &&
+                removeVietnameseTones(orderDetail?.MaPhieuDat?.MaNhanVien?.TenNhanVien)}
             </Text>
             <Text>
               Hinh thuc dat:{" "}

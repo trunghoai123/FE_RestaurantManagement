@@ -53,7 +53,7 @@ function OrderDetailAdmin(props) {
       setLoading(false);
     }
   };
-  console.log('orderDetail :>> ', orderDetail);
+  console.log("orderDetail :>> ", orderDetail);
 
   useEffect(() => {
     const arrLocation = window.location.href.split("/");
@@ -562,7 +562,9 @@ function OrderDetailAdmin(props) {
                         <li key={index}>
                           <span className="col-25pc">{item.MaBan}</span>
                           <span className=" stock-col">{item.SoChoNgoi}</span>
-                          <span className=" name-col">{item.MaPhong?.MaKhuVuc?.TenKhuVuc + ", " + item.MaPhong?.TenPhong}</span>
+                          <span className=" name-col">
+                            {item.MaPhong?.MaKhuVuc?.TenKhuVuc + ", " + item.MaPhong?.TenPhong}
+                          </span>
                           <span className="">{item.SoThuTuBan}</span>
                         </li>
                       );
@@ -756,7 +758,7 @@ const OrderDetailAdminStyle = styled.div`
                 width: 25%;
                 display: inline-block;
               }
-              .col-25pc{
+              .col-25pc {
                 width: 25%;
               }
               .name-col {
