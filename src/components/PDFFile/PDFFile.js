@@ -99,7 +99,8 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
         </View>
         <View style={styles.viewFlex}>
           <View>thong tin lien he</View>
-          <View>so dien thoai: 0906778443 email: evergreengarden@gmail.com</View>
+          <View>so dien thoai: 0906778443 </View>
+          <View>email: evergreengarden@gmail.com</View>
         </View>
         <View style={styles.title}>
           <Text>HOA DON</Text>
