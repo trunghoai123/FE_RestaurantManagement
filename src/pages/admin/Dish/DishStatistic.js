@@ -10,7 +10,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { getDishByDate } from "utils/api";
 import DishUpdateForm from "components/Dish/DishUpdateForm";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import PDFInvoiceStatistic from "components/PDFFile/PDFInvoiceStatistic";
 import PDFDishStatistic from "components/PDFFile/PDFDishStatistic";
 
 const DishStatisticStyles = styled.div`
@@ -133,8 +132,8 @@ const schema = yup
         name: "is-true-amount",
         skipAbsent: true,
         test(value, ctx) {
-          if (Number(value) > 999 || Number(value) < 1) {
-            return ctx.createError({ message: "Hãy nhập số lượng > 1 và < 999" });
+          if (Number(value) > 999 || Number(value) < 0) {
+            return ctx.createError({ message: "Hãy nhập số lượng > 0 và < 999" });
           }
           return true;
         },
@@ -174,7 +173,7 @@ const DishStatistic = (props) => {
       result = await getDishByDate(data);
       if (result?.data) {
         const newDishes = result.data.filter(
-          (dish) => dish.SoLuongBan > Number(getValues("larger"))
+          (dish) => dish.SoLuongBan >= Number(getValues("larger"))
         );
         const sortedDishes = quickSortByQuantity(newDishes);
         const addedTotal = addTotalMoney(sortedDishes);
@@ -281,7 +280,7 @@ const DishStatistic = (props) => {
                   className="filter__value__input"
                   type="number"
                   name="larger"
-                  min="1"
+                  min="0"
                   max="9999"
                   {...register("larger")}
                 ></Input>

@@ -10,6 +10,10 @@ const styles = StyleSheet.create({
     padding: "10px",
     fontSize: "13px",
   },
+  title: {
+    alignItems: "center",
+    fontSize: "35px",
+  },
   viewFlex: {
     flexDirection: "row",
     alignItems: "center",
@@ -93,6 +97,13 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
             <Text style={styles.topResName}>Evergreen Garden</Text>
           </View>
         </View>
+        <View style={styles.viewFlex}>
+          <View>thong tin lien he</View>
+          <View>so dien thoai: 0906778443 email: evergreengarden@gmail.com</View>
+        </View>
+        <View style={styles.title}>
+          <Text>HOA DON</Text>
+        </View>
         <View style={styles.normalText}>
           <Text>Thoi gian xuat: {convertInterDate(new Date())}</Text>
         </View>
@@ -100,13 +111,7 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
           <Text>Thoi gian bat dau: {convertInterDate(new Date(invoice?.ThoiGianBatDau))}</Text>
         </View>
         <View style={styles.normalText}>
-          <Text>Ten khach hang: {invoice?.HoTen && removeVietnameseTones(invoice?.HoTen)}</Text>
-        </View>
-        <View style={styles.normalText}>
           <Text>Ten nhan vien: {invoice?.HoTen && removeVietnameseTones(invoice?.HoTen)}</Text>
-        </View>
-        <View style={styles.normalText}>
-          <Text>So Dien Thoai: {invoice?.SoDienThoai}</Text>
         </View>
         <View style={styles.normalText}>
           <Text>
@@ -117,6 +122,9 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
               ? "Dat phong thuong"
               : " Dat phong VIP"}
           </Text>
+        </View>
+        <View style={styles.normalText}>
+          <Text>Ten khach hang: {invoice?.HoTen && removeVietnameseTones(invoice?.HoTen)}</Text>
         </View>
         <View style={styles.viewFlexTitle}>
           <Text style={styles.columnDishLong}>Ten Mon</Text>

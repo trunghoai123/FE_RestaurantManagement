@@ -33,10 +33,20 @@ const schema = yup
         /^(([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\s\'ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*)([a-zA-Z\sÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]))*$/,
         "hãy kiểm tra lại họ tên"
       ),
-    email: yup
-      .string("hãy xem lại email")
-      .required("hãy nhập email")
-      .email("Hãy nhập đúng định dạng email"),
+    email: yup.string("hãy xem lại mật khẩu").test({
+      name: "is-email",
+      skipAbsent: true,
+      test(value, ctx) {
+        if (!(value === "")) {
+          if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(value)) {
+            return ctx.createError({ message: "email sai" });
+          } else {
+            return true;
+          }
+        }
+        return true;
+      },
+    }),
   })
   .required();
 function AddOrderAdmin() {
@@ -49,7 +59,7 @@ function AddOrderAdmin() {
   const [listPhongThuong, setListPhongThuong] = useState([]);
   const [listPhongVIP, setListPhongVIP] = useState([]);
   const [loaiPhieuDat, setLoaiPhieuDat] = useState(LOAIPHIEUDAT.BAN);
-  const [thoiGianBatDau, setThoiGianBatDau] = useState(new Date());
+  const [thoiGianBatDau, setThoiGianBatDau] = useState();
   const [hoTen, setHoTen] = useState("");
   const [msgNum, setMsgNum] = useState("");
   const [msgNumPeo, setMsgNumPeo] = useState("");
@@ -230,15 +240,16 @@ function AddOrderAdmin() {
   };
 
   const handleOpenModal = () => {
-    if (soLuongNguoiTrenBanOrPhong && thoiGianBatDau && soLuongBanOrPhong) {
+    console.log(thoiGianBatDau);
+    if (getValues("peopleCount") && thoiGianBatDau && getValues("tableCount")) {
       loaiPhieuDat == 0 ? setIsModalAddTable(true) : setIsModalAddRoom(true);
     }
-    if (!soLuongBanOrPhong) {
+    if (!getValues("tableCount")) {
       enqueueSnackbar(`Vui lòng chọn số lượng`, {
         variant: "warning",
       });
     }
-    if (!soLuongNguoiTrenBanOrPhong) {
+    if (!getValues("peopleCount")) {
       enqueueSnackbar(`Vui lòng chọn số người`, {
         variant: "warning",
       });
@@ -526,6 +537,7 @@ function AddOrderAdmin() {
 
               <div className="btn-item">
                 <button
+                  type="button"
                   className="btn-order info"
                   onClick={() => {
                     handleOpenModal();
@@ -612,6 +624,7 @@ function AddOrderAdmin() {
     </OrderAdminStyle>
   );
 }
+
 const OrderAdminStyle = styled.div`
   padding: 64px 10px 10px;
   background-color: #f3f3f3;
