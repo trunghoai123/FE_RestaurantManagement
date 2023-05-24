@@ -541,6 +541,7 @@ export const getInvoiceByAll = async ({
   LoaiHoaDon,
   TrangThai,
   ThoiGianBatDau,
+  MaHoaDon,
 }) => {
   return axiosClient
     .post(`invoice/getInvoiceByAll`, {
@@ -552,6 +553,7 @@ export const getInvoiceByAll = async ({
       LoaiHoaDon,
       TrangThai,
       ThoiGianBatDau,
+      MaHoaDon,
     })
     .then((res) => {
       return res.data;

@@ -177,7 +177,8 @@ const InvoiceSearch = (props) => {
         result = await getInvoiceByAll(data);
       } else {
         const data = {
-          MaPhieuDat: getValues("orderId").trim(),
+          // MaPhieuDat: getValues("orderId").trim(),
+          MaHoaDon: getValues("orderId").trim(),
           MaNhanVien: getValues("staffId").trim(),
           MaKhachHang: getValues("clientId").trim(),
           HoTen: getValues("fullname").trim(),
@@ -252,7 +253,7 @@ const InvoiceSearch = (props) => {
           <div className="filter__row">
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Mã</label>
+                <label className="filter__value__label">Mã hóa đơn</label>
                 <Input
                   className="filter__value__input"
                   placeHolder="Mã hóa đơn"
