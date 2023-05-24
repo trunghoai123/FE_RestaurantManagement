@@ -816,6 +816,7 @@ const OrderAdminStyle = styled.div`
   }
   .btn-group {
     float: right;
+  
   }
   .btn-order {
     border: none;
