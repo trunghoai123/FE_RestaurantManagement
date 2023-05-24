@@ -385,8 +385,10 @@ function InvoiceDetailAdmin(props) {
 
   const handleFindCustomer = async (e) => {
     if (e.charCode === 13) {
+      e.preventDefault();
       let result = await getCustomerByPhone({ SoDienThoai: e.target.value });
       if (result.success && result.data) {
+        setValue("fullname", result.data.TenKhachHang);
         setInvoice({ ...invoice, HoTen: result.data.TenKhachHang, MaKhachHang: result.data._id });
       } else {
         enqueueSnackbar("Không tìm thấy khách hàng", {
@@ -395,7 +397,6 @@ function InvoiceDetailAdmin(props) {
       }
     }
   };
-  console.log(isInfo);
   return (
     <InvoiceDetailAdminStyle ref={component}>
       {loading && <Loading />}

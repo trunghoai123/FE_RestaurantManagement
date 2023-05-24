@@ -252,8 +252,11 @@ function AddOrderAdmin() {
 
   const handleFindCustomer = async (e) => {
     if (e.charCode === 13) {
+      e.preventDefault();
       let result = await getCustomerByPhone({ SoDienThoai: e.target.value });
       if (result.success && result.data) {
+        setValue("fullname", result.data.TenKhachHang);
+        setValue("email", result.data.Email);
         setHoTen(result.data.TenKhachHang);
         setEmail(result.data.Email);
         setMaKH(result.data._id);
@@ -300,7 +303,7 @@ function AddOrderAdmin() {
                   }}
                   type="text"
                   //   value={soDienThoai}
-                  //   placeholder="vd: 0923222555"
+                  placeholder="vd: 0923222555"
                   //   onChange={(e) => {
                   //     setSoDienThoai(e.target.value);
                   //   }}

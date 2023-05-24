@@ -73,6 +73,7 @@ function AddInvoiceAdmin() {
     },
     resolver: yupResolver(schema),
   });
+
   useEffect(() => {
     getEmployee(user._id);
   }, []);
@@ -211,8 +212,10 @@ function AddInvoiceAdmin() {
       setIsModalAddRoom(true);
     }
   };
+
   const handleFindCustomer = async (e) => {
     if (e.charCode === 13) {
+      e.preventDefault();
       let result = await getCustomerByPhone({ SoDienThoai: e.target.value });
       if (result.success && result.data) {
         setValue("fullname", result.data.TenKhachHang);
@@ -224,7 +227,6 @@ function AddInvoiceAdmin() {
   return (
     <OrderAdminStyle>
       {loading && <Loading />}
-
       <div className="title">Tạo hóa đơn</div>
       <div className="btn-group">
         <button className="btn-order handle" onClick={handleAddOrder}>
