@@ -345,6 +345,7 @@ function AddOrderAdmin() {
               <div className="row-item">
                 <span className="label">Loại đơn đặt:</span>
                 <button
+                  type="button"
                   className={`btn-order type ${loaiPhieuDat == 0 ? "active" : "choose"}`}
                   onClick={() => {
                     setLoaiPhieuDat(0);
@@ -353,6 +354,7 @@ function AddOrderAdmin() {
                   Đơn đặt bàn
                 </button>
                 <button
+                  type="button"
                   className={`btn-order type ${loaiPhieuDat == 1 ? "active" : "choose"}`}
                   onClick={() => {
                     setLoaiPhieuDat(1);
@@ -361,6 +363,7 @@ function AddOrderAdmin() {
                   Đơn đặt phòng thường
                 </button>
                 <button
+                  type="button"
                   className={`btn-order type ${loaiPhieuDat == 2 ? "active" : "choose"}`}
                   onClick={() => {
                     setLoaiPhieuDat(2);
@@ -585,6 +588,7 @@ function AddOrderAdmin() {
               )}
               <div className="btn-item">
                 <button
+                  type="button"
                   className="btn-order info"
                   onClick={() => {
                     setIsModalAddMenu(true);
