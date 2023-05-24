@@ -14,8 +14,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     fontSize: "13px",
-    // columnGap: "20px",
     justifyContent: "space-between",
+  },
+  title: {
+    alignItems: "center",
+    fontSize: "35px",
   },
   viewFlexTitle: {
     flexDirection: "row",
@@ -68,7 +71,6 @@ const PDFDeposit = ({ orderDetail }) => {
     }
     return sum;
   };
-
   useEffect(() => {
     const loadInfor = async () => {
       try {
@@ -83,6 +85,8 @@ const PDFDeposit = ({ orderDetail }) => {
     };
     loadInfor();
   }, []);
+
+  console.log(orderDetail);
 
   const totalDishPrice = (dishes) => {
     let sum = 0;
@@ -106,24 +110,67 @@ const PDFDeposit = ({ orderDetail }) => {
           </View>
         </View>
         <View style={styles.normalText}>
-          <Text>Thoi gian xuat: {convertInterDate(new Date())}</Text>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>thong tin lien he</Text>
+            <Text>Thoi gian xuat: {convertInterDate(new Date())}</Text>
+          </View>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>so dien thoai: 0906778443 </Text>
+            <Text>
+              Thoi gian bat dau:{" "}
+              {convertInterDate(new Date(orderDetail?.MaPhieuDat?.ThoiGianBatDau))}
+            </Text>
+          </View>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>email: evergreengarden@gmail.com</Text>
+            <Text>
+              Ten khach hang:{" "}
+              {orderDetail?.MaPhieuDat?.HoTen &&
+                removeVietnameseTones(orderDetail?.MaPhieuDat?.HoTen)}
+            </Text>
+          </View>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>website: evergreengarden.com</Text>
+            <Text>So Dien Thoai: {orderDetail?.MaPhieuDat?.SoDienThoai}</Text>
+          </View>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>
+              Ten nhan vien:{" "}
+              {orderDetail?.MaPhieuDat.MaNhanVien.TenNhanVien &&
+                removeVietnameseTones(orderDetail?.MaPhieuDat.MaNhanVien.TenNhanVien)}
+            </Text>
+            <Text>
+              Hinh thuc dat:{" "}
+              {orderDetail?.LoaiPhieuDat === 0
+                ? "Dat ban"
+                : orderDetail?.LoaiPhieuDat === 1
+                ? "Dat phong thuong"
+                : " Dat phong VIP"}
+            </Text>
+          </View>
         </View>
-        <View style={styles.normalText}>
+        <View style={styles.title}>
+          <Text>PHIEU XAC NHAN DAT COC</Text>
+        </View>
+        {/* <View style={styles.normalText}>
+          <Text>Thoi gian xuat: {convertInterDate(new Date())}</Text>
+        </View> */}
+        {/* <View style={styles.normalText}>
           <Text>
             Thoi gian bat dau: {convertInterDate(new Date(orderDetail?.MaPhieuDat?.ThoiGianBatDau))}
           </Text>
-        </View>
-        <View style={styles.normalText}>
+        </View> */}
+        {/* <View style={styles.normalText}>
           <Text>
             Ten khach hang:{" "}
             {orderDetail?.MaPhieuDat?.HoTen &&
               removeVietnameseTones(orderDetail?.MaPhieuDat?.HoTen)}
           </Text>
-        </View>
-        <View style={styles.normalText}>
+        </View> */}
+        {/* <View style={styles.normalText}>
           <Text>So Dien Thoai: {orderDetail?.MaPhieuDat?.SoDienThoai}</Text>
-        </View>
-        <View style={styles.normalText}>
+        </View> */}
+        {/* <View style={styles.normalText}>
           <Text>
             Hinh thuc dat:{" "}
             {orderDetail?.LoaiPhieuDat === 0
@@ -132,7 +179,7 @@ const PDFDeposit = ({ orderDetail }) => {
               ? "Dat phong thuong"
               : " Dat phong VIP"}
           </Text>
-        </View>
+        </View> */}
         <View style={styles.viewFlexTitle}>
           <Text style={styles.columnDishLong}>Ten Mon</Text>
           <Text style={styles.columnDish}> So Luong</Text>

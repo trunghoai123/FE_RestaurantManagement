@@ -85,7 +85,6 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
     };
     loadInfor();
   }, []);
-
   return (
     <Document>
       <Page style={styles.body}>
@@ -97,36 +96,40 @@ const PDFFile = ({ invoice, dishPrice, wasPay }) => {
             <Text style={styles.topResName}>Evergreen Garden</Text>
           </View>
         </View>
-        <View style={styles.viewFlex}>
-          <View>thong tin lien he</View>
-          <View>so dien thoai: 0906778443 </View>
-          <View>email: evergreengarden@gmail.com</View>
+        <View style={styles.normalText}>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>thong tin lien he</Text>
+            <Text>Thoi gian xuat: {convertInterDate(new Date())}</Text>
+          </View>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>so dien thoai: 0906778443 </Text>
+            <Text>Thoi gian bat dau: {convertInterDate(new Date(invoice?.ThoiGianBatDau))}</Text>
+          </View>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>email: evergreengarden@gmail.com</Text>
+            <Text>
+              Hinh thuc dat:{" "}
+              {invoice?.LoaiHoaDon === 0
+                ? "Dat ban"
+                : invoice?.LoaiHoaDon === 1
+                ? "Dat phong thuong"
+                : " Dat phong VIP"}
+            </Text>
+          </View>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>website: evergreengarden.com</Text>
+            <Text>Ten khach hang: {invoice?.HoTen && removeVietnameseTones(invoice?.HoTen)}</Text>
+          </View>
+          <View style={styles.viewFlex}>
+            <Text style={styles.normalText}>
+              Ten nhan vien: {staff?.TenNhanVien && removeVietnameseTones(staff?.TenNhanVien)}
+            </Text>
+          </View>
         </View>
         <View style={styles.title}>
           <Text>HOA DON</Text>
         </View>
-        <View style={styles.normalText}>
-          <Text>Thoi gian xuat: {convertInterDate(new Date())}</Text>
-        </View>
-        <View style={styles.normalText}>
-          <Text>Thoi gian bat dau: {convertInterDate(new Date(invoice?.ThoiGianBatDau))}</Text>
-        </View>
-        <View style={styles.normalText}>
-          <Text>Ten nhan vien: {invoice?.HoTen && removeVietnameseTones(invoice?.HoTen)}</Text>
-        </View>
-        <View style={styles.normalText}>
-          <Text>
-            Hinh thuc dat:{" "}
-            {invoice?.LoaiHoaDon === 0
-              ? "Dat ban"
-              : invoice?.LoaiHoaDon === 1
-              ? "Dat phong thuong"
-              : " Dat phong VIP"}
-          </Text>
-        </View>
-        <View style={styles.normalText}>
-          <Text>Ten khach hang: {invoice?.HoTen && removeVietnameseTones(invoice?.HoTen)}</Text>
-        </View>
+        <View style={styles.normalText}></View>
         <View style={styles.viewFlexTitle}>
           <Text style={styles.columnDishLong}>Ten Mon</Text>
           <Text style={styles.columnDish}> So Luong</Text>
