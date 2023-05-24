@@ -148,9 +148,13 @@ const InvoiceSearch = (props) => {
   useEffect(() => {
     fetchInvoices();
   }, [mode]);
+
   const handleViewDetail = (id) => {
     navigate(`/admin/invoice/${id}`);
   };
+
+  console.log(invoices);
+
   const fetchInvoices = async () => {
     try {
       let result;
@@ -177,10 +181,11 @@ const InvoiceSearch = (props) => {
         result = await getInvoiceByAll(data);
       } else {
         const data = {
-          // MaPhieuDat: getValues("orderId").trim(),
+          MaPhieuDat: getValues("clientId").trim(),
           MaHoaDon: getValues("orderId").trim(),
           MaNhanVien: getValues("staffId").trim(),
-          MaKhachHang: getValues("clientId").trim(),
+          // MaPhieuDat: getValues("orderId").trim(),
+          // MaKhachHang: getValues("clientId").trim(),
           HoTen: getValues("fullname").trim(),
           SoDienThoai: getValues("phone").trim(),
           LoaiHoaDon:
@@ -276,7 +281,7 @@ const InvoiceSearch = (props) => {
             </div>
             <div className="filter__value">
               <div className="value__content">
-                <label className="filter__value__label">Mã khách hàng</label>
+                <label className="filter__value__label">Mã phiếu đặt</label>
                 <Input
                   className="filter__value__input"
                   name="fullname"
