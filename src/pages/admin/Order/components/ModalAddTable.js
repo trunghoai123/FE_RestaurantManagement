@@ -267,6 +267,8 @@ const ModalStyle = styled.div`
         }
         .btn-group{
             float: right;
+            width: auto;
+
         }
         .clear{
             clear: both;

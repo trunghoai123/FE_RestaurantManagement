@@ -323,7 +323,9 @@ const ModalStyle = styled.div`
             text-align : right;
         }
         .btn-group{
-            justify-content: flex-end
+            float: right;
+            width: auto;
+
     
             
         }
