@@ -312,7 +312,7 @@ function AddOrderAdmin() {
                                     <span className="label">
                                         Thời gian đặt: 
                                     </span>
-                                    <input type="date" className="time-format date" onChange={(e)=>{
+                                    <input type="date" placeholder="dd-mm-yyyy" className="time-format date" onChange={(e)=>{
                                             let date = new Date(e.target.value)
                                             date.setHours(hours)
                                             date.setMinutes(minutes)
@@ -713,7 +713,7 @@ const OrderAdminStyle = styled.div`
     }
     .btn-group{
         float: right;
-
+        width: auto;
         
     }
     .btn-order{

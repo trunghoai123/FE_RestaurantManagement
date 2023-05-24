@@ -186,6 +186,14 @@ const DropDown = styled.div`
       transition: 0.2s ease-in;
       overflow: hidden;
       width: 100%;
+      height: 300px;
+      overflow-y: auto;
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgb(220, 180, 110, 1);
+      }
 
       .item {
         position: relative;
@@ -246,6 +254,8 @@ const DropDown = styled.div`
         .nav {
           display: none;
           transition: all 0.2s ease-in;
+          
+
           .nav-item {
             height: 36px;
             display: flex;

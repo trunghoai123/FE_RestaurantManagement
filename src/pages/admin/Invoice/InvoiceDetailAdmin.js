@@ -99,6 +99,7 @@ function InvoiceDetailAdmin(props) {
     }
     return 0;
   };
+ 
 
   const renderButton = () => {
     switch (invoice?.TrangThai) {
@@ -635,6 +636,7 @@ function InvoiceDetailAdmin(props) {
           getInvoice={getInvoice}
         />
       )}
+      
     </InvoiceDetailAdminStyle>
   );
 }
