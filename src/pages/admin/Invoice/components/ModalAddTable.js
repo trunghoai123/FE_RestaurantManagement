@@ -4,7 +4,17 @@ import styled from "styled-components";
 import { updateInvoice , getTableMatchTimeAndSeat, updateManyTable } from "utils/api";
 import { enqueueSnackbar } from "notistack";
 
+const convertDate = (time) => {
+    const dateString = time;
+    const date = new Date(dateString);
 
+    const day = String(date.getDate()).padStart(2, '0'); // Lấy ngày và thêm số 0 nếu cần
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Lấy tháng và thêm số 0 nếu cần
+    const year = date.getFullYear(); // Lấy năm
+
+
+    return `${year}-${month}-${day}`;
+}
 function ModalAddTable({setIsModalAddTable, loaiHoaDon , setLoading,
     soNguoi , thoiGianBatDau , listBan , setListBan , isSave, invoiceId ,getInvoice}) {
     const [data, setData] = useState([])
@@ -20,7 +30,7 @@ function ModalAddTable({setIsModalAddTable, loaiHoaDon , setLoading,
 
     const getData = async ()=>{
         setLoading(true)
-        let result = await getTableMatchTimeAndSeat({ SoNguoi : soNguoi , ThoiGianBatDau : thoiGianBatDau , LoaiPhieuDat : loaiHoaDon })
+        let result = await getTableMatchTimeAndSeat({ SoNguoi : soNguoi , ThoiGianBatDau : convertDate(thoiGianBatDau) , LoaiPhieuDat : loaiHoaDon })
         if(result && result.data){
             setLoading(false)
             setData(result.data)
@@ -87,13 +97,18 @@ function ModalAddTable({setIsModalAddTable, loaiHoaDon , setLoading,
                     </div>
                     <div className="modal-add-body">
                         <div className="modal-col-70">
-                            <h5>{`Danh sách bàn hợp lệ`}</h5>
+                            <h5>Danh sách bàn</h5>
+                            <div className="box-desc-color">
+                                <span>*đỏ: đặt trước</span>
+                                <span>*vàng: có khách</span>
+                            </div>
                             <ul>
                                 {
                                data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
-                                            <div className={`item ${item.TrangThai == 1 ? "active": ""}`}>
+                                            <div className={`item ${item.TrangThaiDat === true ? "active-order": 
+                                                        item.TrangThai == 1 ? "active": ""}`}>
                                                 <div>
                                                     <span>Mã bàn:</span>{"  "}
                                                     <span>{item.MaBan}</span>
@@ -115,7 +130,7 @@ function ModalAddTable({setIsModalAddTable, loaiHoaDon , setLoading,
                                                     {item.SoThuTuBan}
                                                 </div>
                                                 <div className="btn-group">
-                                                    <button disabled={item.TrangThai === 0 ? "" : "disabled"} className="btn-order handle"
+                                                    <button disabled={item.TrangThai === 1 || item.TrangThaiDat === true ? "disabled" : ""} className="btn-order handle"
                                                     onClick={ async()=>{
                                                         if(!dataUse?.some((itm)=>
                                                             item.MaBan == itm.MaBan
@@ -247,11 +262,23 @@ const ModalStyle = styled.div`
                 margin-right: 10px;
                 height: 100%;
                 overflow-y : auto;
+                position: relative;
+
 
                 ::-webkit-scrollbar {
                     display: none;
                 }
 
+                .box-desc-color{
+                    position: absolute;
+                    right: 0;
+                    top: 0px;
+                    display: flex;
+                    span{
+                        font-size: 12px;
+                        margin-right: 10px;
+                    }
+                }
                 ul{
                     list-style-type: none;
                     padding : 0;
@@ -274,6 +301,9 @@ const ModalStyle = styled.div`
 
                             &.active{
                                 border: 5px solid #dcb46e;
+                            }
+                            &.active-order{
+                                border: 5px solid #f75e5e;
                             }
                         }
                     }

@@ -7,12 +7,23 @@ import { enqueueSnackbar } from "notistack";
 const MaLoaiPhongThuong = 1;
 const MaLoaiPhongVIP = 2;
 
+
+const convertDate = (time) => {
+    const dateString = time;
+    const date = new Date(dateString);
+
+    const day = String(date.getDate()).padStart(2, '0'); // Lấy ngày và thêm số 0 nếu cần
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Lấy tháng và thêm số 0 nếu cần
+    const year = date.getFullYear(); // Lấy năm
+
+
+    return `${year}-${month}-${day}`;
+}
 function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
     soNguoi , thoiGianBatDau , soPhong , listPhong , setListPhong}) {
     const [data, setData] = useState([])
     const [dataUse , setDataUse] =useState([])
     const [maLoaiPhong, setMaLoaiPhong] =useState("")
-
     useEffect(() => {
         getMaLoaiPhong()
         setDataUse(listPhong)
@@ -37,7 +48,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
     }
     const getData = async ()=>{
         setLoading(true)
-        let result = await getRoomMatchTimeAndSeat({ SoNguoi : soNguoi , ThoiGianBatDau : thoiGianBatDau , LoaiPhieuDat : loaiPhieuDat, MaLoaiPhong : maLoaiPhong })
+        let result = await getRoomMatchTimeAndSeat({ SoNguoi : soNguoi , ThoiGianBatDau : convertDate(thoiGianBatDau) , LoaiPhieuDat : loaiPhieuDat, MaLoaiPhong : maLoaiPhong })
         if(result && result.data){
             setLoading(false)
             setData(result.data)
@@ -72,13 +83,17 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                     </div>
                     <div className="modal-add-body">
                         <div className="modal-col-70">
-                            <h5>{`Danh sách phòng hợp lệ`}</h5>
+                            <h5>Danh sách phòng</h5>
+                            <div className="box-desc-color">
+                                <span>*đỏ: đặt trước</span>
+                                <span>*vàng: có khách</span>
+                            </div>
                             <ul>
                                 {
                                 data && data?.map((item, idx)=>{
                                     return (
                                         <li key={idx}>
-                                            <div className="item">
+                                            <div className={`item ${item.TrangThaiDat === true ? "active": ""}`}>
                                             <div>
                                                     <span>Mã phòng:</span>{"  "}
                                                     {item.MaPhong}
@@ -100,7 +115,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                                     {item.MaKhuVuc.TenKhuVuc}
                                                 </div>
                                                 <div className="btn-group">
-                                                    <button className="btn-order handle"
+                                                    <button disabled={item.TrangThaiDat === true ? "disabled" : ""} className="btn-order handle"
                                                     onClick={async()=>{
                                                         if(!dataUse?.some((itm)=>
                                                             item.MaPhong == itm.MaPhong
@@ -152,7 +167,7 @@ function ModalAddRoom({setIsModalAddRoom, loaiPhieuDat , orderId , setLoading,
                                                     {item.MaKhuVuc.TenKhuVuc}
                                                 </div>
                                                 <div className="btn-group">
-                                                    <button className="btn-order cancel"
+                                                    <button disabled={item.TrangThaiDat === false ? "" : "disabled"} className="btn-order cancel"
                                                         onClick={()=>{
                                                             setDataUse(dataUse?.filter((itm)=>
                                                             item.MaPhong != itm.MaPhong
@@ -232,9 +247,22 @@ const ModalStyle = styled.div`
                 margin-right: 10px;
                 height: 100%;
                 overflow-y : auto;
+                position: relative;
+
 
                 ::-webkit-scrollbar {
                     display: none;
+                }
+
+                .box-desc-color{
+                    position: absolute;
+                    right: 0;
+                    top: 0px;
+                    display: flex;
+                    span{
+                        font-size: 12px;
+                        margin-right: 10px;
+                    }
                 }
 
                 ul{
@@ -256,6 +284,10 @@ const ModalStyle = styled.div`
                             background-color: #f3f3f3;
                             border-radius : 5px;
                             padding : 5px;
+
+                            &.active{
+                                border: 5px solid #f75e5e;
+                            }
                         }
                     }
                 }
@@ -322,6 +354,10 @@ const ModalStyle = styled.div`
             margin-left: 10px;
             :hover {
               opacity: 0.8;
+            }
+            :disabled{
+                opacity: 0.2 !important;
+                cursor: no-drop;
             }
     
             &.handle{
